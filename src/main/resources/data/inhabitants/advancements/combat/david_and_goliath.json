@@ -1,0 +1,28 @@
+{
+  "parent": "minecraft:adventure/kill_a_mob",
+  "criteria": {
+    "killed_bogre": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "inhabitants:bogre"
+        }
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "item": "inhabitants:giant_bone"
+    },
+    "title": {
+      "translate": "advancement.inhabitants.david_and_goliath.title"
+    },
+    "description": {
+      "translate": "advancement.inhabitants.david_and_goliath.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  }
+}
