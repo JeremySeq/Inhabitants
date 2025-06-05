@@ -2,6 +2,8 @@ package com.jeremyseq.inhabitants.entities.bogre;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -21,6 +23,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.CauldronBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -52,6 +56,8 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static float ROAR_RANGE = 24f;
     public static float HOSTILE_RANGE = 18f;
 
+    private BlockPos cauldronPos = null;
+
     private static final int ROAR_TICKS = 100; // how long a roar animation lasts (server)
 
     private int roaringTick = 0;
@@ -59,6 +65,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     private final List<Player> warnedPlayers = new ArrayList<>();
 
     // MAKE CHOWDER
+    private boolean pickedUpFish = false; // if the Bogre has picked up the fish item
     private ItemEntity droppedFishItem = null;
     private Player droppedFishPlayer = null; // the player that dropped the fish item
     private static final double CHOWDER_REACH_DISTANCE = 3;
@@ -72,6 +79,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        this.setPersistenceRequired();
     }
 
     public static AttributeSupplier setAttributes() {
@@ -115,16 +123,18 @@ public class BogreEntity extends Monster implements GeoEntity {
         return PlayState.CONTINUE;
     }
 
-//    protected @NotNull PathNavigation createNavigation(Level pLevel) {
-//        GroundPathNavigation groundPathNavigation = new GroundPathNavigation(this, pLevel);
-//        groundPathNavigation.setCanOpenDoors(false);
-//        groundPathNavigation.setCanFloat(false);
-//        groundPathNavigation.setCanPassDoors(true);
-//        return groundPathNavigation;
-//    }
-
     @Override
     public void customServerAiStep() {
+        if (cauldronPos == null || !isValidCauldron(cauldronPos)) {
+            Optional<BlockPos> nearestCauldron = BlockPos.betweenClosedStream(blockPosition().offset(-10, -2, -10), blockPosition().offset(10, 2, 10))
+                    .map(BlockPos::immutable)
+                    .filter(pos -> level().getBlockState(pos).getBlock() instanceof CauldronBlock)
+                    .findFirst();
+
+            nearestCauldron.ifPresent(blockPos -> cauldronPos = blockPos);
+            Inhabitants.LOGGER.debug("Bogre assigned to cauldron at: {}", cauldronPos);
+        }
+
         // if attacked during chowder making
         if (this.getLastHurtByMob() != null) {
             this.state = State.CAUTIOUS;
@@ -157,6 +167,47 @@ public class BogreEntity extends Monster implements GeoEntity {
             return;
         }
 
+        if (pickedUpFish) {
+            if (cauldronPos == null) { // TODO: if the bogre has no cauldron assigned, it will not attempt to make chowder
+                this.state = State.CAUTIOUS;
+                return;
+            }
+            double distance = this.distanceToSqr(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5);
+            distance = Math.sqrt(distance);
+            if (distance > 2.5) {
+                // move to the cauldron if not close enough
+                this.getNavigation().moveTo(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5, 1.0D);
+                return;
+            }
+
+            // close enough to start making chowder
+            this.navigation.stop();
+            Inhabitants.LOGGER.debug("TICKING!");
+            this.lookAt(EntityAnchorArgument.Anchor.FEET, cauldronPos.getCenter());
+            this.lookAt(EntityAnchorArgument.Anchor.EYES, cauldronPos.getCenter());
+            chowderTicks++;
+            if (chowderTicks >= CHOWDER_TIME_TICKS) {
+                Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
+
+                // chowder complete
+                // TODO: add particle effects or something?
+                this.spawnAtLocation(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get())); // spawn the chowder item
+
+                droppedFishPlayer.sendSystemMessage(Component.literal("The Bogre has made chowder from the fish you dropped!"));
+                if (!tamedPlayers.contains(droppedFishPlayer.getUUID())) {
+                    droppedFishPlayer.sendSystemMessage(Component.literal("You have tamed the Bogre!"));
+                }
+                this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
+                tamedPlayers.add(droppedFishPlayer.getUUID()); // add the player that dropped the fish to the tamed list
+                pickedUpFish = false; // reset the picked up fish state
+                droppedFishPlayer = null; // reset the dropped fish player
+                this.state = State.CAUTIOUS;
+                chowderTicks = 0;
+            }
+
+            return;
+        }
+
         if (droppedFishItem == null || !droppedFishItem.isAlive()) {
             this.state = State.CAUTIOUS;
             return;
@@ -164,31 +215,20 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         double distance = this.distanceTo(droppedFishItem);
         if (distance > CHOWDER_REACH_DISTANCE) {
-            boolean path = this.getNavigation().moveTo(droppedFishItem, 1.0D); // approach the fish
+            boolean path = this.getNavigation().moveTo(droppedFishItem.getX(), droppedFishItem.getY(), droppedFishItem.getZ(), 1.0D); // approach the fish
             if (!path) {
                 Inhabitants.LOGGER.debug("Bogre failed to path to fish, distance: {}", distance);
             }
             return;
         }
 
-        // close enough to start making chowder
-        this.getNavigation().stop();
-        Inhabitants.LOGGER.debug("TICKING!");
-        chowderTicks++;
-        if (chowderTicks >= CHOWDER_TIME_TICKS) {
-            Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
-
-            // chowder complete
-            // TODO: add particle effects or something?
-            droppedFishItem.discard(); // remove the fish
-            this.spawnAtLocation(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get())); // spawn the chowder item
-            tamedPlayers.add(droppedFishPlayer.getUUID()); // add the player that dropped the fish to the tamed list
-
-            droppedFishPlayer.sendSystemMessage(Component.literal("The Bogre has made chowder from the fish you dropped! You have tamed the Bogre!"));
-            this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
+        if (!pickedUpFish) {
+            this.getNavigation().stop();
+            droppedFishItem.discard();
+            Inhabitants.LOGGER.debug("Picked up the fish");
+            pickedUpFish = true; // mark that the Bogre has picked up the fish
             droppedFishItem = null; // reset the dropped fish item
-            this.state = State.CAUTIOUS;
-            chowderTicks = 0;
+            return;
         }
     }
 
@@ -317,6 +357,11 @@ public class BogreEntity extends Monster implements GeoEntity {
         return tamedPlayers.contains(player.getUUID());
     }
 
+    private boolean isValidCauldron(BlockPos pos) {
+        BlockState state = level().getBlockState(pos);
+        return state.getBlock() instanceof CauldronBlock;
+    }
+
     @Override
     public float getStepHeight() {
         return 1.5f;
@@ -325,25 +370,39 @@ public class BogreEntity extends Monster implements GeoEntity {
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        ListTag uuidList = new ListTag();
-        for (UUID uuid : tamedPlayers) {
-            uuidList.add(NbtUtils.createUUID(uuid));
+
+        ListTag list = new ListTag();
+        for (UUID id : tamedPlayers) {
+            CompoundTag idTag = new CompoundTag();
+            idTag.putUUID("uuid", id);
+            list.add(idTag);
         }
-        tag.put("TamedPlayers", uuidList);
+        tag.put("tamedPlayers", list);
+
+        if (cauldronPos != null) {
+            tag.put("CauldronPos", NbtUtils.writeBlockPos(cauldronPos));
+        }
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+
         tamedPlayers.clear();
-        if (tag.contains("TamedPlayers", Tag.TAG_LIST)) {
-            ListTag uuidList = tag.getList("TamedPlayers", Tag.TAG_COMPOUND);
-            for (Tag t : uuidList) {
-                tamedPlayers.add(NbtUtils.loadUUID(t));
+
+        if (tag.contains("tamedPlayers", Tag.TAG_LIST)) {
+            ListTag list = tag.getList("tamedPlayers", Tag.TAG_COMPOUND);
+            for (int i = 0; i < list.size(); i++) {
+                CompoundTag idTag = list.getCompound(i);
+                UUID id = idTag.getUUID("uuid");
+                tamedPlayers.add(id);
             }
         }
-    }
 
+        if (tag.contains("CauldronPos")) {
+            cauldronPos = NbtUtils.readBlockPos(tag.getCompound("CauldronPos"));
+        }
+    }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
