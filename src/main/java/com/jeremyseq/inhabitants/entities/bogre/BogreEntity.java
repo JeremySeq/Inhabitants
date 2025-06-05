@@ -1,6 +1,11 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -13,6 +18,7 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -22,8 +28,7 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class BogreEntity extends Monster implements GeoEntity {
@@ -47,8 +52,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static float ROAR_RANGE = 24f;
     public static float HOSTILE_RANGE = 18f;
 
-//    private Player hostilePlayer = null; // the player the Bogre is currently hostile towards
-
     private static final int ROAR_TICKS = 100; // how long a roar animation lasts (server)
 
     private int roaringTick = 0;
@@ -57,10 +60,15 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     // MAKE CHOWDER
     private ItemEntity droppedFishItem = null;
-    private static final double CHOWDER_REACH_DISTANCE = 2.0;
+    private Player droppedFishPlayer = null; // the player that dropped the fish item
+    private static final double CHOWDER_REACH_DISTANCE = 3;
     private static final int CHOWDER_TIME_TICKS = 100;
 
     private int chowderTicks = 0;
+
+    // list of players who have tamed the Bogre
+    private final Set<UUID> tamedPlayers = new HashSet<>();
+
 
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -117,6 +125,19 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     public void customServerAiStep() {
+        // if attacked during chowder making
+        if (this.getLastHurtByMob() != null) {
+            this.state = State.CAUTIOUS;
+            if (this.getLastHurtByMob() instanceof Player player) {
+                // if the attacker is a player, remove them from tamedPlayers
+                if (tamedPlayers.contains(player.getUUID())) {
+                    player.sendSystemMessage(Component.literal("The Bogre does not trust you anymore!"));
+                }
+                tamedPlayers.remove(player.getUUID());
+            }
+            this.setTarget(this.getLastHurtByMob());
+            return;
+        }
         if (this.state == State.CAUTIOUS) {
             cautiousAiStep();
         } else if (this.state == State.MAKE_CHOWDER) {
@@ -143,7 +164,10 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         double distance = this.distanceTo(droppedFishItem);
         if (distance > CHOWDER_REACH_DISTANCE) {
-            this.getNavigation().moveTo(droppedFishItem, 1.0D); // approach the fish
+            boolean path = this.getNavigation().moveTo(droppedFishItem, 1.0D); // approach the fish
+            if (!path) {
+                Inhabitants.LOGGER.debug("Bogre failed to path to fish, distance: {}", distance);
+            }
             return;
         }
 
@@ -155,10 +179,14 @@ public class BogreEntity extends Monster implements GeoEntity {
             Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
 
             // chowder complete
-            this.level().broadcastEntityEvent(this, (byte) 14); // trigger particles (optional)
+            // TODO: add particle effects or something?
             droppedFishItem.discard(); // remove the fish
-            droppedFishItem = null; // reset the dropped fish item
+            this.spawnAtLocation(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get())); // spawn the chowder item
+            tamedPlayers.add(droppedFishPlayer.getUUID()); // add the player that dropped the fish to the tamed list
+
+            droppedFishPlayer.sendSystemMessage(Component.literal("The Bogre has made chowder from the fish you dropped! You have tamed the Bogre!"));
             this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
+            droppedFishItem = null; // reset the dropped fish item
             this.state = State.CAUTIOUS;
             chowderTicks = 0;
         }
@@ -178,7 +206,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             // sort players by distance to the Bogre, closest to farthest
             withinHostileRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
             for (Player player : withinHostileRange) {
-                if (player.distanceTo(this) <= HOSTILE_RANGE && this.hasLineOfSight(player)
+                if (!this.isTamedBy(player) && player.distanceTo(this) <= HOSTILE_RANGE && this.hasLineOfSight(player)
                         && !player.isCreative() && !player.isSpectator()) {
                     this.setTarget(player);
                     break;
@@ -194,7 +222,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             // sort players by distance to the Bogre, closest to farthest
             withinRoarRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
             for (Player player : withinRoarRange) {
-                if (!warnedPlayers.contains(player) && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)) {
+                if (!this.isTamedBy(player) && !warnedPlayers.contains(player) && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)) {
                     // face player and start roaring
                     roaredPlayer = player;
                     this.lookControl.setLookAt(roaredPlayer);
@@ -242,27 +270,29 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         for (Player player : possibleFishDroppers) {
             float distance = player.distanceTo(this);
-            if (distance > HOSTILE_RANGE && distance <= FORGET_RANGE) {
+            if (distance <= FORGET_RANGE) {
+                if (distance > HOSTILE_RANGE || this.isTamedBy(player)) {
+                    // get nearby item entities (fish on ground)
+                    List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class,
+                            player.getBoundingBox().inflate(4), // check small radius around player
+                            item -> item.isAlive() &&
+                                    (item.getItem().is(Items.COD)
+                                            || item.getItem().is(Items.SALMON)
+                                            || item.getItem().is(Items.TROPICAL_FISH)
+                                            || item.getItem().is(Items.PUFFERFISH)
+                                    ) // TODO: any fish item, use a tag or something
+                    );
 
-                // get nearby item entities (fish on ground)
-                List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class,
-                        player.getBoundingBox().inflate(4), // check small radius around player
-                        item -> item.isAlive() &&
-                                (item.getItem().is(Items.COD)
-                                        || item.getItem().is(Items.SALMON)
-                                        || item.getItem().is(Items.TROPICAL_FISH)
-                                        || item.getItem().is(Items.PUFFERFISH)
-                                ) // TODO: any fish item, use a tag or something
-                );
+                    for (ItemEntity fishItem : nearbyItems) {
+                        if (this.hasLineOfSight(fishItem)) {
+                            player.sendSystemMessage(Component.literal("The Bogre notices the fish you dropped..."));
 
-                for (ItemEntity fishItem : nearbyItems) {
-                    if (this.hasLineOfSight(fishItem)) {
-                        player.sendSystemMessage(Component.literal("The Bogre notices the fish you dropped..."));
-
-                        fishItem.setExtendedLifetime();
-                        droppedFishItem = fishItem;
-                        this.state = State.MAKE_CHOWDER; // change state to make chowder
-                        break; // only trigger once per tick per player
+                            fishItem.setExtendedLifetime();
+                            droppedFishItem = fishItem;
+                            droppedFishPlayer = player; // store the player that dropped the fish
+                            this.state = State.MAKE_CHOWDER; // change state to make chowder
+                            break; // only trigger once per tick per player
+                        }
                     }
                 }
             }
@@ -282,6 +312,38 @@ public class BogreEntity extends Monster implements GeoEntity {
         super.defineSynchedData();
         entityData.define(ROAR_ANIM, false);
     }
+
+    public boolean isTamedBy(Player player) {
+        return tamedPlayers.contains(player.getUUID());
+    }
+
+    @Override
+    public float getStepHeight() {
+        return 1.5f;
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        ListTag uuidList = new ListTag();
+        for (UUID uuid : tamedPlayers) {
+            uuidList.add(NbtUtils.createUUID(uuid));
+        }
+        tag.put("TamedPlayers", uuidList);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        tamedPlayers.clear();
+        if (tag.contains("TamedPlayers", Tag.TAG_LIST)) {
+            ListTag uuidList = tag.getList("TamedPlayers", Tag.TAG_COMPOUND);
+            for (Tag t : uuidList) {
+                tamedPlayers.add(NbtUtils.loadUUID(t));
+            }
+        }
+    }
+
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
