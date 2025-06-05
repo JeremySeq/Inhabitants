@@ -1,7 +1,9 @@
 package com.jeremyseq.inhabitants;
 
+import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.potions.ModPotions;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,6 +28,8 @@ public class Inhabitants
         IEventBus modEventBus = context.getModEventBus();
 
         ModItems.register(modEventBus);
+        ModEffects.register(modEventBus);
+        ModPotions.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
 
