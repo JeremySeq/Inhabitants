@@ -1,19 +1,25 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
 import java.util.ArrayList;
@@ -23,16 +29,38 @@ import java.util.function.Predicate;
 public class BogreEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
+    public enum State {
+        CAUTIOUS,
+        MAKE_CHOWDER,
+        MAKE_BONE
+    }
+
+    public State state = State.CAUTIOUS;
+
+    /**
+     * On client side, this is used to start the roar animation and is set to false immediately after starting.
+     * On server side, this is used to determine if the Bogre is currently roaring and is set to false after ROAR_TICKS
+     */
+    public static final EntityDataAccessor<Boolean> ROAR_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+
     public static float FORGET_RANGE = 35f;
     public static float ROAR_RANGE = 24f;
     public static float HOSTILE_RANGE = 18f;
 
-    private Player hostilePlayer = null; // the player the Bogre is currently hostile towards
+//    private Player hostilePlayer = null; // the player the Bogre is currently hostile towards
 
     private static final int ROAR_TICKS = 100; // how long a roar animation lasts (server)
-    private boolean roaring = false;
+
     private int roaringTick = 0;
+    private Player roaredPlayer = null; // the player that the Bogre is currently roaring at
     private final List<Player> warnedPlayers = new ArrayList<>();
+
+    // MAKE CHOWDER
+    private ItemEntity droppedFishItem = null;
+    private static final double CHOWDER_REACH_DISTANCE = 2.0;
+    private static final int CHOWDER_TIME_TICKS = 100;
+
+    private int chowderTicks = 0;
 
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -45,7 +73,14 @@ public class BogreEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0F)
-                .add(Attributes.MOVEMENT_SPEED, .3f).build();
+                .add(Attributes.MOVEMENT_SPEED, .25f).build();
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, true));
+//        this.goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> true));
+        this.goalSelector.addGoal(7, new ConditionalStrollGoal(this, 1.0D));
     }
 
     @Override
@@ -53,21 +88,106 @@ public class BogreEntity extends Monster implements GeoEntity {
         controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
-    private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> tAnimationState) {
+    private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
+        if (isRoaring()) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("roar", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                setRoaring(false);
+                animationState.getController().forceAnimationReset();
+            }
+            return PlayState.CONTINUE;
+        }
+
+        if (animationState.isMoving()) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
+        } else {
+            animationState.getController().setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.LOOP));
+        }
+
         return PlayState.CONTINUE;
     }
 
+//    protected @NotNull PathNavigation createNavigation(Level pLevel) {
+//        GroundPathNavigation groundPathNavigation = new GroundPathNavigation(this, pLevel);
+//        groundPathNavigation.setCanOpenDoors(false);
+//        groundPathNavigation.setCanFloat(false);
+//        groundPathNavigation.setCanPassDoors(true);
+//        return groundPathNavigation;
+//    }
+
     @Override
     public void customServerAiStep() {
+        if (this.state == State.CAUTIOUS) {
+            cautiousAiStep();
+        } else if (this.state == State.MAKE_CHOWDER) {
+            makeChowderAiStep();
+        }
+    }
 
-        if (hostilePlayer != null) {
-            // TODO: attack the hostile player, if they leave FORGET_RANGE, forget them
+    /**
+     * The Bogre attempts to make chowder from a fish dropped by a player.
+     * The fish should be droppedFishItem.
+     */
+    private void makeChowderAiStep() {
+        // if attacked during chowder making
+        if (this.getLastHurtByMob() != null) {
+            this.state = State.CAUTIOUS;
+            this.setTarget(this.getLastHurtByMob());
+            return;
         }
 
-        // TODO: search for players within HOSTILE_RANGE, if found, set hostilePlayer to that player
+        if (droppedFishItem == null || !droppedFishItem.isAlive()) {
+            this.state = State.CAUTIOUS;
+            return;
+        }
+
+        double distance = this.distanceTo(droppedFishItem);
+        if (distance > CHOWDER_REACH_DISTANCE) {
+            this.getNavigation().moveTo(droppedFishItem, 1.0D); // approach the fish
+            return;
+        }
+
+        // close enough to start making chowder
+        this.getNavigation().stop();
+        Inhabitants.LOGGER.debug("TICKING!");
+        chowderTicks++;
+        if (chowderTicks >= CHOWDER_TIME_TICKS) {
+            Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
+
+            // chowder complete
+            this.level().broadcastEntityEvent(this, (byte) 14); // trigger particles (optional)
+            droppedFishItem.discard(); // remove the fish
+            droppedFishItem = null; // reset the dropped fish item
+            this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
+            this.state = State.CAUTIOUS;
+            chowderTicks = 0;
+        }
+    }
+
+    private void cautiousAiStep() {
+        if (this.getTarget() != null) {
+            if (this.distanceTo(this.getTarget()) > FORGET_RANGE) {
+                this.setTarget(null);
+            }
+        }
+
+        if (this.getTarget() == null) {
+            List<Player> withinHostileRange = this.level().getEntitiesOfClass(Player.class,
+                    getBoundingBox().inflate(HOSTILE_RANGE), Predicate.not(Player::isSpectator));
+
+            // sort players by distance to the Bogre, closest to farthest
+            withinHostileRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
+            for (Player player : withinHostileRange) {
+                if (player.distanceTo(this) <= HOSTILE_RANGE && this.hasLineOfSight(player)
+                        && !player.isCreative() && !player.isSpectator()) {
+                    this.setTarget(player);
+                    break;
+                }
+            }
+        }
 
         // search for players within ROAR_RANGE
-        if (!roaring) {
+        if (!isRoaring()) {
             List<Player> withinRoarRange = this.level().getEntitiesOfClass(Player.class,
                     getBoundingBox().inflate(ROAR_RANGE), Predicate.not(Player::isSpectator));
 
@@ -75,22 +195,92 @@ public class BogreEntity extends Monster implements GeoEntity {
             withinRoarRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
             for (Player player : withinRoarRange) {
                 if (!warnedPlayers.contains(player) && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)) {
+                    // face player and start roaring
+                    roaredPlayer = player;
+                    this.lookControl.setLookAt(roaredPlayer);
                     player.sendSystemMessage(Component.literal("The Bogre roars at you!"));
-                    roaring = true; // TODO: set roaring to false on server after some ticks
+                    setRoaring(true);
                     warnedPlayers.add(player);
                     break;
                 }
             }
         } else {
+            this.lookControl.setLookAt(roaredPlayer);
             roaringTick++;
             if (roaringTick >= ROAR_TICKS) {
-                roaring = false;
+                setRoaring(false);
+                roaredPlayer = null; // reset the roared player
                 roaringTick = 0;
             }
         }
 
         // prune warnedPlayers list
         warnedPlayers.removeIf(player -> player.distanceTo(this) > FORGET_RANGE);
+
+
+        // if roaring, keep looking at the roared player
+        if (isRoaring() && roaredPlayer != null) {
+            this.lookControl.setLookAt(roaredPlayer, 30.0F, 30.0F);
+        } else {
+            // otherwise look at the nearest player within FORGET_RANGE
+            List<Player> nearbyPlayers = this.level().getEntitiesOfClass(Player.class,
+                    getBoundingBox().inflate(FORGET_RANGE), Predicate.not(Player::isSpectator));
+
+            if (!nearbyPlayers.isEmpty()) {
+                nearbyPlayers.sort((a, b) -> Float.compare(a.distanceTo(this), b.distanceTo(this)));
+                Player nearest = nearbyPlayers.get(0);
+
+                if (this.hasLineOfSight(nearest)) {
+                    this.lookControl.setLookAt(nearest, 30.0F, 30.0F);
+                }
+            }
+        }
+
+        // detect fish dropped by non-hostile players
+        List<Player> possibleFishDroppers = this.level().getEntitiesOfClass(Player.class,
+                getBoundingBox().inflate(FORGET_RANGE), Predicate.not(Player::isSpectator));
+
+        for (Player player : possibleFishDroppers) {
+            float distance = player.distanceTo(this);
+            if (distance > HOSTILE_RANGE && distance <= FORGET_RANGE) {
+
+                // get nearby item entities (fish on ground)
+                List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class,
+                        player.getBoundingBox().inflate(4), // check small radius around player
+                        item -> item.isAlive() &&
+                                (item.getItem().is(Items.COD)
+                                        || item.getItem().is(Items.SALMON)
+                                        || item.getItem().is(Items.TROPICAL_FISH)
+                                        || item.getItem().is(Items.PUFFERFISH)
+                                ) // TODO: any fish item, use a tag or something
+                );
+
+                for (ItemEntity fishItem : nearbyItems) {
+                    if (this.hasLineOfSight(fishItem)) {
+                        player.sendSystemMessage(Component.literal("The Bogre notices the fish you dropped..."));
+
+                        fishItem.setExtendedLifetime();
+                        droppedFishItem = fishItem;
+                        this.state = State.MAKE_CHOWDER; // change state to make chowder
+                        break; // only trigger once per tick per player
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean isRoaring() {
+        return entityData.get(ROAR_ANIM);
+    }
+
+    private void setRoaring(boolean roaring) {
+        entityData.set(ROAR_ANIM, roaring);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(ROAR_ANIM, false);
     }
 
     @Override
