@@ -12,11 +12,11 @@ public class ConditionalStrollGoal extends WaterAvoidingRandomStrollGoal {
 
     @Override
     public boolean canUse() {
-        return bogre.state != BogreEntity.State.MAKE_CHOWDER && !bogre.isRoaring() && super.canUse();
+        return bogre.getTarget() == null && bogre.state != BogreEntity.State.MAKE_CHOWDER && !bogre.isRoaring() && super.canUse();
     }
 
     @Override
     public boolean canContinueToUse() {
-        return bogre.state != BogreEntity.State.MAKE_CHOWDER && !bogre.isRoaring() && super.canContinueToUse();
+        return bogre.getTarget() == null && bogre.state != BogreEntity.State.MAKE_CHOWDER && !bogre.isRoaring() && super.canContinueToUse();
     }
 }

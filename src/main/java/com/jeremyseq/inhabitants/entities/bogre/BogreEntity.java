@@ -15,9 +15,9 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -52,6 +52,7 @@ public class BogreEntity extends Monster implements GeoEntity {
      * On server side, this is used to determine if the Bogre is currently roaring and is set to false after ROAR_TICKS
      */
     public static final EntityDataAccessor<Boolean> ROAR_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> ATTACK_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static float FORGET_RANGE = 35f;
     public static float ROAR_RANGE = 24f;
@@ -78,6 +79,17 @@ public class BogreEntity extends Monster implements GeoEntity {
     private final Set<UUID> tamedPlayers = new HashSet<>();
 
 
+    // ATTACK
+    private int attackCooldown = 0;
+    private int attackWindup = -1;
+    private int attackPostDelay = -1; // counts down after damage, finishing attack animation
+
+    private static final int ATTACK_COOLDOWN_TICKS = 60; // time between attacks
+    private static final int ATTACK_OFFSET = 25; // windup time before damage
+
+
+    private boolean randomChance = false; // used to trigger a rare idle animation
+
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.setPersistenceRequired();
@@ -95,7 +107,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, true));
+//        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, true));
 //        this.goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> true));
         this.goalSelector.addGoal(7, new ConditionalStrollGoal(this, 1.0D));
     }
@@ -115,10 +127,33 @@ public class BogreEntity extends Monster implements GeoEntity {
             return PlayState.CONTINUE;
         }
 
+        if (entityData.get(ATTACK_ANIM)) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                entityData.set(ATTACK_ANIM, false);
+                animationState.getController().forceAnimationReset();
+            }
+            return PlayState.CONTINUE;
+        }
+
         if (animationState.isMoving()) {
             animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
         } else {
-            animationState.getController().setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.LOOP));
+            if (randomChance) {
+                animationState.getController().setAnimation(RawAnimation.begin().then("idle_rare", Animation.LoopType.PLAY_ONCE));
+                if (animationState.getController().hasAnimationFinished()) {
+                    animationState.getController().forceAnimationReset();
+                    randomChance = false;
+                    animationState.getController().forceAnimationReset();
+                }
+                return PlayState.CONTINUE;
+            }
+
+            animationState.getController().setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                animationState.getController().forceAnimationReset();
+                randomChance = new Random().nextFloat() < 0.1f; // chance to trigger a rare idle animation
+            }
         }
 
         return PlayState.CONTINUE;
@@ -136,25 +171,106 @@ public class BogreEntity extends Monster implements GeoEntity {
             Inhabitants.LOGGER.debug("Bogre assigned to cauldron at: {}", cauldronPos);
         }
 
-        // if attacked during chowder making
-        if (this.getLastHurtByMob() != null) {
-            this.state = State.CAUTIOUS;
-            if (this.getLastHurtByMob() instanceof Player player) {
-                // if the attacker is a player, remove them from tamedPlayers
-                if (tamedPlayers.contains(player.getUUID())) {
-                    player.sendSystemMessage(Component.literal("The Bogre does not trust you anymore!"));
-                }
-                tamedPlayers.remove(player.getUUID());
+        if (this.getTarget() != null) {
+            if (this.distanceTo(this.getTarget()) > FORGET_RANGE || !this.getTarget().isAlive() || this.getTarget().isDeadOrDying()) {
+                this.setTarget(null);
             }
-            this.setTarget(this.getLastHurtByMob());
+        }
+
+        // attack target
+        if (attackCooldown > 0 || attackWindup > 0 || this.getTarget() != null) {
+            attackPlayerAiStep();
             return;
         }
+
         if (this.state == State.CAUTIOUS) {
             cautiousAiStep();
         } else if (this.state == State.MAKE_CHOWDER) {
             makeChowderAiStep();
         }
     }
+
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        // if attacked by a player, switch to cautious state and set the player as target
+        this.state = State.CAUTIOUS;
+        if (pSource.getEntity() instanceof Player player && player.isAlive()) {
+            // if the attacker is a player, remove them from tamedPlayers
+            if (tamedPlayers.contains(player.getUUID())) {
+                player.sendSystemMessage(Component.literal("The Bogre does not trust you anymore!"));
+            }
+            tamedPlayers.remove(player.getUUID());
+            this.setTarget(player);
+        }
+        return super.hurt(pSource, pAmount);
+    }
+
+    /**
+     * Attacks the target.
+     */
+    private void attackPlayerAiStep() {
+        LivingEntity target = this.getTarget();
+
+        // Cancel target if it's invalid
+        if (target != null && (!target.isAlive() || target.isDeadOrDying())) {
+            this.setTarget(null);
+            target = null;
+        }
+
+        // Tick down cooldown
+        if (attackCooldown > 0) {
+            attackCooldown--;
+        }
+
+        // Handle post-delay (animation finish) even if no target
+        if (attackPostDelay > 0) {
+            attackPostDelay--;
+            if (attackPostDelay == 0) {
+                entityData.set(ATTACK_ANIM, false);
+            }
+            return; // Still finishing the animation
+        }
+
+        // Handle windup — but only if a valid target is still around
+        if (attackWindup > 0) {
+            attackWindup--;
+            if (attackWindup == 0) {
+                if (target != null) {
+                    double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
+                    double distanceSq = this.distanceToSqr(target);
+                    if (distanceSq <= attackReach * attackReach) {
+                        this.doHurtTarget(target);
+                        this.playSound(SoundEvents.PLAYER_ATTACK_STRONG, 1.0f, 1.0f);
+                    }
+                }
+                attackPostDelay = 15; // Let animation finish
+                attackCooldown = ATTACK_COOLDOWN_TICKS;
+                attackWindup = -1;
+            }
+            return;
+        }
+
+        // If no target, we're done for this tick
+        if (target == null) {
+            return;
+        }
+
+        double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
+        double distanceSq = this.distanceToSqr(target);
+
+        // If close enough and off cooldown, start windup
+        if (distanceSq <= attackReach * attackReach && attackCooldown <= 0 && attackWindup < 0) {
+            attackWindup = ATTACK_OFFSET;
+            entityData.set(ATTACK_ANIM, false); // reset to allow retrigger
+            entityData.set(ATTACK_ANIM, true);
+            return;
+        }
+
+        // Default behavior: approach the target
+        this.getNavigation().moveTo(target, 1.2);
+    }
+
+
 
     /**
      * The Bogre attempts to make chowder from a fish dropped by a player.
@@ -359,6 +475,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(ROAR_ANIM, false);
+        entityData.define(ATTACK_ANIM, false);
     }
 
     public boolean isTamedBy(Player player) {
