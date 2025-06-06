@@ -14,7 +14,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -217,7 +216,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         double distance = this.distanceTo(droppedFishItem);
         if (distance > CHOWDER_REACH_DISTANCE) {
-            boolean path = this.getNavigation().moveTo(droppedFishItem.getX(), droppedFishItem.getY(), droppedFishItem.getZ(), 1.0D); // approach the fish
+            boolean path = this.getNavigation().moveTo(droppedFishItem.getX(), droppedFishItem.getY() + .5, droppedFishItem.getZ(), 1.0D); // approach the fish
             if (!path) {
                 Inhabitants.LOGGER.debug("Bogre failed to path to fish, distance: {}", distance);
             }
@@ -226,8 +225,15 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         if (!pickedUpFish) {
             this.getNavigation().stop();
-            droppedFishItem.discard();
-            Inhabitants.LOGGER.debug("Picked up the fish");
+            ItemStack fishStack = droppedFishItem.getItem();
+
+            if (fishStack.getCount() > 1) {
+                fishStack.shrink(1); // remove only one fish
+            } else {
+                droppedFishItem.discard(); // discard the item if it was the last fish
+            }
+
+            Inhabitants.LOGGER.debug("Picked up one fish");
             pickedUpFish = true; // mark that the Bogre has picked up the fish
             droppedFishItem = null; // reset the dropped fish item
             return;
