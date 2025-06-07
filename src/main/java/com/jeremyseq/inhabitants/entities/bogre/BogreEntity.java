@@ -24,8 +24,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -33,6 +36,7 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -42,7 +46,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public enum State {
         CAUTIOUS,
         MAKE_CHOWDER,
-        MAKE_BONE
+        CARVE_BONE
     }
 
     public State state = State.CAUTIOUS;
@@ -65,6 +69,11 @@ public class BogreEntity extends Monster implements GeoEntity {
     private int roaringTick = 0;
     private Player roaredPlayer = null; // the player that the Bogre is currently roaring at
     private final List<Player> warnedPlayers = new ArrayList<>();
+
+    // CARVE_BONE
+    private static final int BONE_CARVE_TIME_TICKS = 100; // time it takes to carve a bone
+    private int boneCarveTicks = 0; // counts down while carving a bone
+    private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
 
     // MAKE CHOWDER
     private boolean pickedUpFish = false; // if the Bogre has picked up the fish item
@@ -187,6 +196,8 @@ public class BogreEntity extends Monster implements GeoEntity {
             cautiousAiStep();
         } else if (this.state == State.MAKE_CHOWDER) {
             makeChowderAiStep();
+        } else if (this.state == State.CARVE_BONE) {
+            carveBoneAiStep();
         }
     }
 
@@ -271,19 +282,68 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
 
+    /**
+     * The Bogre carves a giant bone from 3 bone blocks.
+     * This is a placeholder method for future implementation.
+     */
+    private void carveBoneAiStep() {
+        // find/verify bone blocks
+//        List<BlockPos> boneBlockPositions = findThreeBoneBlocksInLine((int) ROAR_RANGE);
+
+        if (boneBlockPositions == null || boneBlockPositions.size() < 3) {
+            this.state = State.CAUTIOUS; // revert to cautious state if not enough bone blocks found
+            return;
+        }
+
+        // ensure the bone blocks are still valid
+        for (BlockPos pos : boneBlockPositions) {
+            BlockState state = this.level().getBlockState(pos);
+            if (!state.is(Blocks.BONE_BLOCK)) {
+                Inhabitants.LOGGER.debug("Bogre found invalid bone block at: {}", pos);
+                this.state = State.CAUTIOUS; // revert to cautious state if any block is not a bone block
+                return;
+            }
+        }
+
+        // move to the carving site
+        BlockPos center = getAveragePosition(boneBlockPositions);
+        double distance = this.distanceToSqr(center.getX() + 0.5, center.getY(), center.getZ() + 0.5);
+        distance = Math.sqrt(distance);
+        if (distance > 2.5) {
+
+            this.getNavigation().moveTo(this.getNavigation().createPath(center, 0), 1);
+            return;
+        }
+
+        // carving
+        this.getNavigation().stop();
+        this.lookAt(EntityAnchorArgument.Anchor.FEET, Vec3.atCenterOf(center));
+        this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3.atCenterOf(center));
+        boneCarveTicks++;
+
+        if (boneCarveTicks >= BONE_CARVE_TIME_TICKS) {
+            Inhabitants.LOGGER.debug("BONE CARVING COMPLETE!");
+
+            // remove the bone blocks
+            for (BlockPos pos : boneBlockPositions) {
+                if (this.level().getBlockState(pos).is(Blocks.BONE_BLOCK)) {
+                    this.level().destroyBlock(pos, false); // remove block without drops
+                }
+            }
+
+            this.spawnAtLocation(new ItemStack(ModItems.GIANT_BONE.get()));
+            this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F); // some kind of cracking/carving sound
+
+            this.state = State.CAUTIOUS;
+            boneCarveTicks = 0;
+        }
+    }
 
     /**
      * The Bogre attempts to make chowder from a fish dropped by a player.
      * The fish should be droppedFishItem.
      */
     private void makeChowderAiStep() {
-        // if attacked during chowder making
-        if (this.getLastHurtByMob() != null) {
-            this.state = State.CAUTIOUS;
-            this.setTarget(this.getLastHurtByMob());
-            return;
-        }
-
         if (pickedUpFish) {
             if (cauldronPos == null) { // TODO: if the bogre has no cauldron assigned, it will not attempt to make chowder
                 this.state = State.CAUTIOUS;
@@ -332,7 +392,8 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         double distance = this.distanceTo(droppedFishItem);
         if (distance > CHOWDER_REACH_DISTANCE) {
-            boolean path = this.getNavigation().moveTo(droppedFishItem.getX(), droppedFishItem.getY() + .5, droppedFishItem.getZ(), 1.0D); // approach the fish
+            BlockPos pos = new BlockPos(droppedFishItem.getBlockX(), droppedFishItem.getBlockY(), droppedFishItem.getBlockZ());
+            boolean path = this.getNavigation().moveTo(this.getNavigation().createPath(pos, 0), 1);
             if (!path) {
                 Inhabitants.LOGGER.debug("Bogre failed to path to fish, distance: {}", distance);
             }
@@ -455,10 +516,22 @@ public class BogreEntity extends Monster implements GeoEntity {
                             droppedFishItem = fishItem;
                             droppedFishPlayer = player; // store the player that dropped the fish
                             this.state = State.MAKE_CHOWDER; // change state to make chowder
-                            break; // only trigger once per tick per player
+                            return;
                         }
                     }
                 }
+            }
+        }
+
+        // check for bone blocks to carve
+        List<BlockPos> boneBlockPositions = findThreeBoneBlocksInLine((int) ROAR_RANGE);
+        if (boneBlockPositions != null && boneBlockPositions.size() >= 3) {
+            if (findNearbyTrustedPlayer(getAveragePosition(boneBlockPositions), 5) != null) {
+                // if a trusted player is nearby, carve the bone blocks
+                Inhabitants.LOGGER.debug("Found bone blocks to carve: {}", boneBlockPositions);
+                this.boneBlockPositions = boneBlockPositions; // store the positions for carving
+                this.state = State.CARVE_BONE; // change state to carve bone
+                return;
             }
         }
     }
@@ -534,6 +607,60 @@ public class BogreEntity extends Monster implements GeoEntity {
             cauldronPos = NbtUtils.readBlockPos(tag.getCompound("CauldronPos"));
         }
     }
+
+    private @Nullable Player findNearbyTrustedPlayer(BlockPos center, double radius) {
+        List<Player> players = this.level().getEntitiesOfClass(Player.class, new AABB(center).inflate(radius));
+        for (Player player : players) {
+            if (tamedPlayers.contains(player.getUUID())) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private List<BlockPos> findThreeBoneBlocksInLine(int radius) {
+        BlockPos origin = this.blockPosition();
+        List<BlockPos> boneBlocks = new ArrayList<>();
+
+        // collect all bone blocks in the search radius
+        BlockPos.betweenClosedStream(origin.offset(-radius, -3, -radius), origin.offset(radius, 3, radius))
+                .forEach(pos -> {
+                    if (this.level().getBlockState(pos).is(Blocks.BONE_BLOCK)) {
+                        boneBlocks.add(pos.immutable());
+                    }
+                });
+
+        // sort by distance to Bogre
+        boneBlocks.sort(Comparator.comparingDouble(pos -> pos.distSqr(origin)));
+
+        Set<BlockPos> boneBlockSet = new HashSet<>(boneBlocks);
+
+        // try to find a line of 3 in any direction centered on one of the blocks
+        for (BlockPos pos : boneBlocks) {
+            if (boneBlockSet.contains(pos.offset(-1, 0, 0)) && boneBlockSet.contains(pos.offset(1, 0, 0))) {
+                return List.of(pos.offset(-1, 0, 0), pos, pos.offset(1, 0, 0));
+            }
+            if (boneBlockSet.contains(pos.offset(0, 0, -1)) && boneBlockSet.contains(pos.offset(0, 0, 1))) {
+                return List.of(pos.offset(0, 0, -1), pos, pos.offset(0, 0, 1));
+            }
+        }
+
+        return null;
+    }
+
+
+
+    private BlockPos getAveragePosition(List<BlockPos> positions) {
+        int x = 0, y = 0, z = 0;
+        for (BlockPos pos : positions) {
+            x += pos.getX();
+            y += pos.getY();
+            z += pos.getZ();
+        }
+        return new BlockPos(x / positions.size(), y / positions.size(), z / positions.size());
+    }
+
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
