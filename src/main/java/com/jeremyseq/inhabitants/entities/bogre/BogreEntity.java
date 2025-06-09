@@ -21,6 +21,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -77,7 +78,11 @@ public class BogreEntity extends Monster implements GeoEntity {
     private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
 
     // MAKE CHOWDER
-    private boolean pickedUpFish = false; // if the Bogre has picked up the fish item
+//    public static final EntityDataAccessor<Boolean> HOLDING_FISH = // if the Bogre has picked up the fish item
+//            SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<ItemStack> FISH_HELD = // if the Bogre has picked up the fish item
+            SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.ITEM_STACK);
+
     private ItemEntity droppedFishItem = null;
     private Player droppedFishPlayer = null; // the player that dropped the fish item
     private static final double CHOWDER_REACH_DISTANCE = 3;
@@ -346,7 +351,7 @@ public class BogreEntity extends Monster implements GeoEntity {
      * The fish should be droppedFishItem.
      */
     private void makeChowderAiStep() {
-        if (pickedUpFish) {
+        if (!this.getFishHeld().isEmpty()) {
             if (cauldronPos == null) { // TODO: if the bogre has no cauldron assigned, it will not attempt to make chowder
                 this.state = State.CAUTIOUS;
                 return;
@@ -379,7 +384,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 }
                 this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
                 tamedPlayers.add(droppedFishPlayer.getUUID()); // add the player that dropped the fish to the tamed list
-                pickedUpFish = false; // reset the picked up fish state
+                this.setFishHeld(ItemStack.EMPTY); // reset the holding fish state
                 droppedFishPlayer = null; // reset the dropped fish player
                 this.state = State.CAUTIOUS;
                 chowderTicks = 0;
@@ -400,9 +405,10 @@ public class BogreEntity extends Monster implements GeoEntity {
             return;
         }
 
-        if (!pickedUpFish) {
+        if (this.getFishHeld().isEmpty()) {
             this.getNavigation().stop();
             ItemStack fishStack = droppedFishItem.getItem();
+            Item fishItem = fishStack.getItem();
 
             if (fishStack.getCount() > 1) {
                 fishStack.shrink(1); // remove only one fish
@@ -411,7 +417,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
 
             Inhabitants.LOGGER.debug("Picked up one fish");
-            pickedUpFish = true; // mark that the Bogre has picked up the fish
+            this.setFishHeld(new ItemStack(fishItem, 1)); // set the holding fish state
             droppedFishItem = null; // reset the dropped fish item
             return;
         }
@@ -562,6 +568,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         super.defineSynchedData();
         entityData.define(ROAR_ANIM, false);
         entityData.define(ATTACK_ANIM, false);
+        entityData.define(FISH_HELD, ItemStack.EMPTY);
     }
 
     public boolean isTamedBy(Player player) {
@@ -571,6 +578,14 @@ public class BogreEntity extends Monster implements GeoEntity {
     private boolean isValidCauldron(BlockPos pos) {
         BlockState state = level().getBlockState(pos);
         return state.getBlock() instanceof CauldronBlock;
+    }
+
+    public ItemStack getFishHeld() {
+        return this.entityData.get(FISH_HELD);
+    }
+    
+    private void setFishHeld(ItemStack fishHeld) {
+        this.entityData.set(FISH_HELD, fishHeld);
     }
 
     @Override
