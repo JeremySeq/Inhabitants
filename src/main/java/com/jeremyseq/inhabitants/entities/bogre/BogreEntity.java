@@ -61,8 +61,9 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static float FORGET_RANGE = 35f;
     public static float ROAR_RANGE = 24f;
     public static float HOSTILE_RANGE = 18f;
+    public static final double MAX_CAULDRON_DIST_SQR = 24*24;
 
-    private BlockPos cauldronPos = null;
+    public BlockPos cauldronPos = null;
 
     private static final int ROAR_TICKS = 100; // how long a roar animation lasts (server)
 
@@ -222,27 +223,27 @@ public class BogreEntity extends Monster implements GeoEntity {
     private void attackPlayerAiStep() {
         LivingEntity target = this.getTarget();
 
-        // Cancel target if it's invalid
+        // cancel target if it's invalid
         if (target != null && (!target.isAlive() || target.isDeadOrDying())) {
             this.setTarget(null);
             target = null;
         }
 
-        // Tick down cooldown
+        // tick down cooldown
         if (attackCooldown > 0) {
             attackCooldown--;
         }
 
-        // Handle post-delay (animation finish) even if no target
+        // handle animationn finish even if no target
         if (attackPostDelay > 0) {
             attackPostDelay--;
             if (attackPostDelay == 0) {
                 entityData.set(ATTACK_ANIM, false);
             }
-            return; // Still finishing the animation
+            return; // still finishing the animation
         }
 
-        // Handle windup — but only if a valid target is still around
+        // handle windup - but only if a valid target is still around
         if (attackWindup > 0) {
             attackWindup--;
             if (attackWindup == 0) {
@@ -254,14 +255,14 @@ public class BogreEntity extends Monster implements GeoEntity {
                         this.playSound(SoundEvents.PLAYER_ATTACK_STRONG, 1.0f, 1.0f);
                     }
                 }
-                attackPostDelay = 15; // Let animation finish
+                attackPostDelay = 15; // let animation finish
                 attackCooldown = ATTACK_COOLDOWN_TICKS;
                 attackWindup = -1;
             }
             return;
         }
 
-        // If no target, we're done for this tick
+        // if no target, we're done for this tick
         if (target == null) {
             return;
         }
@@ -269,7 +270,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
         double distanceSq = this.distanceToSqr(target);
 
-        // If close enough and off cooldown, start windup
+        // if close enough and off cooldown, start windup
         if (distanceSq <= attackReach * attackReach && attackCooldown <= 0 && attackWindup < 0) {
             attackWindup = ATTACK_OFFSET;
             entityData.set(ATTACK_ANIM, false); // reset to allow retrigger
@@ -277,8 +278,9 @@ public class BogreEntity extends Monster implements GeoEntity {
             return;
         }
 
-        // Default behavior: approach the target
-        this.getNavigation().moveTo(target, 1.2);
+        // approach the target if not close enough
+        BlockPos targetPos = new BlockPos((int) target.getX(), (int) target.getY(), (int) target.getZ());
+        this.moveTo(targetPos, 1);
     }
 
 
@@ -310,8 +312,8 @@ public class BogreEntity extends Monster implements GeoEntity {
         double distance = this.distanceToSqr(center.getX() + 0.5, center.getY(), center.getZ() + 0.5);
         distance = Math.sqrt(distance);
         if (distance > 2.5) {
-
-            this.getNavigation().moveTo(this.getNavigation().createPath(center, 0), 1);
+            this.moveTo(center, 1);
+//            this.getNavigation().moveTo(this.getNavigation().createPath(center, 0), 1);
             return;
         }
 
@@ -353,7 +355,8 @@ public class BogreEntity extends Monster implements GeoEntity {
             distance = Math.sqrt(distance);
             if (distance > 2.5) {
                 // move to the cauldron if not close enough
-                this.getNavigation().moveTo(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5, 1.0D);
+                this.moveTo(cauldronPos, 1);
+//                this.getNavigation().moveTo(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5, 1.0D);
                 return;
             }
 
@@ -393,10 +396,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         double distance = this.distanceTo(droppedFishItem);
         if (distance > CHOWDER_REACH_DISTANCE) {
             BlockPos pos = new BlockPos(droppedFishItem.getBlockX(), droppedFishItem.getBlockY(), droppedFishItem.getBlockZ());
-            boolean path = this.getNavigation().moveTo(this.getNavigation().createPath(pos, 0), 1);
-            if (!path) {
-                Inhabitants.LOGGER.debug("Bogre failed to path to fish, distance: {}", distance);
-            }
+            this.moveTo(pos, 1, false);
             return;
         }
 
@@ -534,6 +534,19 @@ public class BogreEntity extends Monster implements GeoEntity {
                 return;
             }
         }
+    }
+
+    private boolean moveTo(BlockPos pos, double speed, boolean checkCauldronDistance) {
+        if (checkCauldronDistance && this.cauldronPos.distToCenterSqr(pos.getX(), pos.getY(), pos.getZ()) > MAX_CAULDRON_DIST_SQR) {
+            Inhabitants.LOGGER.debug("Bogre is too far from cauldron, not moving to position: {}", pos);
+            return false;
+        }
+        this.getNavigation().moveTo(this.getNavigation().createPath(pos, 0), speed);
+        return true;
+    }
+
+    private boolean moveTo(BlockPos pos, double speed) {
+        return moveTo(pos, speed, true);
     }
 
     public boolean isRoaring() {
