@@ -19,6 +19,12 @@ public class ModItems {
     public static final RegistryObject<Item> BRACER_OF_MIGHT = ITEMS.register("bracer_of_might",
             () -> new BracerOfMightItem());
 
+    public static final RegistryObject<Item> RAW_ABYSSFISH = ITEMS.register("raw_abyssfish",
+            () -> new RawAbyssfishItem());
+
+    public static final RegistryObject<Item> COOKED_ABYSSFISH = ITEMS.register("cooked_abyssfish",
+            () -> new CookedAbyssfishItem());
+
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
