@@ -15,11 +15,11 @@ public class ModPotions {
 
     public static final RegistryObject<Potion> IMMUNITY_POTION =
             POTIONS.register("immunity", () ->
-                    new Potion(new MobEffectInstance(ModEffects.IMMUNITY.get(), 20 * 60))); // 1 minute
+                    new Potion(new MobEffectInstance(ModEffects.IMMUNITY.get(), 20 * 60)));
 
     public static final RegistryObject<Potion> ADAPTATION_POTION =
             POTIONS.register("adaptation", () ->
-                    new Potion(new MobEffectInstance(ModEffects.ADAPTATION.get(), 20 * 60))); // 1 minute
+                    new Potion(new MobEffectInstance(ModEffects.ADAPTATION.get(), 20 * 60)));
 
     public static void register(IEventBus bus) {
         POTIONS.register(bus);

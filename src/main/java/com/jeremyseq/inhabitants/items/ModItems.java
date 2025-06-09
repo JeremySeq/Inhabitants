@@ -30,6 +30,12 @@ public class ModItems {
     public static final RegistryObject<Item> WARPED_CLAM_ITEM = ITEMS.register("warped_clam",
             () -> new WarpedClamItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> RAW_ABYSSFISH = ITEMS.register("raw_abyssfish",
+            RawAbyssfishItem::new);
+
+    public static final RegistryObject<Item> COOKED_ABYSSFISH = ITEMS.register("cooked_abyssfish",
+            CookedAbyssfishItem::new);
+
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

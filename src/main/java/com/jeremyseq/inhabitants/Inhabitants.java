@@ -6,9 +6,13 @@ import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.potions.ModPotions;
+import com.jeremyseq.inhabitants.potions.SimpleBrewingRecipe;
 import com.mojang.logging.LogUtils;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -67,7 +71,11 @@ public class Inhabitants
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-
+            event.enqueueWork(() -> {
+                BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
+                        Items.POTION, Potions.AWKWARD, ModItems.RAW_ABYSSFISH.get(), ModPotions.ADAPTATION_POTION.get()
+                ));
+            });
         }
     }
 }
