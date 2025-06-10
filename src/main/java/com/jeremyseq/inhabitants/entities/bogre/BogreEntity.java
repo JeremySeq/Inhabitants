@@ -58,6 +58,7 @@ public class BogreEntity extends Monster implements GeoEntity {
      */
     public static final EntityDataAccessor<Boolean> ROAR_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> ATTACK_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static float FORGET_RANGE = 35f;
     public static float ROAR_RANGE = 24f;
@@ -85,10 +86,11 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private ItemEntity droppedFishItem = null;
     private Player droppedFishPlayer = null; // the player that dropped the fish item
-    private static final double CHOWDER_REACH_DISTANCE = 3;
-    private static final int CHOWDER_TIME_TICKS = 100;
+    private static final double FISH_REACH_DISTANCE = 3;
+    private static final int CHOWDER_TIME_TICKS = 280;
+    private static final int DROP_FISH_OFFSET = 70; // at what time the Bogre should drop the fish item after starting to make chowder
 
-    private int chowderTicks = 0;
+    private double chowderTicks = 0; // used both on client and server to time cooking
 
     // list of players who have tamed the Bogre
     private final Set<UUID> tamedPlayers = new HashSet<>();
@@ -142,6 +144,15 @@ public class BogreEntity extends Monster implements GeoEntity {
             return PlayState.CONTINUE;
         }
 
+        if (entityData.get(COOKING_ANIM)) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("cooking", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                entityData.set(COOKING_ANIM, false);
+                animationState.getController().forceAnimationReset();
+            }
+            return PlayState.CONTINUE;
+        }
+
         if (entityData.get(ATTACK_ANIM)) {
             animationState.getController().setAnimation(RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE));
             if (animationState.getController().hasAnimationFinished()) {
@@ -172,6 +183,18 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
 
         return PlayState.CONTINUE;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.level().isClientSide) {
+            if (this.entityData.get(COOKING_ANIM)) {
+                chowderTicks++;
+            } else {
+                chowderTicks = 0;
+            }
+        }
     }
 
     @Override
@@ -370,6 +393,12 @@ public class BogreEntity extends Monster implements GeoEntity {
             Inhabitants.LOGGER.debug("TICKING!");
             this.lookAt(EntityAnchorArgument.Anchor.FEET, cauldronPos.getCenter());
             this.lookAt(EntityAnchorArgument.Anchor.EYES, cauldronPos.getCenter());
+            // start cooking animation
+            if (chowderTicks == 0) {
+                Inhabitants.LOGGER.debug("STARTING CHOWDER ANIMATION!");
+                entityData.set(COOKING_ANIM, false);
+                entityData.set(COOKING_ANIM, true);
+            }
             chowderTicks++;
             if (chowderTicks >= CHOWDER_TIME_TICKS) {
                 Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
@@ -399,7 +428,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
 
         double distance = this.distanceTo(droppedFishItem);
-        if (distance > CHOWDER_REACH_DISTANCE) {
+        if (distance > FISH_REACH_DISTANCE) {
             BlockPos pos = new BlockPos(droppedFishItem.getBlockX(), droppedFishItem.getBlockY(), droppedFishItem.getBlockZ());
             this.moveTo(pos, 1, false);
             return;
@@ -568,6 +597,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         super.defineSynchedData();
         entityData.define(ROAR_ANIM, false);
         entityData.define(ATTACK_ANIM, false);
+        entityData.define(COOKING_ANIM, false);
         entityData.define(FISH_HELD, ItemStack.EMPTY);
     }
 
@@ -582,6 +612,19 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     public ItemStack getFishHeld() {
         return this.entityData.get(FISH_HELD);
+    }
+
+    /**
+     * Used specifically by the client to determine what to render in the Bogre's hand.
+     */
+    public ItemStack getAnimateFishHeld() {
+        if (!this.getFishHeld().isEmpty() && this.entityData.get(COOKING_ANIM)) {
+            // if the chowder animation is at the drop fish offset, return an empty stack
+            if (this.chowderTicks >= DROP_FISH_OFFSET) {
+                return ItemStack.EMPTY;
+            }
+        }
+        return this.getFishHeld();
     }
     
     private void setFishHeld(ItemStack fishHeld) {

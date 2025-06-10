@@ -34,7 +34,7 @@ public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
 
         @Override
         protected @Nullable ItemStack getStackForBone(GeoBone bone, BogreEntity animatable) {
-            if ("fish".equals(bone.getName()) && !animatable.getFishHeld().isEmpty()) {
+            if ("fish".equals(bone.getName()) && !animatable.getAnimateFishHeld().isEmpty()) {
                 return animatable.getFishHeld();
             }
 
