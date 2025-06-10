@@ -61,6 +61,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> ATTACK_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> DEATH_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static float FORGET_RANGE = 35f;
     public static float ROAR_RANGE = 24f;
@@ -104,8 +105,10 @@ public class BogreEntity extends Monster implements GeoEntity {
     private static final int ATTACK_COOLDOWN_TICKS = 60; // time between attacks
     private static final int ATTACK_OFFSET = 25; // windup time before damage
 
-
     private boolean randomChance = false; // used to trigger a rare idle animation
+
+    private int deathAnimationTicks = 0;
+    private static final int DEATH_ANIMATION_DURATION = 50;
 
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -157,6 +160,11 @@ public class BogreEntity extends Monster implements GeoEntity {
                 entityData.set(CARVING_ANIM, false);
                 animationState.getController().forceAnimationReset();
             }
+            return PlayState.CONTINUE;
+        }
+
+        if (entityData.get(DEATH_ANIM)) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("death", Animation.LoopType.HOLD_ON_LAST_FRAME));
             return PlayState.CONTINUE;
         }
 
@@ -604,6 +612,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(ATTACK_ANIM, false);
         entityData.define(COOKING_ANIM, false);
         entityData.define(CARVING_ANIM, false);
+        entityData.define(DEATH_ANIM, false);
         entityData.define(FISH_HELD, ItemStack.EMPTY);
     }
 
@@ -635,6 +644,28 @@ public class BogreEntity extends Monster implements GeoEntity {
     
     private void setFishHeld(ItemStack fishHeld) {
         this.entityData.set(FISH_HELD, fishHeld);
+    }
+
+    @Override
+    protected void tickDeath() {
+        if (!this.level().isClientSide) {
+            if (this.entityData.get(DEATH_ANIM)) {
+                deathAnimationTicks++;
+                if (deathAnimationTicks >= DEATH_ANIMATION_DURATION) {
+                    super.tickDeath();
+                }
+            } else {
+                super.tickDeath();
+            }
+        }
+    }
+
+    @Override
+    public void die(@NotNull DamageSource cause) {
+        if (!this.level().isClientSide) {
+            this.entityData.set(DEATH_ANIM, true);
+        }
+        super.die(cause);
     }
 
     @Override
