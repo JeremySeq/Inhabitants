@@ -217,7 +217,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (cauldronPos == null || !isValidCauldron(cauldronPos)) {
             Optional<BlockPos> nearestCauldron = BlockPos.betweenClosedStream(blockPosition().offset(-10, -2, -10), blockPosition().offset(10, 2, 10))
                     .map(BlockPos::immutable)
-                    .filter(pos -> level().getBlockState(pos).getBlock() instanceof CauldronBlock)
+                    .filter(this::isValidCauldron)
                     .findFirst();
 
             nearestCauldron.ifPresent(blockPos -> cauldronPos = blockPos);
