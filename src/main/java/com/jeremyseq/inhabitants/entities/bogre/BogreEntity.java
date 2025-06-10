@@ -577,7 +577,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     private boolean moveTo(BlockPos pos, double speed, boolean checkCauldronDistance) {
-        if (checkCauldronDistance && this.cauldronPos.distToCenterSqr(pos.getX(), pos.getY(), pos.getZ()) > MAX_CAULDRON_DIST_SQR) {
+        if (checkCauldronDistance && this.cauldronPos != null && this.cauldronPos.distToCenterSqr(pos.getX(), pos.getY(), pos.getZ()) > MAX_CAULDRON_DIST_SQR) {
             Inhabitants.LOGGER.debug("Bogre is too far from cauldron, not moving to position: {}", pos);
             return false;
         }
