@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -79,8 +80,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
 
     // MAKE CHOWDER
-//    public static final EntityDataAccessor<Boolean> HOLDING_FISH = // if the Bogre has picked up the fish item
-//            SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<ItemStack> FISH_HELD = // if the Bogre has picked up the fish item
             SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.ITEM_STACK);
 
@@ -124,8 +123,6 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-//        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, true));
-//        this.goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> true));
         this.goalSelector.addGoal(7, new ConditionalStrollGoal(this, 1.0D));
     }
 
@@ -311,15 +308,11 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.moveTo(targetPos, 1);
     }
 
-
     /**
      * The Bogre carves a giant bone from 3 bone blocks.
      * This is a placeholder method for future implementation.
      */
     private void carveBoneAiStep() {
-        // find/verify bone blocks
-//        List<BlockPos> boneBlockPositions = findThreeBoneBlocksInLine((int) ROAR_RANGE);
-
         if (boneBlockPositions == null || boneBlockPositions.size() < 3) {
             this.state = State.CAUTIOUS; // revert to cautious state if not enough bone blocks found
             return;
@@ -341,7 +334,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         distance = Math.sqrt(distance);
         if (distance > 2.5) {
             this.moveTo(center, 1);
-//            this.getNavigation().moveTo(this.getNavigation().createPath(center, 0), 1);
             return;
         }
 
@@ -384,7 +376,6 @@ public class BogreEntity extends Monster implements GeoEntity {
             if (distance > 2.5) {
                 // move to the cauldron if not close enough
                 this.moveTo(cauldronPos, 1);
-//                this.getNavigation().moveTo(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5, 1.0D);
                 return;
             }
 
@@ -637,13 +628,13 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
+    protected void dropCustomDeathLoot(@NotNull DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
         this.spawnAtLocation(new ItemStack(ModItems.BRACER_OF_MIGHT.get()));
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
 
         ListTag list = new ListTag();
@@ -660,7 +651,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
 
         tamedPlayers.clear();
@@ -720,8 +711,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         return null;
     }
 
-
-
     private BlockPos getAveragePosition(List<BlockPos> positions) {
         int x = 0, y = 0, z = 0;
         for (BlockPos pos : positions) {
@@ -731,7 +720,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
         return new BlockPos(x / positions.size(), y / positions.size(), z / positions.size());
     }
-
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
