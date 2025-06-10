@@ -60,6 +60,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> ROAR_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> ATTACK_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static float FORGET_RANGE = 35f;
     public static float ROAR_RANGE = 24f;
@@ -75,7 +76,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     private final List<Player> warnedPlayers = new ArrayList<>();
 
     // CARVE_BONE
-    private static final int BONE_CARVE_TIME_TICKS = 100; // time it takes to carve a bone
+    private static final int BONE_CARVE_TIME_TICKS = 200; // time it takes to carve a bone
     private int boneCarveTicks = 0; // counts down while carving a bone
     private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
 
@@ -145,6 +146,15 @@ public class BogreEntity extends Monster implements GeoEntity {
             animationState.getController().setAnimation(RawAnimation.begin().then("cooking", Animation.LoopType.PLAY_ONCE));
             if (animationState.getController().hasAnimationFinished()) {
                 entityData.set(COOKING_ANIM, false);
+                animationState.getController().forceAnimationReset();
+            }
+            return PlayState.CONTINUE;
+        }
+
+        if (entityData.get(CARVING_ANIM)) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("carving", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                entityData.set(CARVING_ANIM, false);
                 animationState.getController().forceAnimationReset();
             }
             return PlayState.CONTINUE;
@@ -341,6 +351,10 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.getNavigation().stop();
         this.lookAt(EntityAnchorArgument.Anchor.FEET, Vec3.atCenterOf(center));
         this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3.atCenterOf(center));
+        if (boneCarveTicks == 0) {
+            entityData.set(CARVING_ANIM, false);
+            entityData.set(CARVING_ANIM, true);
+        }
         boneCarveTicks++;
 
         if (boneCarveTicks >= BONE_CARVE_TIME_TICKS) {
@@ -589,6 +603,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(ROAR_ANIM, false);
         entityData.define(ATTACK_ANIM, false);
         entityData.define(COOKING_ANIM, false);
+        entityData.define(CARVING_ANIM, false);
         entityData.define(FISH_HELD, ItemStack.EMPTY);
     }
 

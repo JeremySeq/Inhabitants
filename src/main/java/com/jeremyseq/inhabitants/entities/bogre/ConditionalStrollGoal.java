@@ -13,7 +13,7 @@ public class ConditionalStrollGoal extends WaterAvoidingRandomStrollGoal {
 
     @Override
     public boolean canUse() {
-        if (bogre.getTarget() != null || bogre.state == BogreEntity.State.MAKE_CHOWDER || bogre.isRoaring()) return false;
+        if (bogre.getTarget() != null || bogre.state != BogreEntity.State.CAUTIOUS || bogre.isRoaring()) return false;
 
         if (bogre.cauldronPos != null) {
             double dist = bogre.distanceToSqr(Vec3.atCenterOf(bogre.cauldronPos));
@@ -25,7 +25,7 @@ public class ConditionalStrollGoal extends WaterAvoidingRandomStrollGoal {
 
     @Override
     public boolean canContinueToUse() {
-        if (bogre.getTarget() != null || bogre.state == BogreEntity.State.MAKE_CHOWDER || bogre.isRoaring()) return false;
+        if (bogre.getTarget() != null || bogre.state != BogreEntity.State.CAUTIOUS || bogre.isRoaring()) return false;
 
         if (bogre.cauldronPos != null) {
             double dist = bogre.distanceToSqr(Vec3.atCenterOf(bogre.cauldronPos));
