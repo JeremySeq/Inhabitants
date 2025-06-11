@@ -14,6 +14,7 @@ import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
     public BogreRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new BogreModel());
+        this.shadowRadius = 1.25f;
         addRenderLayer(new HeldItemLayer(this));
     }
 
