@@ -1,12 +1,14 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
@@ -16,6 +18,14 @@ public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
         super(renderManager, new BogreModel());
         this.shadowRadius = 1.25f;
         addRenderLayer(new HeldItemLayer(this));
+    }
+
+    @Override
+    public void scaleModelForRender(float widthScale, float heightScale, PoseStack poseStack, BogreEntity animatable,
+                                    BakedGeoModel model, boolean isReRender, float partialTick, int packedLight, int packedOverlay) {
+        float scale = 1.33f;
+        poseStack.scale(scale, scale, scale);
+        super.scaleModelForRender(widthScale, heightScale, poseStack, animatable, model, isReRender, partialTick, packedLight, packedOverlay);
     }
 
     @Override
