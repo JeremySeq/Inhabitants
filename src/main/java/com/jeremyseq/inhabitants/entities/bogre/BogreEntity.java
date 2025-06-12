@@ -4,6 +4,8 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -12,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -109,6 +112,10 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private int deathAnimationTicks = 0;
     private static final int DEATH_ANIMATION_DURATION = 50;
+
+    private static final double SHOCKWAVE_RADIUS = 7;
+    private static final float SHOCKWAVE_KNOCKBACK = 3f;
+    private static final float SHOCKWAVE_DAMAGE = 32f; // damage at the center of the shockwave
 
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -290,22 +297,63 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (attackWindup > 0) {
             attackWindup--;
             if (attackWindup == 0) {
-                if (target != null) {
-                    double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
-                    double distanceSq = this.distanceToSqr(target);
-                    if (distanceSq <= attackReach * attackReach) {
-                        this.doHurtTarget(target);
-                        this.playSound(SoundEvents.PLAYER_ATTACK_STRONG, 1.0f, 1.0f);
+                // create shockwave effect
+                AABB shockwaveArea = new AABB(this.getX() - SHOCKWAVE_RADIUS, this.getY() - 1, this.getZ() - SHOCKWAVE_RADIUS,
+                        this.getX() + SHOCKWAVE_RADIUS, this.getY() + 2, this.getZ() + SHOCKWAVE_RADIUS);
+                List<Player> affectedPlayers = this.level().getEntitiesOfClass(Player.class, shockwaveArea,
+                        player -> !player.isSpectator() && player.isAlive());
+
+                for (Player player : affectedPlayers) {
+                    double dx = this.getX() - player.getX();
+                    double dz = this.getZ() - player.getZ();
+                    double distance = Math.sqrt(dx * dx + dz * dz);
+                    if (distance > SHOCKWAVE_RADIUS) {
+                        continue;
+                    }
+                    if (distance > 0.1) {
+                        player.knockback(SHOCKWAVE_KNOCKBACK, dx / distance, dz / distance);
+
+                        // do damage, falling off based on distance
+                        // this has a max damage of SHOCKWAVE_DAMAGE at the center and falls off to 0 at the edge
+                        float damage = (float) (SHOCKWAVE_DAMAGE * (1 - Math.min(distance / SHOCKWAVE_RADIUS, 1)));
+                        Inhabitants.LOGGER.debug(String.valueOf(damage));
+                        player.hurt(this.damageSources().mobAttack(this), damage);
                     }
                 }
-                attackPostDelay = 15; // let animation finish
+
+                // add visual and sound effects for the shockwave
+                if (this.level() instanceof ServerLevel serverLevel) {
+                    this.playSound(SoundEvents.GENERIC_EXPLODE, 1.0f, 1.0f);
+
+                    // cloud ring
+                    for (int i = 0; i < 20; i++) {
+                        double angle = 2 * Math.PI * i / 20;
+                        double px = this.getX() + Math.cos(angle) * SHOCKWAVE_RADIUS;
+                        double pz = this.getZ() + Math.sin(angle) * SHOCKWAVE_RADIUS;
+                        serverLevel.sendParticles(ParticleTypes.CLOUD, px, this.getY(), pz, 1, 0, 0, 0, 0);
+                    }
+
+                    // crack-like particles around center
+                    BlockState state = this.getBlockStateOn();
+                    BlockParticleOption crackParticles = new BlockParticleOption(ParticleTypes.BLOCK, state);
+                    for (int i = 0; i < 40; i++) {
+                        double angle = 2 * Math.PI * i / 40;
+                        double radius = SHOCKWAVE_RADIUS * (0.3 + 0.7 * Math.random()); // inner to outer ring
+                        double px = this.getX() + Math.cos(angle) * radius;
+                        double pz = this.getZ() + Math.sin(angle) * radius;
+                        double py = this.getY();
+
+                        serverLevel.sendParticles(crackParticles, px, py, pz, 5, 0.1, 0.01, 0.1, 0.05);
+                    }
+                }
+
+                attackPostDelay = 15;
                 attackCooldown = ATTACK_COOLDOWN_TICKS;
                 attackWindup = -1;
             }
             return;
         }
 
-        // if no target, we're done for this tick
         if (target == null) {
             return;
         }
@@ -313,15 +361,13 @@ public class BogreEntity extends Monster implements GeoEntity {
         double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
         double distanceSq = this.distanceToSqr(target);
 
-        // if close enough and off cooldown, start windup
         if (distanceSq <= attackReach * attackReach && attackCooldown <= 0 && attackWindup < 0) {
             attackWindup = ATTACK_OFFSET;
-            entityData.set(ATTACK_ANIM, false); // reset to allow retrigger
+            entityData.set(ATTACK_ANIM, false);
             entityData.set(ATTACK_ANIM, true);
             return;
         }
 
-        // approach the target if not close enough
         BlockPos targetPos = new BlockPos((int) target.getX(), (int) target.getY(), (int) target.getZ());
         this.moveTo(targetPos, 1);
     }
