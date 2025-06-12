@@ -256,7 +256,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public boolean hurt(DamageSource pSource, float pAmount) {
         // if attacked by a player, switch to cautious state and set the player as target
         this.state = State.CAUTIOUS;
-        if (pSource.getEntity() instanceof Player player && player.isAlive()) {
+        if (pSource.getEntity() instanceof Player player && player.isAlive() && !player.isCreative()) {
             // if the attacker is a player, remove them from tamedPlayers
             if (tamedPlayers.contains(player.getUUID())) {
                 player.sendSystemMessage(Component.literal("The Bogre does not trust you anymore!"));
@@ -301,7 +301,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 AABB shockwaveArea = new AABB(this.getX() - SHOCKWAVE_RADIUS, this.getY() - 1, this.getZ() - SHOCKWAVE_RADIUS,
                         this.getX() + SHOCKWAVE_RADIUS, this.getY() + 2, this.getZ() + SHOCKWAVE_RADIUS);
                 List<Player> affectedPlayers = this.level().getEntitiesOfClass(Player.class, shockwaveArea,
-                        player -> !player.isSpectator() && player.isAlive());
+                        player -> !player.isSpectator() && !player.isCreative() && player.isAlive());
 
                 for (Player player : affectedPlayers) {
                     double dx = this.getX() - player.getX();
@@ -356,6 +356,11 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         if (target == null) {
             return;
+        } else if (target instanceof Player player) {
+            if (player.isCreative() || player.isSpectator()) {
+                this.setTarget(null);
+                return;
+            }
         }
 
         double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
@@ -541,7 +546,9 @@ public class BogreEntity extends Monster implements GeoEntity {
             // sort players by distance to the Bogre, closest to farthest
             withinRoarRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
             for (Player player : withinRoarRange) {
-                if (!this.isTamedBy(player) && !warnedPlayers.contains(player) && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)) {
+                if (!this.isTamedBy(player) && !warnedPlayers.contains(player)
+                        && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)
+                        && !player.isCreative() && !player.isSpectator()) {
                     // face player and start roaring
                     roaredPlayer = player;
                     this.lookControl.setLookAt(roaredPlayer);
@@ -571,7 +578,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         } else {
             // otherwise look at the nearest player within FORGET_RANGE
             List<Player> nearbyPlayers = this.level().getEntitiesOfClass(Player.class,
-                    getBoundingBox().inflate(FORGET_RANGE), Predicate.not(Player::isSpectator));
+                    getBoundingBox().inflate(FORGET_RANGE), (player -> !player.isSpectator() && !player.isCreative()));
 
             if (!nearbyPlayers.isEmpty()) {
                 nearbyPlayers.sort((a, b) -> Float.compare(a.distanceTo(this), b.distanceTo(this)));
@@ -590,7 +597,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         for (Player player : possibleFishDroppers) {
             float distance = player.distanceTo(this);
             if (distance <= FORGET_RANGE) {
-                if (distance > HOSTILE_RANGE || this.isTamedBy(player)) {
+                if (distance > HOSTILE_RANGE || this.isTamedBy(player) || player.isCreative()) {
                     // get nearby item entities (fish on ground)
                     List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class,
                             player.getBoundingBox().inflate(4), // check small radius around player
