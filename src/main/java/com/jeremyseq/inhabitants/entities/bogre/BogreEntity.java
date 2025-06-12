@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
@@ -426,7 +427,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 }
             }
 
-            this.spawnAtLocation(new ItemStack(ModItems.GIANT_BONE.get()));
+            EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.GIANT_BONE.get()), 1f, 0.3f);
             this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F); // some kind of cracking/carving sound
 
             this.state = State.CAUTIOUS;
@@ -446,7 +447,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
             double distance = this.distanceToSqr(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5);
             distance = Math.sqrt(distance);
-            if (distance > 2.5) {
+            if (distance > 3) {
                 // move to the cauldron if not close enough
                 this.moveTo(cauldronPos, 1);
                 return;
@@ -469,7 +470,8 @@ public class BogreEntity extends Monster implements GeoEntity {
 
                 // chowder complete
                 // TODO: add particle effects or something?
-                this.spawnAtLocation(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get())); // spawn the chowder item
+
+                EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()), 1f, 0.5f);
 
                 droppedFishPlayer.sendSystemMessage(Component.literal("The Bogre has made chowder from the fish you dropped!"));
                 if (!tamedPlayers.contains(droppedFishPlayer.getUUID())) {
