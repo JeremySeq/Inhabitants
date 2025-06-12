@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.phys.Vec3;
 
 public class ConditionalStrollGoal extends WaterAvoidingRandomStrollGoal {
     private final BogreEntity bogre;
@@ -12,11 +13,44 @@ public class ConditionalStrollGoal extends WaterAvoidingRandomStrollGoal {
 
     @Override
     public boolean canUse() {
-        return bogre.getTarget() == null && bogre.state != BogreEntity.State.MAKE_CHOWDER && !bogre.isRoaring() && super.canUse();
+        if (bogre.getTarget() != null || bogre.state != BogreEntity.State.CAUTIOUS || bogre.isRoaring()) return false;
+
+        if (bogre.cauldronPos != null) {
+            double dist = bogre.distanceToSqr(Vec3.atCenterOf(bogre.cauldronPos));
+            if (dist > BogreEntity.MAX_CAULDRON_DIST_SQR) return false;
+        }
+
+        return super.canUse();
     }
 
     @Override
     public boolean canContinueToUse() {
-        return bogre.getTarget() == null && bogre.state != BogreEntity.State.MAKE_CHOWDER && !bogre.isRoaring() && super.canContinueToUse();
+        if (bogre.getTarget() != null || bogre.state != BogreEntity.State.CAUTIOUS || bogre.isRoaring()) return false;
+
+        if (bogre.cauldronPos != null) {
+            double dist = bogre.distanceToSqr(Vec3.atCenterOf(bogre.cauldronPos));
+            if (dist > BogreEntity.MAX_CAULDRON_DIST_SQR) return false;
+        }
+
+        return super.canContinueToUse();
+    }
+
+    @Override
+    protected Vec3 getPosition() {
+        // clamp target wander position within max range of cauldron
+        if (bogre.cauldronPos != null) {
+            for (int i = 0; i < 10; i++) { // try up to 10 times
+                Vec3 candidate = super.getPosition();
+                if (candidate == null) continue;
+
+                double dist = candidate.distanceToSqr(Vec3.atCenterOf(bogre.cauldronPos));
+                if (dist <= BogreEntity.MAX_CAULDRON_DIST_SQR) return candidate;
+            }
+
+            // fallback to cauldron center if no valid position found
+            return Vec3.atCenterOf(bogre.cauldronPos);
+        }
+
+        return super.getPosition();
     }
 }

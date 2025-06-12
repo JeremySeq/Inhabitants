@@ -1,9 +1,12 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -12,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -21,6 +25,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -29,6 +34,7 @@ import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -57,12 +63,16 @@ public class BogreEntity extends Monster implements GeoEntity {
      */
     public static final EntityDataAccessor<Boolean> ROAR_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> ATTACK_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> DEATH_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static float FORGET_RANGE = 35f;
     public static float ROAR_RANGE = 24f;
     public static float HOSTILE_RANGE = 18f;
+    public static final double MAX_CAULDRON_DIST_SQR = 24*24;
 
-    private BlockPos cauldronPos = null;
+    public BlockPos cauldronPos = null;
 
     private static final int ROAR_TICKS = 100; // how long a roar animation lasts (server)
 
@@ -71,18 +81,21 @@ public class BogreEntity extends Monster implements GeoEntity {
     private final List<Player> warnedPlayers = new ArrayList<>();
 
     // CARVE_BONE
-    private static final int BONE_CARVE_TIME_TICKS = 100; // time it takes to carve a bone
+    private static final int BONE_CARVE_TIME_TICKS = 200; // time it takes to carve a bone
     private int boneCarveTicks = 0; // counts down while carving a bone
     private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
 
     // MAKE CHOWDER
-    private boolean pickedUpFish = false; // if the Bogre has picked up the fish item
+    public static final EntityDataAccessor<ItemStack> FISH_HELD = // if the Bogre has picked up the fish item
+            SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.ITEM_STACK);
+
     private ItemEntity droppedFishItem = null;
     private Player droppedFishPlayer = null; // the player that dropped the fish item
-    private static final double CHOWDER_REACH_DISTANCE = 3;
-    private static final int CHOWDER_TIME_TICKS = 100;
+    private static final double FISH_REACH_DISTANCE = 3;
+    private static final int CHOWDER_TIME_TICKS = 280;
+    private static final int DROP_FISH_OFFSET = 70; // at what time the Bogre should drop the fish item after starting to make chowder
 
-    private int chowderTicks = 0;
+    private double chowderTicks = 0; // used both on client and server to time cooking
 
     // list of players who have tamed the Bogre
     private final Set<UUID> tamedPlayers = new HashSet<>();
@@ -96,8 +109,14 @@ public class BogreEntity extends Monster implements GeoEntity {
     private static final int ATTACK_COOLDOWN_TICKS = 60; // time between attacks
     private static final int ATTACK_OFFSET = 25; // windup time before damage
 
-
     private boolean randomChance = false; // used to trigger a rare idle animation
+
+    private int deathAnimationTicks = 0;
+    private static final int DEATH_ANIMATION_DURATION = 50;
+
+    private static final double SHOCKWAVE_RADIUS = 7;
+    private static final float SHOCKWAVE_KNOCKBACK = 3f;
+    private static final float SHOCKWAVE_DAMAGE = 32f; // damage at the center of the shockwave
 
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -116,8 +135,6 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-//        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, true));
-//        this.goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> true));
         this.goalSelector.addGoal(7, new ConditionalStrollGoal(this, 1.0D));
     }
 
@@ -133,6 +150,29 @@ public class BogreEntity extends Monster implements GeoEntity {
                 setRoaring(false);
                 animationState.getController().forceAnimationReset();
             }
+            return PlayState.CONTINUE;
+        }
+
+        if (entityData.get(COOKING_ANIM)) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("cooking", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                entityData.set(COOKING_ANIM, false);
+                animationState.getController().forceAnimationReset();
+            }
+            return PlayState.CONTINUE;
+        }
+
+        if (entityData.get(CARVING_ANIM)) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("carving", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                entityData.set(CARVING_ANIM, false);
+                animationState.getController().forceAnimationReset();
+            }
+            return PlayState.CONTINUE;
+        }
+
+        if (entityData.get(DEATH_ANIM)) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("death", Animation.LoopType.HOLD_ON_LAST_FRAME));
             return PlayState.CONTINUE;
         }
 
@@ -169,11 +209,23 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        if (this.level().isClientSide) {
+            if (this.entityData.get(COOKING_ANIM)) {
+                chowderTicks++;
+            } else {
+                chowderTicks = 0;
+            }
+        }
+    }
+
+    @Override
     public void customServerAiStep() {
         if (cauldronPos == null || !isValidCauldron(cauldronPos)) {
             Optional<BlockPos> nearestCauldron = BlockPos.betweenClosedStream(blockPosition().offset(-10, -2, -10), blockPosition().offset(10, 2, 10))
                     .map(BlockPos::immutable)
-                    .filter(pos -> level().getBlockState(pos).getBlock() instanceof CauldronBlock)
+                    .filter(this::isValidCauldron)
                     .findFirst();
 
             nearestCauldron.ifPresent(blockPos -> cauldronPos = blockPos);
@@ -205,7 +257,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public boolean hurt(DamageSource pSource, float pAmount) {
         // if attacked by a player, switch to cautious state and set the player as target
         this.state = State.CAUTIOUS;
-        if (pSource.getEntity() instanceof Player player && player.isAlive()) {
+        if (pSource.getEntity() instanceof Player player && player.isAlive() && !player.isCreative()) {
             // if the attacker is a player, remove them from tamedPlayers
             if (tamedPlayers.contains(player.getUUID())) {
                 player.sendSystemMessage(Component.literal("The Bogre does not trust you anymore!"));
@@ -222,74 +274,115 @@ public class BogreEntity extends Monster implements GeoEntity {
     private void attackPlayerAiStep() {
         LivingEntity target = this.getTarget();
 
-        // Cancel target if it's invalid
+        // cancel target if it's invalid
         if (target != null && (!target.isAlive() || target.isDeadOrDying())) {
             this.setTarget(null);
             target = null;
         }
 
-        // Tick down cooldown
+        // tick down cooldown
         if (attackCooldown > 0) {
             attackCooldown--;
         }
 
-        // Handle post-delay (animation finish) even if no target
+        // handle animationn finish even if no target
         if (attackPostDelay > 0) {
             attackPostDelay--;
             if (attackPostDelay == 0) {
                 entityData.set(ATTACK_ANIM, false);
             }
-            return; // Still finishing the animation
+            return; // still finishing the animation
         }
 
-        // Handle windup — but only if a valid target is still around
+        // handle windup - but only if a valid target is still around
         if (attackWindup > 0) {
             attackWindup--;
             if (attackWindup == 0) {
-                if (target != null) {
-                    double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
-                    double distanceSq = this.distanceToSqr(target);
-                    if (distanceSq <= attackReach * attackReach) {
-                        this.doHurtTarget(target);
-                        this.playSound(SoundEvents.PLAYER_ATTACK_STRONG, 1.0f, 1.0f);
+                // create shockwave effect
+                AABB shockwaveArea = new AABB(this.getX() - SHOCKWAVE_RADIUS, this.getY() - 1, this.getZ() - SHOCKWAVE_RADIUS,
+                        this.getX() + SHOCKWAVE_RADIUS, this.getY() + 2, this.getZ() + SHOCKWAVE_RADIUS);
+                List<Player> affectedPlayers = this.level().getEntitiesOfClass(Player.class, shockwaveArea,
+                        player -> !player.isSpectator() && !player.isCreative() && player.isAlive());
+
+                for (Player player : affectedPlayers) {
+                    double dx = this.getX() - player.getX();
+                    double dz = this.getZ() - player.getZ();
+                    double distance = Math.sqrt(dx * dx + dz * dz);
+                    if (distance > SHOCKWAVE_RADIUS) {
+                        continue;
+                    }
+                    if (distance > 0.1) {
+                        player.knockback(SHOCKWAVE_KNOCKBACK, dx / distance, dz / distance);
+
+                        // do damage, falling off based on distance
+                        // this has a max damage of SHOCKWAVE_DAMAGE at the center and falls off to 0 at the edge
+                        float damage = (float) (SHOCKWAVE_DAMAGE * (1 - Math.min(distance / SHOCKWAVE_RADIUS, 1)));
+                        Inhabitants.LOGGER.debug(String.valueOf(damage));
+                        player.hurt(this.damageSources().mobAttack(this), damage);
                     }
                 }
-                attackPostDelay = 15; // Let animation finish
+
+                // add visual and sound effects for the shockwave
+                if (this.level() instanceof ServerLevel serverLevel) {
+                    this.playSound(SoundEvents.GENERIC_EXPLODE, 1.0f, 1.0f);
+
+                    // cloud ring
+                    for (int i = 0; i < 20; i++) {
+                        double angle = 2 * Math.PI * i / 20;
+                        double px = this.getX() + Math.cos(angle) * SHOCKWAVE_RADIUS;
+                        double pz = this.getZ() + Math.sin(angle) * SHOCKWAVE_RADIUS;
+                        serverLevel.sendParticles(ParticleTypes.CLOUD, px, this.getY(), pz, 1, 0, 0, 0, 0);
+                    }
+
+                    // crack-like particles around center
+                    BlockState state = this.getBlockStateOn();
+                    BlockParticleOption crackParticles = new BlockParticleOption(ParticleTypes.BLOCK, state);
+                    for (int i = 0; i < 40; i++) {
+                        double angle = 2 * Math.PI * i / 40;
+                        double radius = SHOCKWAVE_RADIUS * (0.3 + 0.7 * Math.random()); // inner to outer ring
+                        double px = this.getX() + Math.cos(angle) * radius;
+                        double pz = this.getZ() + Math.sin(angle) * radius;
+                        double py = this.getY();
+
+                        serverLevel.sendParticles(crackParticles, px, py, pz, 5, 0.1, 0.01, 0.1, 0.05);
+                    }
+                }
+
+                attackPostDelay = 15;
                 attackCooldown = ATTACK_COOLDOWN_TICKS;
                 attackWindup = -1;
             }
             return;
         }
 
-        // If no target, we're done for this tick
         if (target == null) {
             return;
+        } else if (target instanceof Player player) {
+            if (player.isCreative() || player.isSpectator()) {
+                this.setTarget(null);
+                return;
+            }
         }
 
         double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
         double distanceSq = this.distanceToSqr(target);
 
-        // If close enough and off cooldown, start windup
         if (distanceSq <= attackReach * attackReach && attackCooldown <= 0 && attackWindup < 0) {
             attackWindup = ATTACK_OFFSET;
-            entityData.set(ATTACK_ANIM, false); // reset to allow retrigger
+            entityData.set(ATTACK_ANIM, false);
             entityData.set(ATTACK_ANIM, true);
             return;
         }
 
-        // Default behavior: approach the target
-        this.getNavigation().moveTo(target, 1.2);
+        BlockPos targetPos = new BlockPos((int) target.getX(), (int) target.getY(), (int) target.getZ());
+        this.moveTo(targetPos, 1);
     }
-
 
     /**
      * The Bogre carves a giant bone from 3 bone blocks.
      * This is a placeholder method for future implementation.
      */
     private void carveBoneAiStep() {
-        // find/verify bone blocks
-//        List<BlockPos> boneBlockPositions = findThreeBoneBlocksInLine((int) ROAR_RANGE);
-
         if (boneBlockPositions == null || boneBlockPositions.size() < 3) {
             this.state = State.CAUTIOUS; // revert to cautious state if not enough bone blocks found
             return;
@@ -310,8 +403,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         double distance = this.distanceToSqr(center.getX() + 0.5, center.getY(), center.getZ() + 0.5);
         distance = Math.sqrt(distance);
         if (distance > 2.5) {
-
-            this.getNavigation().moveTo(this.getNavigation().createPath(center, 0), 1);
+            this.moveTo(center, 1);
             return;
         }
 
@@ -319,6 +411,10 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.getNavigation().stop();
         this.lookAt(EntityAnchorArgument.Anchor.FEET, Vec3.atCenterOf(center));
         this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3.atCenterOf(center));
+        if (boneCarveTicks == 0) {
+            entityData.set(CARVING_ANIM, false);
+            entityData.set(CARVING_ANIM, true);
+        }
         boneCarveTicks++;
 
         if (boneCarveTicks >= BONE_CARVE_TIME_TICKS) {
@@ -331,7 +427,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 }
             }
 
-            this.spawnAtLocation(new ItemStack(ModItems.GIANT_BONE.get()));
+            EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.GIANT_BONE.get()), 1f, 0.3f);
             this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F); // some kind of cracking/carving sound
 
             this.state = State.CAUTIOUS;
@@ -344,16 +440,16 @@ public class BogreEntity extends Monster implements GeoEntity {
      * The fish should be droppedFishItem.
      */
     private void makeChowderAiStep() {
-        if (pickedUpFish) {
+        if (!this.getFishHeld().isEmpty()) {
             if (cauldronPos == null) { // TODO: if the bogre has no cauldron assigned, it will not attempt to make chowder
                 this.state = State.CAUTIOUS;
                 return;
             }
             double distance = this.distanceToSqr(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5);
             distance = Math.sqrt(distance);
-            if (distance > 2.5) {
+            if (distance > 3) {
                 // move to the cauldron if not close enough
-                this.getNavigation().moveTo(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5, 1.0D);
+                this.moveTo(cauldronPos, 1);
                 return;
             }
 
@@ -362,13 +458,20 @@ public class BogreEntity extends Monster implements GeoEntity {
             Inhabitants.LOGGER.debug("TICKING!");
             this.lookAt(EntityAnchorArgument.Anchor.FEET, cauldronPos.getCenter());
             this.lookAt(EntityAnchorArgument.Anchor.EYES, cauldronPos.getCenter());
+            // start cooking animation
+            if (chowderTicks == 0) {
+                Inhabitants.LOGGER.debug("STARTING CHOWDER ANIMATION!");
+                entityData.set(COOKING_ANIM, false);
+                entityData.set(COOKING_ANIM, true);
+            }
             chowderTicks++;
             if (chowderTicks >= CHOWDER_TIME_TICKS) {
                 Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
 
                 // chowder complete
                 // TODO: add particle effects or something?
-                this.spawnAtLocation(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get())); // spawn the chowder item
+
+                EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()), 1f, 0.5f);
 
                 droppedFishPlayer.sendSystemMessage(Component.literal("The Bogre has made chowder from the fish you dropped!"));
                 if (!tamedPlayers.contains(droppedFishPlayer.getUUID())) {
@@ -376,7 +479,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 }
                 this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
                 tamedPlayers.add(droppedFishPlayer.getUUID()); // add the player that dropped the fish to the tamed list
-                pickedUpFish = false; // reset the picked up fish state
+                this.setFishHeld(ItemStack.EMPTY); // reset the holding fish state
                 droppedFishPlayer = null; // reset the dropped fish player
                 this.state = State.CAUTIOUS;
                 chowderTicks = 0;
@@ -391,18 +494,16 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
 
         double distance = this.distanceTo(droppedFishItem);
-        if (distance > CHOWDER_REACH_DISTANCE) {
+        if (distance > FISH_REACH_DISTANCE) {
             BlockPos pos = new BlockPos(droppedFishItem.getBlockX(), droppedFishItem.getBlockY(), droppedFishItem.getBlockZ());
-            boolean path = this.getNavigation().moveTo(this.getNavigation().createPath(pos, 0), 1);
-            if (!path) {
-                Inhabitants.LOGGER.debug("Bogre failed to path to fish, distance: {}", distance);
-            }
+            this.moveTo(pos, 1, false);
             return;
         }
 
-        if (!pickedUpFish) {
+        if (this.getFishHeld().isEmpty()) {
             this.getNavigation().stop();
             ItemStack fishStack = droppedFishItem.getItem();
+            Item fishItem = fishStack.getItem();
 
             if (fishStack.getCount() > 1) {
                 fishStack.shrink(1); // remove only one fish
@@ -411,7 +512,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
 
             Inhabitants.LOGGER.debug("Picked up one fish");
-            pickedUpFish = true; // mark that the Bogre has picked up the fish
+            this.setFishHeld(new ItemStack(fishItem, 1)); // set the holding fish state
             droppedFishItem = null; // reset the dropped fish item
             return;
         }
@@ -447,7 +548,9 @@ public class BogreEntity extends Monster implements GeoEntity {
             // sort players by distance to the Bogre, closest to farthest
             withinRoarRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
             for (Player player : withinRoarRange) {
-                if (!this.isTamedBy(player) && !warnedPlayers.contains(player) && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)) {
+                if (!this.isTamedBy(player) && !warnedPlayers.contains(player)
+                        && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)
+                        && !player.isCreative() && !player.isSpectator()) {
                     // face player and start roaring
                     roaredPlayer = player;
                     this.lookControl.setLookAt(roaredPlayer);
@@ -477,7 +580,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         } else {
             // otherwise look at the nearest player within FORGET_RANGE
             List<Player> nearbyPlayers = this.level().getEntitiesOfClass(Player.class,
-                    getBoundingBox().inflate(FORGET_RANGE), Predicate.not(Player::isSpectator));
+                    getBoundingBox().inflate(FORGET_RANGE), (player -> !player.isSpectator() && !player.isCreative()));
 
             if (!nearbyPlayers.isEmpty()) {
                 nearbyPlayers.sort((a, b) -> Float.compare(a.distanceTo(this), b.distanceTo(this)));
@@ -496,7 +599,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         for (Player player : possibleFishDroppers) {
             float distance = player.distanceTo(this);
             if (distance <= FORGET_RANGE) {
-                if (distance > HOSTILE_RANGE || this.isTamedBy(player)) {
+                if (distance > HOSTILE_RANGE || this.isTamedBy(player) || player.isCreative()) {
                     // get nearby item entities (fish on ground)
                     List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class,
                             player.getBoundingBox().inflate(4), // check small radius around player
@@ -536,6 +639,19 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
     }
 
+    private boolean moveTo(BlockPos pos, double speed, boolean checkCauldronDistance) {
+        if (checkCauldronDistance && this.cauldronPos != null && this.cauldronPos.distToCenterSqr(pos.getX(), pos.getY(), pos.getZ()) > MAX_CAULDRON_DIST_SQR) {
+            Inhabitants.LOGGER.debug("Bogre is too far from cauldron, not moving to position: {}", pos);
+            return false;
+        }
+        this.getNavigation().moveTo(this.getNavigation().createPath(pos, 0), speed);
+        return true;
+    }
+
+    private boolean moveTo(BlockPos pos, double speed) {
+        return moveTo(pos, speed, true);
+    }
+
     public boolean isRoaring() {
         return entityData.get(ROAR_ANIM);
     }
@@ -549,6 +665,10 @@ public class BogreEntity extends Monster implements GeoEntity {
         super.defineSynchedData();
         entityData.define(ROAR_ANIM, false);
         entityData.define(ATTACK_ANIM, false);
+        entityData.define(COOKING_ANIM, false);
+        entityData.define(CARVING_ANIM, false);
+        entityData.define(DEATH_ANIM, false);
+        entityData.define(FISH_HELD, ItemStack.EMPTY);
     }
 
     public boolean isTamedBy(Player player) {
@@ -560,19 +680,62 @@ public class BogreEntity extends Monster implements GeoEntity {
         return state.getBlock() instanceof CauldronBlock;
     }
 
+    public ItemStack getFishHeld() {
+        return this.entityData.get(FISH_HELD);
+    }
+
+    /**
+     * Used specifically by the client to determine what to render in the Bogre's hand.
+     */
+    public ItemStack getAnimateFishHeld() {
+        if (!this.getFishHeld().isEmpty() && this.entityData.get(COOKING_ANIM)) {
+            // if the chowder animation is at the drop fish offset, return an empty stack
+            if (this.chowderTicks >= DROP_FISH_OFFSET) {
+                return ItemStack.EMPTY;
+            }
+        }
+        return this.getFishHeld();
+    }
+    
+    private void setFishHeld(ItemStack fishHeld) {
+        this.entityData.set(FISH_HELD, fishHeld);
+    }
+
+    @Override
+    protected void tickDeath() {
+        if (!this.level().isClientSide) {
+            if (this.entityData.get(DEATH_ANIM)) {
+                deathAnimationTicks++;
+                if (deathAnimationTicks >= DEATH_ANIMATION_DURATION) {
+                    super.tickDeath();
+                }
+            } else {
+                super.tickDeath();
+            }
+        }
+    }
+
+    @Override
+    public void die(@NotNull DamageSource cause) {
+        if (!this.level().isClientSide) {
+            this.entityData.set(DEATH_ANIM, true);
+        }
+        super.die(cause);
+    }
+
     @Override
     public float getStepHeight() {
         return 1.5f;
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
+    protected void dropCustomDeathLoot(@NotNull DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
         this.spawnAtLocation(new ItemStack(ModItems.BRACER_OF_MIGHT.get()));
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
 
         ListTag list = new ListTag();
@@ -589,7 +752,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
 
         tamedPlayers.clear();
@@ -649,8 +812,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         return null;
     }
 
-
-
     private BlockPos getAveragePosition(List<BlockPos> positions) {
         int x = 0, y = 0, z = 0;
         for (BlockPos pos : positions) {
@@ -660,7 +821,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
         return new BlockPos(x / positions.size(), y / positions.size(), z / positions.size());
     }
-
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
