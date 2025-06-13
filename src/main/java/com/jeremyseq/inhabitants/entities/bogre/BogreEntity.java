@@ -93,7 +93,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     private Player droppedFishPlayer = null; // the player that dropped the fish item
     private static final double FISH_REACH_DISTANCE = 3;
     private static final int CHOWDER_TIME_TICKS = 280;
-    private static final int DROP_FISH_OFFSET = 70; // at what time the Bogre should drop the fish item after starting to make chowder
+    private static final int DROP_FISH_OFFSET = 56; // at what time the Bogre should drop the fish item after starting to make chowder
 
     private double chowderTicks = 0; // used both on client and server to time cooking
 
