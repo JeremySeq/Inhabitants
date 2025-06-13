@@ -16,7 +16,7 @@ public class BogreCauldronModel extends GeoModel<BogreCauldronEntity> {
     }
 
     @Override
-    public ResourceLocation getAnimationResource(BogreCauldronEntity object) {
-        return null;
+    public ResourceLocation getAnimationResource(BogreCauldronEntity bogreEntity) {
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "animations/bogre_cauldron.animation.json");
     }
 }

@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.entities.bogre;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
+import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
@@ -30,7 +31,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -676,9 +676,27 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     private boolean isValidCauldron(BlockPos pos) {
-        BlockState state = level().getBlockState(pos);
-        return state.getBlock() instanceof CauldronBlock;
+        double centerX = pos.getX() + 0.5;
+        double centerY = pos.getY();
+        double centerZ = pos.getZ() + 0.5;
+
+        // Search for BogreCauldronEntities within a small radius around the center
+        List<BogreCauldronEntity> entities = level().getEntitiesOfClass(
+                BogreCauldronEntity.class,
+                new AABB(centerX - 0.5, centerY - 1, centerZ - 0.5, centerX + 0.5, centerY + 2, centerZ + 0.5)
+        );
+
+        // Check if any of those entities are centered at the given block position
+        for (BogreCauldronEntity entity : entities) {
+            BlockPos entityCenter = entity.blockPosition();
+            if (entityCenter.equals(pos)) {
+                return true;
+            }
+        }
+
+        return false;
     }
+
 
     public ItemStack getFishHeld() {
         return this.entityData.get(FISH_HELD);
