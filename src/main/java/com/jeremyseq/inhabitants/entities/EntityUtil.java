@@ -14,7 +14,7 @@ public class EntityUtil {
         ItemEntity itemEntity = new ItemEntity(
                 level,
                 entity.getX(),
-                entity.getY() + entity.getEyeHeight() * 0.5,
+                entity.getEyeY(),
                 entity.getZ(),
                 stack.copy()
         );

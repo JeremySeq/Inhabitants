@@ -427,7 +427,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 }
             }
 
-            EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.GIANT_BONE.get()), 1f, 0.3f);
+            EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.GIANT_BONE.get()), .3f, 0.3f);
             this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F); // some kind of cracking/carving sound
 
             this.state = State.CAUTIOUS;
@@ -471,7 +471,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 // chowder complete
                 // TODO: add particle effects or something?
 
-                EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()), 1f, 0.5f);
+                EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()), .3f, 0.5f);
 
                 droppedFishPlayer.sendSystemMessage(Component.literal("The Bogre has made chowder from the fish you dropped!"));
                 if (!tamedPlayers.contains(droppedFishPlayer.getUUID())) {
