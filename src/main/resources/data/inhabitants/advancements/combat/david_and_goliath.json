@@ -12,7 +12,7 @@
   },
   "display": {
     "icon": {
-      "item": "inhabitants:giant_bone"
+      "item": "inhabitants:dead_bogre_icon"
     },
     "title": {
       "translate": "advancement.inhabitants.david_and_goliath.title"
