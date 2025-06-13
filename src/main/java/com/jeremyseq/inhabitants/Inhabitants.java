@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants;
 
+import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModItems;
@@ -37,6 +38,7 @@ public class Inhabitants
 
         modEventBus.addListener(this::commonSetup);
 
+        ModBlocks.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);

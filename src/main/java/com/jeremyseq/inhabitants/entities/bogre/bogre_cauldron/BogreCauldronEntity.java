@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron;
 
+import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -11,8 +12,7 @@ import net.minecraft.world.level.Level;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 
@@ -28,6 +28,25 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
     }
 
     @Override
+    public void onAddedToWorld() {
+        super.onAddedToWorld();
+        if (!level().isClientSide) {
+            level().setBlock(this.blockPosition(), ModBlocks.INVISIBLE_CAULDRON_BLOCK.get().defaultBlockState(), 3);
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        super.remove(reason);
+        if (!level().isClientSide) {
+            if (level().getBlockState(this.blockPosition()).is(ModBlocks.INVISIBLE_CAULDRON_BLOCK.get())) {
+                level().removeBlock(this.blockPosition(), false);
+            }
+        }
+    }
+
+
+    @Override
     public boolean isPickable() {
         return true;
     }
@@ -37,19 +56,25 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
         if (this.level() instanceof ServerLevel serverLevel) {
             this.health -= amount;
 
-            // sound effect
+            // play hit sound
             serverLevel.playSound(null, this.blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.5F, 1.0F);
 
-            // particles
-            serverLevel.sendParticles(ParticleTypes.CRIT, getX() + 1, getY() + 1, getZ() + 1, 10, 0.5, 0.5, 0.5, 0.1);
+            // show crit particles
+            serverLevel.sendParticles(ParticleTypes.CRIT, getX() + 0.5, getY() + 0.5, getZ() + 0.5, 10, 0.5, 0.5, 0.5, 0.1);
 
             if (this.health <= 0) {
+                // play break sound
                 serverLevel.playSound(null, this.blockPosition(), SoundEvents.ANVIL_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+
+                // show block breaking particles (simulating stone break)
+                serverLevel.levelEvent(2001, this.blockPosition(), net.minecraft.core.registries.BuiltInRegistries.BLOCK.getId(net.minecraft.world.level.block.Blocks.STONE));
+
                 this.remove(RemovalReason.KILLED);
             }
         }
-        return false;
+        return true;
     }
+
 
     @Override
     public void tick() {
@@ -104,7 +129,6 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
             level().playLocalSound(px, py, pz, SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS, 0.4f, 0.8f + level().random.nextFloat() * 0.4f, false);
 
         }
-
     }
 
     @Override
@@ -132,8 +156,9 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
         controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
-    private PlayState predicate(AnimationState<BogreCauldronEntity> state) {
-        return null;
+    private PlayState predicate(AnimationState<BogreCauldronEntity> animationState) {
+        animationState.getController().setAnimation(RawAnimation.begin().then("animation", Animation.LoopType.LOOP));
+        return PlayState.CONTINUE;
     }
 
     @Override
