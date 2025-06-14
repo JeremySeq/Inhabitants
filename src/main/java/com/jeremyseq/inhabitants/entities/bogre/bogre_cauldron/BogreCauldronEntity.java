@@ -9,6 +9,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
@@ -19,7 +22,8 @@ import software.bernie.geckolib.core.object.PlayState;
 public class BogreCauldronEntity extends Entity implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
-    private float health; // Set max health here
+    private boolean placedBlock = false;
+    private float health;
 
     public BogreCauldronEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -28,15 +32,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    public void onAddedToWorld() {
-        super.onAddedToWorld();
-        if (!level().isClientSide) {
-            level().setBlock(this.blockPosition(), ModBlocks.INVISIBLE_CAULDRON_BLOCK.get().defaultBlockState(), 3);
-        }
-    }
-
-    @Override
-    public void remove(RemovalReason reason) {
+    public void remove(@NotNull RemovalReason reason) {
         super.remove(reason);
         if (!level().isClientSide) {
             if (level().getBlockState(this.blockPosition()).is(ModBlocks.INVISIBLE_CAULDRON_BLOCK.get())) {
@@ -52,7 +48,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurt(@NotNull DamageSource source, float amount) {
         if (this.level() instanceof ServerLevel serverLevel) {
             this.health -= amount;
 
@@ -67,7 +63,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
                 serverLevel.playSound(null, this.blockPosition(), SoundEvents.ANVIL_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
 
                 // show block breaking particles (simulating stone break)
-                serverLevel.levelEvent(2001, this.blockPosition(), net.minecraft.core.registries.BuiltInRegistries.BLOCK.getId(net.minecraft.world.level.block.Blocks.STONE));
+                serverLevel.levelEvent(2001, this.blockPosition(), Block.getId(Blocks.STONE.defaultBlockState()));
 
                 this.remove(RemovalReason.KILLED);
             }
@@ -79,6 +75,12 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
+
+        if (!placedBlock && !level().isClientSide) {
+            level().setBlock(this.blockPosition(), ModBlocks.INVISIBLE_CAULDRON_BLOCK.get().defaultBlockState(), 3);
+            placedBlock = true;
+        }
+
         if (level().isClientSide) {
             double x = getX();
             double y = getY();
@@ -137,12 +139,12 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compoundTag) {
+    protected void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
 
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compoundTag) {
+    protected void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
 
     }
 
