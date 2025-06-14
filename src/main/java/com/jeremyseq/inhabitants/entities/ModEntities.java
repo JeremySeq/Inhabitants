@@ -24,7 +24,7 @@ public class ModEntities {
     public static final RegistryObject<EntityType<BogreEntity>> BOGRE =
             REGISTRY.register("bogre",
                     () -> EntityType.Builder.of(BogreEntity::new, MobCategory.MONSTER)
-                            .sized(2.75f, 3.8f)
+                            .sized(3.25f, 4.7f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre").toString()));
 
     public static final RegistryObject<EntityType<BogreCauldronEntity>> BOGRE_CAULDRON =
