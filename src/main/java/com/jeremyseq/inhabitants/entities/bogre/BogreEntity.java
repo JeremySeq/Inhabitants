@@ -397,7 +397,7 @@ public class BogreEntity extends Monster implements GeoEntity {
      */
     private void makeChowderAiStep() {
         if (!this.getFishHeld().isEmpty()) {
-            if (cauldronPos == null) { // TODO: if the bogre has no cauldron assigned, it will not attempt to make chowder
+            if (cauldronPos == null) {
                 this.state = State.CAUTIOUS;
                 return;
             }
@@ -425,7 +425,6 @@ public class BogreEntity extends Monster implements GeoEntity {
                 Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
 
                 // chowder complete
-                // TODO: add particle effects or something?
 
                 EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()), .3f, 0.5f);
 
@@ -569,7 +568,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                                             || item.getItem().is(Items.SALMON)
                                             || item.getItem().is(Items.TROPICAL_FISH)
                                             || item.getItem().is(Items.PUFFERFISH)
-                                    ) // TODO: any fish item, use a tag or something
+                                    )
                     );
 
                     for (ItemEntity fishItem : nearbyItems) {
