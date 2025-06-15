@@ -9,12 +9,15 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.awt.*;
+
 public class ModCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Inhabitants.MODID);
 
     public static final RegistryObject<CreativeModeTab> INHABITANTS_TAB = CREATIVE_MODE_TABS.register("inhabitants_tab",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.DEAD_BOGRE_ICON.get()))
+                    .withLabelColor(new Color(0x2C7866).getRGB())
                     .title(Component.translatable("creativetab.inhabitants_tab"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
