@@ -15,6 +15,6 @@ The following mobs are fully implemented and functional in the game.
 
 **Bogre**
 
-A large, tough swamp creature with mossy skin. It moves slowly but hits hard. You can tame it with fish; it can make chowder for you and can carve bones into weapons.
+A large ogre-like creature that lives in the swamp. It moves slowly but hits hard. You can tame it with fish; it can make chowder for you and can carve bones into weapons.
 
 ![Bogre](images/bogre.gif)
