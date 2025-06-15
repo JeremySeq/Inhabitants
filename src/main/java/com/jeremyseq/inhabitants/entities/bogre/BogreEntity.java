@@ -228,8 +228,11 @@ public class BogreEntity extends Monster implements GeoEntity {
                     .filter(this::isValidCauldron)
                     .findFirst();
 
-            nearestCauldron.ifPresent(blockPos -> cauldronPos = blockPos);
-            Inhabitants.LOGGER.debug("Bogre assigned to cauldron at: {}", cauldronPos);
+            this.cauldronPos = nearestCauldron.orElse(null);
+        }
+
+        if (this.cauldronPos == null) {
+            this.tamedPlayers.clear(); // clear tamed players if no cauldron is found
         }
 
         if (this.getTarget() != null) {
@@ -590,6 +593,11 @@ public class BogreEntity extends Monster implements GeoEntity {
                     this.lookControl.setLookAt(nearest, 30.0F, 30.0F);
                 }
             }
+        }
+
+        if (this.cauldronPos == null || !this.isValidCauldron(this.cauldronPos)) {
+            // if no cauldron is assigned, don't attempt to make chowder or carve bone
+            return;
         }
 
         // detect fish dropped by non-hostile players
