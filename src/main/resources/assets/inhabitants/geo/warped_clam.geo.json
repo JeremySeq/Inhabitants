@@ -1,0 +1,154 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 4,
+				"visible_bounds_height": 1.5,
+				"visible_bounds_offset": [0, 0.25, 0]
+			},
+			"bones": [
+				{
+					"name": "clam",
+					"pivot": [-1, 0, 0],
+					"cubes": [
+						{
+							"origin": [-8, 0, 11],
+							"size": [16, 5, 6],
+							"uv": {
+								"north": {"uv": [48, 6], "uv_size": [16, 5]},
+								"east": {"uv": [48, 40], "uv_size": [6, 5]},
+								"south": {"uv": [48, 11], "uv_size": [16, 5]},
+								"west": {"uv": [48, 45], "uv_size": [6, 5]},
+								"up": {"uv": [32, 44], "uv_size": [16, 6]},
+								"down": {"uv": [48, 6], "uv_size": [16, -6]}
+							}
+						}
+					]
+				},
+				{
+					"name": "upperjaw",
+					"parent": "clam",
+					"pivot": [-1, 3, 11],
+					"cubes": [
+						{
+							"origin": [-12, 3, -11],
+							"size": [24, 3, 22],
+							"uv": {
+								"north": {"uv": [48, 16], "uv_size": [24, 3]},
+								"east": {"uv": [48, 28], "uv_size": [22, 3]},
+								"south": {"uv": [48, 19], "uv_size": [24, 3]},
+								"west": {"uv": [48, 31], "uv_size": [22, 3]},
+								"up": {"uv": [0, 0], "uv_size": [24, 22]},
+								"down": {"uv": [0, 44], "uv_size": [24, -22]}
+							}
+						},
+						{
+							"origin": [-7, 0, -13],
+							"size": [4, 6, 2],
+							"uv": {
+								"north": {"uv": [32, 50], "uv_size": [4, 6]},
+								"east": {"uv": [40, 52], "uv_size": [2, 6]},
+								"south": {"uv": [36, 50], "uv_size": [4, 6]},
+								"west": {"uv": [42, 52], "uv_size": [2, 6]},
+								"up": {"uv": [54, 40], "uv_size": [4, 2]},
+								"down": {"uv": [54, 44], "uv_size": [4, -2]}
+							}
+						},
+						{
+							"origin": [3, 0, -13],
+							"size": [4, 6, 2],
+							"uv": {
+								"north": {"uv": [32, 50], "uv_size": [4, 6]},
+								"east": {"uv": [40, 52], "uv_size": [2, 6]},
+								"south": {"uv": [36, 50], "uv_size": [4, 6]},
+								"west": {"uv": [42, 52], "uv_size": [2, 6]},
+								"up": {"uv": [58, 40], "uv_size": [-4, 2]},
+								"down": {"uv": [58, 42], "uv_size": [-4, 2]}
+							}
+						}
+					]
+				},
+				{
+					"name": "lowerjaw",
+					"parent": "clam",
+					"pivot": [-1, 3, 11],
+					"cubes": [
+						{
+							"origin": [-12, 0, -11],
+							"size": [24, 3, 22],
+							"uv": {
+								"north": {"uv": [48, 22], "uv_size": [24, 3]},
+								"east": {"uv": [48, 34], "uv_size": [22, 3]},
+								"south": {"uv": [48, 25], "uv_size": [24, 3]},
+								"west": {"uv": [48, 37], "uv_size": [22, 3]},
+								"up": {"uv": [24, 0], "uv_size": [24, 22]},
+								"down": {"uv": [24, 44], "uv_size": [24, -22]}
+							}
+						},
+						{
+							"origin": [-12, 0, -13],
+							"size": [4, 6, 2],
+							"uv": {
+								"north": {"uv": [32, 50], "uv_size": [4, 6]},
+								"east": {"uv": [42, 52], "uv_size": [2, 6]},
+								"south": {"uv": [36, 50], "uv_size": [4, 6]},
+								"west": {"uv": [40, 52], "uv_size": [2, 6]},
+								"up": {"uv": [58, 44], "uv_size": [-4, -2]},
+								"down": {"uv": [58, 42], "uv_size": [-4, -2]}
+							}
+						},
+						{
+							"origin": [8, 0, -13],
+							"size": [4, 6, 2],
+							"uv": {
+								"north": {"uv": [32, 50], "uv_size": [4, 6]},
+								"east": {"uv": [42, 52], "uv_size": [2, 6]},
+								"south": {"uv": [36, 50], "uv_size": [4, 6]},
+								"west": {"uv": [40, 52], "uv_size": [2, 6]},
+								"up": {"uv": [58, 44], "uv_size": [-4, -2]},
+								"down": {"uv": [58, 42], "uv_size": [-4, -2]}
+							}
+						},
+						{
+							"origin": [-2, 0, -13],
+							"size": [4, 6, 2],
+							"uv": {
+								"north": {"uv": [32, 50], "uv_size": [4, 6]},
+								"east": {"uv": [42, 52], "uv_size": [2, 6]},
+								"south": {"uv": [36, 50], "uv_size": [4, 6]},
+								"west": {"uv": [40, 52], "uv_size": [2, 6]},
+								"up": {"uv": [58, 44], "uv_size": [-4, -2]},
+								"down": {"uv": [58, 42], "uv_size": [-4, -2]}
+							}
+						}
+					]
+				},
+				{
+					"name": "tongue",
+					"parent": "clam",
+					"pivot": [0, 3, 5],
+					"cubes": [
+						{
+							"origin": [-8, 2, -6],
+							"size": [16, 1, 11],
+							"pivot": [-1, 2, 5],
+							"rotation": [-12.5, 0, 0],
+							"uv": {
+								"north": {"uv": [40, 50], "uv_size": [16, 1]},
+								"east": {"uv": [44, 52], "uv_size": [11, 1]},
+								"south": {"uv": [40, 51], "uv_size": [16, 1]},
+								"west": {"uv": [44, 53], "uv_size": [11, 1]},
+								"up": {"uv": [0, 44], "uv_size": [16, 11]},
+								"down": {"uv": [16, 55], "uv_size": [16, -11]}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}
