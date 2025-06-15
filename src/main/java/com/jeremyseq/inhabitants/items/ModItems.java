@@ -11,13 +11,13 @@ public class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Inhabitants.MODID);
 
     public static final RegistryObject<Item> GIANT_BONE = ITEMS.register("giant_bone",
-            () -> new GiantBoneItem());
+            GiantBoneItem::new);
 
     public static final RegistryObject<Item> FISH_SNOT_CHOWDER = ITEMS.register("fish_snot_chowder",
-            () -> new FishSnotChowderItem());
+            FishSnotChowderItem::new);
 
     public static final RegistryObject<Item> BRACER_OF_MIGHT = ITEMS.register("bracer_of_might",
-            () -> new BracerOfMightItem());
+            BracerOfMightItem::new);
 
     public static final RegistryObject<Item> DEAD_BOGRE_ICON = ITEMS.register("dead_bogre_icon",
             () -> new Item(new Item.Properties().stacksTo(1)));

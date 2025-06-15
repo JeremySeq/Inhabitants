@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class BracerOfMightItem extends Item {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(@NotNull ItemStack stack, Level level, @NotNull Entity entity, int slot, boolean selected) {
         if (level.isClientSide || !(entity instanceof Player player)) return;
 
         // Only apply if item is in hotbar (slots 0–8)
@@ -32,7 +33,7 @@ public class BracerOfMightItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, Level level, List<Component> tooltip, @NotNull TooltipFlag flag) {
         tooltip.add(Component.literal("Grants Strength II while in hotbar").withStyle(ChatFormatting.BLUE));
     }
 }

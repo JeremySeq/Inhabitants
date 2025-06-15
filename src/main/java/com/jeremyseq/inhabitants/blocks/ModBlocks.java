@@ -21,15 +21,12 @@ public class ModBlocks
             () -> new InvisibleCauldronBlock(Block.Properties.of().noLootTable().strength(-1.0F, 3600000.0F).noOcclusion())
     );
 
-
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
-        RegistryObject<T> toReturn = BLOCKS.register(name, block);
-        registerBlockItem(name, toReturn);
-        return toReturn;
+        return BLOCKS.register(name, block);
     }
 
     private static <T extends Block> RegistryObject<Item> registerBlockItem(String name, RegistryObject<T> block) {
-        return ModItems.ITEMS.register(name, () -> new BlockItem((Block)block.get(), new Item.Properties()));
+        return ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
 
     public static void register(IEventBus eventBus) {

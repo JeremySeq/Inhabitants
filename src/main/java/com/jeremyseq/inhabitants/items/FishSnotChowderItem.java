@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class FishSnotChowderItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, Level level, List<Component> tooltip, @NotNull TooltipFlag flag) {
         tooltip.add(Component.literal("Smells awful...").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     }
 }
