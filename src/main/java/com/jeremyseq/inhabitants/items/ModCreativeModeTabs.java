@@ -20,6 +20,7 @@ public class ModCreativeModeTabs {
                     .withLabelColor(new Color(0x2C7866).getRGB())
                     .title(Component.translatable("creativetab.inhabitants_tab"))
                     .displayItems((pParameters, pOutput) -> {
+                        pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
                         pOutput.accept(ModItems.BRACER_OF_MIGHT.get());
                         pOutput.accept(ModItems.GIANT_BONE.get());
