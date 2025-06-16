@@ -30,7 +30,7 @@ public class WarpedClamRenderer extends GeoEntityRenderer<WarpedClamEntity> {
 
         @Override
         protected ItemDisplayContext getTransformTypeForStack(GeoBone bone, ItemStack stack, WarpedClamEntity animatable) {
-            return ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
+            return ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
         }
 
         @Override
@@ -40,7 +40,5 @@ public class WarpedClamRenderer extends GeoEntityRenderer<WarpedClamEntity> {
             }
             return super.getStackForBone(bone, animatable);
         }
-
-
     }
 }

@@ -147,6 +147,12 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "pearl",
+					"parent": "tongue",
+					"pivot": [0, 2.5, 2],
+					"rotation": [35, 0, 0]
 				}
 			]
 		}

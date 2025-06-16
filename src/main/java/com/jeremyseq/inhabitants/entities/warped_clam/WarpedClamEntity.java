@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.warped_clam;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -32,15 +31,14 @@ import java.util.List;
 public class WarpedClamEntity extends Entity implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
+    public static final EntityDataAccessor<Boolean> OPEN = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> FLING_ANIM = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> DROP_PEARL_ANIM = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
-
-    public static final EntityDataAccessor<Boolean> HAS_PEARL =
-            SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> HAS_PEARL = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int pearlRegenTimer = 0; // Ticks until pearl regenerates
     private int launchDelayTicks = 0;
     private int popDelayTicks = 0;
+    private boolean lastOpenState = false;
 
     public WarpedClamEntity(EntityType<? extends Entity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -69,7 +67,7 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
         }
 
         // Check for players standing on top and trigger launch delay
-        if (hasPearl() && !level().isClientSide && launchDelayTicks == 0) {
+        if (!level().isClientSide && launchDelayTicks == 0) {
             AABB topBox = getBoundingBox().move(0, 0.4, 0); // slightly above the clam
             List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, topBox);
 
@@ -88,11 +86,11 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
             }
         }
 
-        // Handle pearl pop delay
+        // handle pearl pop delay
         if (popDelayTicks > 0) {
             popDelayTicks--;
             if (popDelayTicks == 0) {
-                popPearl();
+                entityData.set(OPEN, false);
             }
         }
 
@@ -113,22 +111,26 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand) {
         ItemStack item = player.getItemInHand(hand);
-        if (item.is(Items.BRUSH) && hasPearl()) {
+        if (!isOpen() && item.is(Items.BRUSH)) {
             if (!level().isClientSide) {
-                entityData.set(DROP_PEARL_ANIM, false);
-                entityData.set(DROP_PEARL_ANIM, true);
+                entityData.set(OPEN, true);
+                popDelayTicks = 60; // how long clam stays open
 
-                popDelayTicks = 20;
-
-                // sound
                 level().playSound(null, getX(), getY(), getZ(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.NEUTRAL, 3.0f, 1.0f);
             }
             return InteractionResult.sidedSuccess(level().isClientSide);
+        } else if (hasPearl() && isOpen()) {
+            popPearl();
+            entityData.set(OPEN, false);
+            entityData.set(HAS_PEARL, false);
+            return InteractionResult.sidedSuccess(level().isClientSide);
         }
+
         return super.interact(player, hand);
     }
+
 
     private void launchEntity() {
         AABB box = getBoundingBox().move(0, 0.4, 0);
@@ -145,8 +147,6 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
 
                 entity.setDeltaMovement(launchVec);
                 entity.hurtMarked = true;
-
-                consumePearl();
 
                 level().playSound(null, getX(), getY(), getZ(), SoundEvents.ENDER_EYE_LAUNCH, SoundSource.NEUTRAL, 4.0f, 1.0f);
             }
@@ -168,6 +168,10 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
         return this.entityData.get(HAS_PEARL);
     }
 
+    public boolean isOpen() {
+        return this.entityData.get(OPEN);
+    }
+
     public void setHasPearl(boolean value) {
         this.entityData.set(HAS_PEARL, value);
     }
@@ -179,26 +183,34 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
+        AnimationController<?> controller = animationState.getController();
+
         if (entityData.get(FLING_ANIM)) {
-            animationState.getController().setAnimation(RawAnimation.begin().then("pushing", Animation.LoopType.PLAY_ONCE));
-            if (animationState.getController().hasAnimationFinished()) {
+            controller.setAnimation(RawAnimation.begin().then("pushing", Animation.LoopType.PLAY_ONCE));
+
+            if (controller.hasAnimationFinished()) {
                 entityData.set(FLING_ANIM, false);
-                animationState.getController().forceAnimationReset();
+                controller.forceAnimationReset();
             }
+
             return PlayState.CONTINUE;
         }
 
-        if (entityData.get(DROP_PEARL_ANIM)) {
-            animationState.getController().setAnimation(RawAnimation.begin().then("dropping_pearl", Animation.LoopType.PLAY_ONCE));
-            if (animationState.getController().hasAnimationFinished()) {
-                entityData.set(DROP_PEARL_ANIM, false);
-                animationState.getController().forceAnimationReset();
+        boolean isOpen = entityData.get(OPEN);
+
+        if (isOpen) {
+            controller.setAnimation(RawAnimation.begin().then("open", Animation.LoopType.HOLD_ON_LAST_FRAME));
+        } else {
+            // only play close once when transitioning from open to closed
+            if (lastOpenState) {
+                controller.setAnimation(RawAnimation.begin().then("close", Animation.LoopType.HOLD_ON_LAST_FRAME));
             }
-            return PlayState.CONTINUE;
         }
 
+        lastOpenState = isOpen;
         return PlayState.CONTINUE;
     }
+
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
@@ -208,8 +220,8 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
     @Override
     protected void defineSynchedData() {
         entityData.define(FLING_ANIM, false);
-        entityData.define(DROP_PEARL_ANIM, false);
         entityData.define(HAS_PEARL, true);
+        entityData.define(OPEN, false);
     }
 
     @Override
