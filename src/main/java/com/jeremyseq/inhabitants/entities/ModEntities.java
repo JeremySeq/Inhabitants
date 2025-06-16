@@ -44,6 +44,7 @@ public class ModEntities {
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
+        event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
     }
 
     @SubscribeEvent

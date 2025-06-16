@@ -7,17 +7,22 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -28,7 +33,7 @@ import software.bernie.geckolib.core.object.PlayState;
 
 import java.util.List;
 
-public class WarpedClamEntity extends Entity implements GeoEntity {
+public class WarpedClamEntity extends Mob implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     public static final EntityDataAccessor<Boolean> OPEN = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
@@ -40,8 +45,38 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
     private int popDelayTicks = 0;
     private boolean lastOpenState = false;
 
-    public WarpedClamEntity(EntityType<? extends Entity> pEntityType, Level pLevel) {
+    public WarpedClamEntity(EntityType<? extends Mob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+    }
+
+    public static AttributeSupplier setAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 20f).build();
+    }
+
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor pLevel,
+                                                  @NotNull DifficultyInstance pDifficulty,
+                                                  @NotNull MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData,
+                                                  @Nullable CompoundTag pDataTag) {
+        if ((pReason == MobSpawnType.SPAWN_EGG) && pLevel.getNearestPlayer(this, 10) != null) {
+            // face same direction as nearest player within 10 blocks (usually the one who used the egg)
+            Player player = pLevel.getNearestPlayer(this, 10);
+            if (player != null) {
+                float playerYaw = player.getYRot();
+                this.setYRot(playerYaw);
+                this.setYHeadRot(playerYaw);
+                this.setYBodyRot(playerYaw);
+            }
+        } else {
+            // for natural spawn or summon, randomize direction
+            float yaw = pLevel.getRandom().nextFloat() * 360f;
+            this.setYRot(yaw);
+            this.setYHeadRot(yaw);
+            this.setYBodyRot(yaw);
+        }
+
+        return pSpawnData;
     }
 
     @Override
@@ -70,6 +105,7 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
         if (!level().isClientSide && launchDelayTicks == 0) {
             AABB topBox = getBoundingBox().move(0, 0.4, 0); // slightly above the clam
             List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, topBox);
+            entities.remove(this);
 
             if (!entities.isEmpty()) {
                 entityData.set(FLING_ANIM, false);
@@ -111,7 +147,7 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand) {
+    protected @NotNull InteractionResult mobInteract(Player player, @NotNull InteractionHand hand) {
         ItemStack item = player.getItemInHand(hand);
         if (!isOpen() && item.is(Items.BRUSH)) {
             if (!level().isClientSide) {
@@ -127,8 +163,7 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
             entityData.set(HAS_PEARL, false);
             return InteractionResult.sidedSuccess(level().isClientSide);
         }
-
-        return super.interact(player, hand);
+        return super.mobInteract(player, hand);
     }
 
 
@@ -136,6 +171,9 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
         AABB box = getBoundingBox().move(0, 0.4, 0);
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, box);
         for (LivingEntity entity : entities) {
+            if (entity == this) {
+                continue;
+            }
             if (entity.onGround()) {
                 // Get direction clam is facing
                 float yaw = this.getYRot(); // Degrees
@@ -219,18 +257,9 @@ public class WarpedClamEntity extends Entity implements GeoEntity {
 
     @Override
     protected void defineSynchedData() {
+        super.defineSynchedData();
         entityData.define(FLING_ANIM, false);
         entityData.define(HAS_PEARL, true);
         entityData.define(OPEN, false);
-    }
-
-    @Override
-    protected void readAdditionalSaveData(@NotNull CompoundTag tag) {
-
-    }
-
-    @Override
-    protected void addAdditionalSaveData(@NotNull CompoundTag tag) {
-
     }
 }
