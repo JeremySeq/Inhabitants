@@ -27,6 +27,10 @@ public class ModItems {
     public static final RegistryObject<Item> BOGRE_SPAWN_EGG = ITEMS.register("bogre_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.BOGRE, 0x36786A, 0xA35242, new Item.Properties()));
 
+    public static final RegistryObject<Item> WARPED_CLAM_ITEM = ITEMS.register("warped_clam_item",
+            () -> new WarpedClamItem(new Item.Properties()));
+
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

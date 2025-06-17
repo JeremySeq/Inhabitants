@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.warped_clam;
 
+import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
@@ -82,7 +84,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
 
     @Override
     public boolean hurt(@NotNull DamageSource pSource, float pAmount) {
-        if (!this.isOpen()) {
+        if (!this.isOpen() && pSource.getEntity() instanceof LivingEntity) {
             return false;
         }
         return super.hurt(pSource, pAmount);
@@ -168,6 +170,16 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
     @Override
     protected @NotNull InteractionResult mobInteract(Player player, @NotNull InteractionHand hand) {
         ItemStack item = player.getItemInHand(hand);
+
+        if (item.getItem() instanceof ShovelItem) {
+            item.hurtAndBreak(3, player, (p) -> p.broadcastBreakEvent(hand));
+            if (!level().isClientSide) {
+                this.discard();
+                this.spawnAtLocation(new ItemStack(ModItems.WARPED_CLAM_ITEM.get()));
+            }
+            return InteractionResult.sidedSuccess(level().isClientSide);
+        }
+
         if (!isOpen() && item.is(Items.BRUSH)) {
             if (!level().isClientSide) {
                 entityData.set(OPEN, true);

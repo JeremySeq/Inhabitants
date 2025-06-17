@@ -24,6 +24,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
                         pOutput.accept(ModItems.BRACER_OF_MIGHT.get());
                         pOutput.accept(ModItems.GIANT_BONE.get());
+                        pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
                     })
                     .build());
 
