@@ -5,7 +5,9 @@
       "trigger": "minecraft:consume_item",
       "conditions": {
         "item": {
-          "item": "inhabitants:fish_snot_chowder"
+          "items": [
+            "inhabitants:fish_snot_chowder"
+          ]
         }
       }
     }
