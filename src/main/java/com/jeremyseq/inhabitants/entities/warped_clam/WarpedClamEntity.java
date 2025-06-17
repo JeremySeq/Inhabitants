@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -78,6 +79,24 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
 
         return pSpawnData;
     }
+
+    @Override
+    public boolean hurt(@NotNull DamageSource pSource, float pAmount) {
+        if (!this.isOpen()) {
+            return false;
+        }
+        return super.hurt(pSource, pAmount);
+    }
+
+    @Override
+    public void die(@NotNull DamageSource pDamageSource) {
+        if (this.hasPearl()) {
+            popPearl();
+        }
+    }
+
+    @Override
+    public void knockback(double pStrength, double pX, double pZ) {}
 
     @Override
     public boolean canBeCollidedWith() {
