@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.jeremyseq.inhabitants.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MixinDecoratedPotPatterns"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "inhabitants.refmap.json"
+}
