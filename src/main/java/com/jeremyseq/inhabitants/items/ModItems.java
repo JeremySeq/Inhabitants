@@ -27,6 +27,9 @@ public class ModItems {
     public static final RegistryObject<Item> BRACER_OF_MIGHT = ITEMS.register("bracer_of_might",
             BracerOfMightItem::new);
 
+    public static final RegistryObject<Item> SPOTLIGHT_POTTERY_SHERD = ITEMS.register("spotlight_pottery_sherd",
+            () -> new CustomSherdItem(ModPottery.SHERD_SPOTLIGHT));
+
     public static final RegistryObject<Item> DEAD_BOGRE_ICON = ITEMS.register("dead_bogre_icon",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
