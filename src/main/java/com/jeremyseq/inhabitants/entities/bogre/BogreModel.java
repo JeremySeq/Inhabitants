@@ -11,17 +11,17 @@ import software.bernie.geckolib.model.data.EntityModelData;
 
 public class BogreModel extends GeoModel<BogreEntity> {
     @Override
-    public ResourceLocation getModelResource(BogreEntity bogreEntity) {
+    public ResourceLocation getModelResource(BogreEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/bogre.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(BogreEntity bogreEntity) {
+    public ResourceLocation getTextureResource(BogreEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre.png");
     }
 
     @Override
-    public ResourceLocation getAnimationResource(BogreEntity bogreEntity) {
+    public ResourceLocation getAnimationResource(BogreEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "animations/bogre.animation.json");
     }
 

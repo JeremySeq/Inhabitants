@@ -6,17 +6,17 @@ import software.bernie.geckolib.model.GeoModel;
 
 public class WarpedClamModel extends GeoModel<WarpedClamEntity> {
     @Override
-    public ResourceLocation getModelResource(WarpedClamEntity bogreEntity) {
+    public ResourceLocation getModelResource(WarpedClamEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/warped_clam.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(WarpedClamEntity bogreEntity) {
+    public ResourceLocation getTextureResource(WarpedClamEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/warped_clam.png");
     }
 
     @Override
-    public ResourceLocation getAnimationResource(WarpedClamEntity bogreEntity) {
+    public ResourceLocation getAnimationResource(WarpedClamEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "animations/warped_clam.animation.json");
     }
 }
