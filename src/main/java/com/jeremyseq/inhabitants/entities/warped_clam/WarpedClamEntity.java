@@ -175,7 +175,9 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             item.hurtAndBreak(3, player, (p) -> p.broadcastBreakEvent(hand));
             if (!level().isClientSide) {
                 this.discard();
-                this.spawnAtLocation(new ItemStack(ModItems.WARPED_CLAM_ITEM.get()));
+                ItemStack clamItem = new ItemStack(ModItems.WARPED_CLAM_ITEM.get());
+                clamItem.getOrCreateTag().putBoolean("has_pearl", hasPearl());
+                this.spawnAtLocation(clamItem);
             }
             return InteractionResult.sidedSuccess(level().isClientSide);
         }

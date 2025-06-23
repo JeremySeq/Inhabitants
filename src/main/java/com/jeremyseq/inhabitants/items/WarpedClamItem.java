@@ -38,6 +38,12 @@ public class WarpedClamItem extends Item {
             clam.setYBodyRot(context.getRotation());
             clam.setYHeadRot(context.getRotation());
 
+            if (itemStack.getTag() != null && itemStack.getTag().contains("has_pearl")) {
+                clam.setHasPearl(itemStack.getTag().getBoolean("has_pearl"));
+            } else {
+                clam.setHasPearl(false);
+            }
+
             level.addFreshEntity(clam);
 
             if (player != null && !player.getAbilities().instabuild) {
