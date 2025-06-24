@@ -18,3 +18,10 @@ The following mobs are fully implemented and functional in the game.
 A large ogre-like creature that lives in the swamp. It moves slowly but hits hard. You can tame it with fish; it can make chowder for you and can carve bones into weapons.
 
 ![Bogre](images/bogre.gif)
+
+**Warped Clam**
+
+A passive End creature that launches players into the air when stepped on, which is especially useful if you have an Elytra. It only takes damage when it opens. Players can use a brush on it to harvest ender pearls and can pick it up using a shovel.
+
+![Warped Clam](images/warped_clam.gif)
+
