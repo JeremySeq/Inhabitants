@@ -28,6 +28,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BRACER_OF_MIGHT.get());
                         pOutput.accept(ModItems.GIANT_BONE.get());
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
+                        pOutput.accept(ModItems.ABYSSFISH_SPAWN_EGG.get());
                         pOutput.accept(ModItems.RAW_ABYSSFISH.get());
                         pOutput.accept(ModItems.COOKED_ABYSSFISH.get());
                         pOutput.accept(ModItems.ABYSSFISH_BUCKET.get());

@@ -48,6 +48,8 @@ public class ModItems {
                     new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))
     );
 
+    public static final RegistryObject<Item> ABYSSFISH_SPAWN_EGG = ITEMS.register("abyssfish_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.ABYSSFISH, 0x509297, 0xA9CDD1, new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
