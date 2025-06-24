@@ -33,8 +33,6 @@ public class Inhabitants
     {
         IEventBus modEventBus = context.getModEventBus();
 
-        ModCreativeModeTabs.register(modEventBus);
-
         ModItems.register(modEventBus);
         ModEffects.register(modEventBus);
         ModPotions.register(modEventBus);
@@ -44,6 +42,8 @@ public class Inhabitants
         ModBlocks.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
         ModLootModifiers.register(modEventBus);
+
+        ModCreativeModeTabs.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -75,6 +75,9 @@ public class Inhabitants
             event.enqueueWork(() -> {
                 BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
                         Items.POTION, Potions.AWKWARD, ModItems.RAW_ABYSSFISH.get(), ModPotions.ADAPTATION_POTION.get()
+                ));
+                BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
+                        Items.POTION, ModPotions.ADAPTATION_POTION.get(), Items.REDSTONE, ModPotions.LONG_ADAPTATION_POTION.get()
                 ));
             });
         }

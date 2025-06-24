@@ -1,10 +1,13 @@
 package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.potions.ModPotions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -25,6 +28,11 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BRACER_OF_MIGHT.get());
                         pOutput.accept(ModItems.GIANT_BONE.get());
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
+                        pOutput.accept(ModItems.RAW_ABYSSFISH.get());
+                        pOutput.accept(ModItems.COOKED_ABYSSFISH.get());
+                        pOutput.accept(ModItems.ABYSSFISH_BUCKET.get());
+                        pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.ADAPTATION_POTION.get()));
+                        pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.LONG_ADAPTATION_POTION.get()));
                     })
                     .build());
 

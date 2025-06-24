@@ -13,7 +13,6 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.animal.AbstractFish;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
@@ -100,6 +99,6 @@ public class AbyssfishEntity extends AbstractFish implements GeoEntity {
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
-        return new ItemStack(Items.COD_BUCKET);
+        return new ItemStack(ModItems.ABYSSFISH_BUCKET.get());
     }
 }

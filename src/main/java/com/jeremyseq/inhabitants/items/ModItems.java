@@ -2,7 +2,11 @@ package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MobBucketItem;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -35,6 +39,14 @@ public class ModItems {
 
     public static final RegistryObject<Item> COOKED_ABYSSFISH = ITEMS.register("cooked_abyssfish",
             CookedAbyssfishItem::new);
+
+    public static final RegistryObject<Item> ABYSSFISH_BUCKET = ITEMS.register("abyssfish_bucket", () ->
+            new MobBucketItem(
+                    ModEntities.ABYSSFISH,
+                    () -> Fluids.WATER,
+                    () -> SoundEvents.BUCKET_EMPTY_FISH,
+                    new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))
+    );
 
 
     public static void register(IEventBus eventBus) {
