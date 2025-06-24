@@ -5,6 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
+import org.jetbrains.annotations.NotNull;
 
 public class SimpleBrewingRecipe implements IBrewingRecipe {
     private final Item inputBottle;
@@ -30,7 +31,7 @@ public class SimpleBrewingRecipe implements IBrewingRecipe {
     }
 
     @Override
-    public ItemStack getOutput(ItemStack input, ItemStack ingredient) {
+    public @NotNull ItemStack getOutput(@NotNull ItemStack input, @NotNull ItemStack ingredient) {
         if (isInput(input) && isIngredient(ingredient)) {
             return PotionUtils.setPotion(new ItemStack(inputBottle), outputPotion);
         }

@@ -1,6 +1,8 @@
 package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishEntity;
+import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
@@ -41,10 +43,18 @@ public class ModEntities {
                             .sized(1.5f, .4f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "warped_clam").toString()));
 
+    public static final RegistryObject<EntityType<AbyssfishEntity>> ABYSSFISH =
+            REGISTRY.register("abyssfish", () -> EntityType.Builder
+                    .of(AbyssfishEntity::new, MobCategory.WATER_AMBIENT)
+                    .sized(0.6f, 0.4f)
+                    .build("abyssfish"));
+
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
+        event.put(ModEntities.ABYSSFISH.get(), AbyssfishEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -52,5 +62,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.BOGRE.get(), BogreRenderer::new);
         EntityRenderers.register(ModEntities.BOGRE_CAULDRON.get(), BogreCauldronRenderer::new);
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
+        EntityRenderers.register(ModEntities.ABYSSFISH.get(), AbyssfishRenderer::new);
     }
 }

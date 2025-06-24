@@ -1,0 +1,14 @@
+{
+  "type": "inhabitants:abyssfish_loot_modifier",
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:gameplay/fishing"
+    },
+    {
+      "condition": "minecraft:random_chance",
+      "chance": 0.1
+    }
+  ],
+  "item": "inhabitants:raw_abyssfish"
+}

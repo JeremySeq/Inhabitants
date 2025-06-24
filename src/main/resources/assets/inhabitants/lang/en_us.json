@@ -12,6 +12,9 @@
   "item.inhabitants.raw_abyssfish": "Raw Abyssfish",
   "item.inhabitants.cooked_abyssfish": "Cooked Abyssfish",
 
+  "item.minecraft.potion.effect.adaptation": "Potion of Adaptation",
+  "effect.inhabitants.adaptation": "Adaptation",
+
   "advancement.inhabitants.david_and_goliath.title": "David and Goliath",
   "advancement.inhabitants.david_and_goliath.description": "Defeat the mighty Bogre.",
   "advancement.inhabitants.ate_fish_snot_chowder.title": "Is this even edible?",
