@@ -568,6 +568,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                                             || item.getItem().is(Items.SALMON)
                                             || item.getItem().is(Items.TROPICAL_FISH)
                                             || item.getItem().is(Items.PUFFERFISH)
+                                            || item.getItem().is(ModItems.RAW_ABYSSFISH.get())
                                     )
                     );
 
