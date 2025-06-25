@@ -130,7 +130,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0F)
-                .add(Attributes.MOVEMENT_SPEED, .25f).build();
+                .add(Attributes.MOVEMENT_SPEED, .15f).build();
     }
 
     @Override
