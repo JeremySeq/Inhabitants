@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
@@ -18,5 +19,13 @@ public class MobSpawning {
                 (entityType, level, spawnType, pos, random) -> true,
                 SpawnPlacementRegisterEvent.Operation.REPLACE
         );
+        event.register(
+                ModEntities.ABYSSFISH.get(),
+                SpawnPlacements.Type.IN_WATER,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                (type, level, reason, pos, random) -> level.getBlockState(pos).getFluidState().is(FluidTags.WATER) && pos.getY() < 45,
+                SpawnPlacementRegisterEvent.Operation.REPLACE
+        );
+
     }
 }
