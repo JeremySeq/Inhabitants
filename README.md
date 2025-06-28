@@ -25,3 +25,9 @@ A passive End creature that launches players into the air when stepped on, which
 
 ![Warped Clam](images/warped_clam.gif)
 
+**Abyssfish**
+
+A glowing fish found deep in the ocean. It can be caught while fishing and cooked like cod, or brewed into a Potion of Adaptation that lets you see clearly underwater and in lava.
+
+![Abyssfish](images/abyssfish.gif)
+
