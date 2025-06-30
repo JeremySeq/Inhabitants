@@ -7,6 +7,8 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -49,12 +51,18 @@ public class ModEntities {
                     .sized(0.6f, 0.4f)
                     .build("abyssfish"));
 
+    public static final RegistryObject<EntityType<ImpalerEntity>> IMPALER =
+            REGISTRY.register("impaler",
+                    () -> EntityType.Builder.of(ImpalerEntity::new, MobCategory.MONSTER)
+                            .sized(1, 2.4f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler").toString()));
 
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.ABYSSFISH.get(), AbyssfishEntity.setAttributes());
+        event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -63,5 +71,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.BOGRE_CAULDRON.get(), BogreCauldronRenderer::new);
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
         EntityRenderers.register(ModEntities.ABYSSFISH.get(), AbyssfishRenderer::new);
+        EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
     }
 }
