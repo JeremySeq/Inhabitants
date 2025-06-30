@@ -1,11 +1,13 @@
 package com.jeremyseq.inhabitants.entities.warped_clam;
 
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.DifficultyInstance;
@@ -22,6 +24,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -188,7 +191,23 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
                 popDelayTicks = 60; // how long clam stays open
 
                 level().playSound(null, getX(), getY(), getZ(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.NEUTRAL, 3.0f, 1.0f);
+
+                // play the brushing sound
+                level().playSound(null, getX(), getY(), getZ(), SoundEvents.BRUSH_SAND, SoundSource.PLAYERS, 1.0f, 1.0f);
+
+                // spawn brushing particles like suspicious sand
+                ((ServerLevel) level()).sendParticles(
+                        new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SUSPICIOUS_SAND.defaultBlockState()),
+                        getX(), getY() + 0.5, getZ(),
+                        10, // count
+                        0.2, 0.2, 0.2, // x, y, z offset
+                        0.0 // speed
+                );
             }
+
+            // reduce brush durability
+            item.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
+
             return InteractionResult.sidedSuccess(level().isClientSide);
         } else if (hasPearl() && isOpen()) {
             popPearl();
