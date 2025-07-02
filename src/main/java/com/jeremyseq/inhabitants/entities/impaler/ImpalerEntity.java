@@ -134,6 +134,11 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    public float getStepHeight() {
+        return 1.5f;
+    }
+
+    @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
     }
