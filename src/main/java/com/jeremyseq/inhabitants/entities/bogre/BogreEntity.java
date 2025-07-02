@@ -56,6 +56,8 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     public State state = State.CAUTIOUS;
+    // used for different textures, 0 or 1
+    public static final EntityDataAccessor<Integer> TEXTURE_TYPE = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT);
 
     /**
      * On client side, this is used to start the roar animation and is set to false immediately after starting.
@@ -691,6 +693,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(CARVING_ANIM, false);
         entityData.define(DEATH_ANIM, false);
         entityData.define(FISH_HELD, ItemStack.EMPTY);
+        entityData.define(TEXTURE_TYPE, this.level().getRandom().nextInt(2));
     }
 
     public boolean isTamedBy(Player player) {
@@ -779,9 +782,15 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.spawnAtLocation(new ItemStack(ModItems.BRACER_OF_MIGHT.get()));
     }
 
+    public int getTextureType() {
+        return entityData.get(TEXTURE_TYPE);
+    }
+
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+
+        tag.putInt("textureType", entityData.get(TEXTURE_TYPE));
 
         ListTag list = new ListTag();
         for (UUID id : tamedPlayers) {
@@ -799,6 +808,12 @@ public class BogreEntity extends Monster implements GeoEntity {
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+
+        if (tag.contains("textureType")) {
+            entityData.set(TEXTURE_TYPE, tag.getInt("textureType"));
+        } else {
+            entityData.set(TEXTURE_TYPE, this.level().getRandom().nextInt(2));
+        }
 
         tamedPlayers.clear();
 
