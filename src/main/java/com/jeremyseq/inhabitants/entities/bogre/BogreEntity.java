@@ -18,9 +18,12 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -30,6 +33,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -693,7 +698,27 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(CARVING_ANIM, false);
         entityData.define(DEATH_ANIM, false);
         entityData.define(FISH_HELD, ItemStack.EMPTY);
-        entityData.define(TEXTURE_TYPE, this.level().getRandom().nextInt(2));
+        entityData.define(TEXTURE_TYPE, getBiomeTextureType());
+    }
+
+    private int getBiomeTextureType() {
+        if (this.level().getBiome(this.blockPosition()).is(Biomes.MANGROVE_SWAMP)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor pLevel,
+                                                                            @NotNull DifficultyInstance pDifficulty,
+                                                                            @NotNull MobSpawnType pReason,
+                                                                            @org.jetbrains.annotations.Nullable SpawnGroupData pSpawnData,
+                                                                            @org.jetbrains.annotations.Nullable CompoundTag pDataTag) {
+        if (pSpawnData == null) {
+            this.entityData.set(TEXTURE_TYPE, getBiomeTextureType());
+        }
+        return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
     public boolean isTamedBy(Player player) {
@@ -812,7 +837,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (tag.contains("textureType")) {
             entityData.set(TEXTURE_TYPE, tag.getInt("textureType"));
         } else {
-            entityData.set(TEXTURE_TYPE, this.level().getRandom().nextInt(2));
+            entityData.set(TEXTURE_TYPE, getBiomeTextureType());
         }
 
         tamedPlayers.clear();
