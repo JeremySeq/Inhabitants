@@ -1,7 +1,9 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -11,6 +13,7 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -20,6 +23,8 @@ import software.bernie.geckolib.core.object.PlayState;
 
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+
+    private int attackAnimTimer = 0;
 
     public ImpalerEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -77,8 +82,33 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    protected void customServerAiStep() {
+
+        if (this.attackAnimTimer > 0) {
+            this.attackAnimTimer--;
+            if (this.attackAnimTimer == 0) {
+                LivingEntity target = getTarget();
+                if (target != null && distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target)) {
+                    super.doHurtTarget(target);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean doHurtTarget(@NotNull Entity target) {
+        if (!level().isClientSide) {
+            triggerAnim("attack", "bite");
+            this.attackAnimTimer = 10;
+        }
+        return true;
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+        controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
+                .triggerableAnim("bite", RawAnimation.begin().then("bite", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
