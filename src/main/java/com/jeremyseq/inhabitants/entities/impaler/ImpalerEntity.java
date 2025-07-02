@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -105,8 +106,19 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    public boolean hurt(@NotNull DamageSource source, float amount) {
+        boolean result = super.hurt(source, amount);
+        if (result && !level().isClientSide) {
+            this.triggerAnim("hurt", "hurt");
+        }
+        return result;
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+        controllers.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
+                .triggerableAnim("hurt", RawAnimation.begin().then("hurt", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
                 .triggerableAnim("bite", RawAnimation.begin().then("bite", Animation.LoopType.PLAY_ONCE)));
     }
