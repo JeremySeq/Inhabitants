@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.goal.RandomSwimmingGoal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.animal.AbstractFish;
+import net.minecraft.world.entity.animal.AbstractSchoolingFish;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,13 +27,10 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class AbyssfishEntity extends AbstractFish implements GeoEntity {
+public class AbyssfishEntity extends AbstractSchoolingFish implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    private static final RawAnimation SWIM_ANIM = RawAnimation.begin().thenLoop("swimming");
-    private static final RawAnimation FLOP_ANIM = RawAnimation.begin().thenLoop("flopping");
-
-    public AbyssfishEntity(EntityType<? extends AbstractFish> type, Level level) {
+    public AbyssfishEntity(EntityType<? extends AbstractSchoolingFish> type, Level level) {
         super(type, level);
     }
 
@@ -47,24 +45,6 @@ public class AbyssfishEntity extends AbstractFish implements GeoEntity {
         this.goalSelector.addGoal(1, new PanicGoal(this, 1.25D));
         this.goalSelector.addGoal(2, new RandomSwimmingGoal(this, 1.0D, 40));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 6.0F));
-    }
-
-    @Override
-    public void aiStep() {
-        super.aiStep();
-
-        if (!this.isInWater() && this.onGround() && this.verticalCollision) {
-            this.setDeltaMovement(
-                    this.getDeltaMovement().add(
-                            (this.random.nextFloat() * 2.0F - 1.0F) * 0.05F,
-                            0.4F,
-                            (this.random.nextFloat() * 2.0F - 1.0F) * 0.05F
-                    )
-            );
-            this.setOnGround(false);
-            this.hasImpulse = true;
-            this.hurt(this.damageSources().dryOut(), 1.0F);
-        }
     }
 
     @Override
@@ -84,11 +64,7 @@ public class AbyssfishEntity extends AbstractFish implements GeoEntity {
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
-        if (this.isInWater()) {
-            animationState.setAnimation(SWIM_ANIM);
-        } else {
-            animationState.setAnimation(FLOP_ANIM);
-        }
+        animationState.setAnimation(RawAnimation.begin().thenLoop("swimming"));
         return PlayState.CONTINUE;
     }
 

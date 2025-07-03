@@ -10,6 +10,7 @@ import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 public class AbyssfishRenderer extends GeoEntityRenderer<AbyssfishEntity> {
     public AbyssfishRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new AbyssfishModel());
+        this.shadowRadius = 0.3f;
         addRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
 

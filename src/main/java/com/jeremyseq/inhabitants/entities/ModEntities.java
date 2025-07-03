@@ -48,7 +48,7 @@ public class ModEntities {
     public static final RegistryObject<EntityType<AbyssfishEntity>> ABYSSFISH =
             REGISTRY.register("abyssfish", () -> EntityType.Builder
                     .of(AbyssfishEntity::new, MobCategory.WATER_AMBIENT)
-                    .sized(0.6f, 0.4f)
+                    .sized(0.6f, 0.3f)
                     .build("abyssfish"));
 
     public static final RegistryObject<EntityType<ImpalerEntity>> IMPALER =
