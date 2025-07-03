@@ -1,6 +1,7 @@
 {
   "entity.inhabitants.bogre": "Bogre",
   "entity.inhabitants.warped_clam": "Warped Clam",
+  "entity.inhabitants.impaler": "Impaler",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -13,6 +14,7 @@
   "item.inhabitants.cooked_abyssfish": "Cooked Pitfish",
   "item.inhabitants.abyssfish_bucket": "Bucket of Pitfish",
   "item.inhabitants.abyssfish_spawn_egg": "Pitfish Spawn Egg",
+  "item.inhabitants.impaler_spawn_egg": "Impaler Spawn Egg",
 
   "item.minecraft.potion.effect.adaptation": "Potion of Adaptation",
   "item.minecraft.potion.effect.long_adaptation": "Potion of Adaptation",

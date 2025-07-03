@@ -51,6 +51,9 @@ public class ModItems {
     public static final RegistryObject<Item> ABYSSFISH_SPAWN_EGG = ITEMS.register("abyssfish_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.ABYSSFISH, 0x509297, 0xA9CDD1, new Item.Properties()));
 
+    public static final RegistryObject<Item> IMPALER_SPAWN_EGG = ITEMS.register("impaler_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.IMPALER, 0xA0925B, 0xC8C4BF, new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

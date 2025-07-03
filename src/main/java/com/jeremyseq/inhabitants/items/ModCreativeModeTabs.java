@@ -34,6 +34,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.ABYSSFISH_BUCKET.get());
                         pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.ADAPTATION_POTION.get()));
                         pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.LONG_ADAPTATION_POTION.get()));
+                        pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                     })
                     .build());
 
