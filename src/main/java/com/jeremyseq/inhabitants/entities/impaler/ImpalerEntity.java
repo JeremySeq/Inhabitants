@@ -1,13 +1,11 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -23,6 +21,7 @@ import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 
 public class ImpalerEntity extends Monster implements GeoEntity {
@@ -43,11 +42,12 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_DAMAGE, 15f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
+                .add(Attributes.FOLLOW_RANGE, 20f)
                 .add(Attributes.MOVEMENT_SPEED, .25f).build();
     }
 
     protected void registerGoals() {
-        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 20f));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         this.addBehaviourGoals();
     }
@@ -56,13 +56,44 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         this.goalSelector.addGoal(1, new RestrictSunGoal(this));
         this.goalSelector.addGoal(2, new FleeSunGoal(this, 1.0D));
         this.goalSelector.addGoal(3, new BreakTorchGoal(this, 1));
+        this.goalSelector.addGoal(4, new SprintAtTargetGoal(this, 1.4D, 6.0D));
         this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0D, false));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+
+        // regenerate health over time
+        if (this.getTarget() == null && this.tickCount % 60 == 0 && this.getHealth() < this.getMaxHealth()) {
+            this.heal(1.0F);
+        }
+        if (this.isSpiked() && this.getHealth() > this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
+            this.entityData.set(SPIKED, false);
+        }
+    }
+
+    @Override
+    public void setSprinting(boolean pSprinting) {
+
+        if (this.isSprinting() && !pSprinting) {
+            // stop sprinting
+            Inhabitants.LOGGER.debug("stop sprinting");
+            this.triggerAnim("sprint", "stopSprint");
+        } else if (!this.isSprinting() && pSprinting) {
+            // start sprinting
+            Inhabitants.LOGGER.debug("start sprinting");
+            this.triggerAnim("sprint", "startSprint");
+        }
+
+        super.setSprinting(pSprinting);
+    }
+
     public void aiStep() {
+        // burn in sunlight
         if (this.isAlive()) {
             boolean flag = this.isSunBurnTick();
             if (flag) {
@@ -90,7 +121,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     @Override
     protected void customServerAiStep() {
-
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
             if (this.attackAnimTimer == 0) {
@@ -139,11 +169,18 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 .triggerableAnim("bite", RawAnimation.begin().then("bite", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "rage", 0, state -> PlayState.STOP)
                 .triggerableAnim("rage", RawAnimation.begin().then("rage", Animation.LoopType.PLAY_ONCE)));
+        controllers.add(new AnimationController<>(this, "sprint", 0, state -> PlayState.STOP)
+                .triggerableAnim("startSprint", RawAnimation.begin().then("stepping on four", Animation.LoopType.PLAY_ONCE))
+                .triggerableAnim("stopSprint", RawAnimation.begin().then("stepping on two", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
         if (animationState.isMoving()) {
-            animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
+            if (this.isSprinting()) {
+                animationState.getController().setAnimation(RawAnimation.begin().then("sprint", Animation.LoopType.LOOP));
+            } else {
+                animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
+            }
         } else {
             animationState.getController().setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.LOOP));
         }
