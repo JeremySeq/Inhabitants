@@ -2,13 +2,14 @@ package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishEntity;
-import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
-import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
+import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
+import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -30,7 +31,7 @@ public class ModEntities {
     public static final RegistryObject<EntityType<BogreEntity>> BOGRE =
             REGISTRY.register("bogre",
                     () -> EntityType.Builder.of(BogreEntity::new, MobCategory.MONSTER)
-                            .sized(2.7f, 3.9f)
+                            .sized(2.75f, 3.8f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre").toString()));
 
     public static final RegistryObject<EntityType<BogreCauldronEntity>> BOGRE_CAULDRON =
@@ -57,6 +58,15 @@ public class ModEntities {
                             .sized(1, 2.4f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler").toString()));
 
+    public static final RegistryObject<EntityType<ImpalerSpikeProjectile>> IMPALER_SPIKE_PROJECTILE =
+            REGISTRY.register("impaler_spike",
+                    () -> EntityType.Builder.<ImpalerSpikeProjectile>of(
+                                    ImpalerSpikeProjectile::new, MobCategory.MISC)
+                            .sized(0.5f, 0.5f)
+                            .clientTrackingRange(4)
+                            .updateInterval(20)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
@@ -70,7 +80,7 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.BOGRE.get(), BogreRenderer::new);
         EntityRenderers.register(ModEntities.BOGRE_CAULDRON.get(), BogreCauldronRenderer::new);
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
-        EntityRenderers.register(ModEntities.ABYSSFISH.get(), AbyssfishRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
+        EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
     }
 }

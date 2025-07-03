@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
+import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
 import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.potions.ModPotions;
@@ -10,6 +11,7 @@ import com.jeremyseq.inhabitants.potions.SimpleBrewingRecipe;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -33,6 +35,8 @@ public class Inhabitants
     {
         IEventBus modEventBus = context.getModEventBus();
 
+        ModCreativeModeTabs.register(modEventBus);
+
         ModItems.register(modEventBus);
         ModEffects.register(modEventBus);
         ModPotions.register(modEventBus);
@@ -41,9 +45,6 @@ public class Inhabitants
 
         ModBlocks.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
-        ModLootModifiers.register(modEventBus);
-
-        ModCreativeModeTabs.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -79,6 +80,7 @@ public class Inhabitants
                 BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
                         Items.POTION, ModPotions.ADAPTATION_POTION.get(), Items.REDSTONE, ModPotions.LONG_ADAPTATION_POTION.get()
                 ));
+                DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(), new ImpalerSpikeDispenserBehavior());
             });
         }
     }

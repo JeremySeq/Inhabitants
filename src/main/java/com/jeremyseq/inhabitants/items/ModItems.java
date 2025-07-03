@@ -54,6 +54,9 @@ public class ModItems {
     public static final RegistryObject<Item> IMPALER_SPAWN_EGG = ITEMS.register("impaler_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.IMPALER, 0xA0925B, 0xC8C4BF, new Item.Properties()));
 
+    public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
+            () -> new ImpalerSpikeItem(new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
