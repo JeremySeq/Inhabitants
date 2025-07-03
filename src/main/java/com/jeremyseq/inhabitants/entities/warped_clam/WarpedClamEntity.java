@@ -188,7 +188,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         if (!isOpen() && item.is(Items.BRUSH)) {
             if (!level().isClientSide) {
                 entityData.set(OPEN, true);
-                popDelayTicks = 60; // how long clam stays open
+                popDelayTicks = 20*15; // how long clam stays open
 
                 level().playSound(null, getX(), getY(), getZ(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.NEUTRAL, 3.0f, 1.0f);
 
@@ -270,13 +270,15 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+        controllers.add(new AnimationController<>(this, "open", 0, state -> PlayState.STOP)
+                .triggerableAnim("open", RawAnimation.begin().then("Opening", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
         AnimationController<?> controller = animationState.getController();
 
         if (entityData.get(FLING_ANIM)) {
-            controller.setAnimation(RawAnimation.begin().then("pushing", Animation.LoopType.PLAY_ONCE));
+            controller.setAnimation(RawAnimation.begin().then("Pushing", Animation.LoopType.PLAY_ONCE));
 
             if (controller.hasAnimationFinished()) {
                 entityData.set(FLING_ANIM, false);
@@ -289,11 +291,11 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         boolean isOpen = entityData.get(OPEN);
 
         if (isOpen) {
-            controller.setAnimation(RawAnimation.begin().then("open", Animation.LoopType.HOLD_ON_LAST_FRAME));
+            controller.setAnimation(RawAnimation.begin().then("Opened", Animation.LoopType.LOOP));
         } else {
             // only play close once when transitioning from open to closed
             if (lastOpenState) {
-                controller.setAnimation(RawAnimation.begin().then("close", Animation.LoopType.HOLD_ON_LAST_FRAME));
+                controller.setAnimation(RawAnimation.begin().then("Close", Animation.LoopType.HOLD_ON_LAST_FRAME));
             }
         }
 
@@ -301,6 +303,14 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         return PlayState.CONTINUE;
     }
 
+    @Override
+    public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> pKey) {
+        // trigger open animation when the OPEN state changes
+        if (pKey.equals(OPEN) && this.isOpen()) {
+            this.triggerAnim("open", "open");
+        }
+        super.onSyncedDataUpdated(pKey);
+    }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
