@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:smoking",
-  "cookingtime": 100,
+  "type": "minecraft:campfire_cooking",
+  "cookingtime": 600,
   "experience": 0.35,
   "ingredient": {
     "item": "inhabitants:raw_abyssfish"
