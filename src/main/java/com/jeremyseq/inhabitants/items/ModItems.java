@@ -1,6 +1,8 @@
 package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.items.pottery.ModPottery;
+import com.jeremyseq.inhabitants.items.pottery.CustomSherdItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -24,6 +26,9 @@ public class ModItems {
 
     public static final RegistryObject<Item> COOKED_ABYSSFISH = ITEMS.register("cooked_abyssfish",
             () -> new CookedAbyssfishItem());
+
+    public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
+            () -> new ImpalerSpikeItem(new Item.Properties()));
 
     public static final RegistryObject<Item> SPOTLIGHT_POTTERY_SHERD = ITEMS.register("spotlight_pottery_sherd",
             () -> new CustomSherdItem(ModPottery.SHERD_SPOTLIGHT));

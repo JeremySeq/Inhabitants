@@ -17,6 +17,9 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> ADAPTATION =
             EFFECTS.register("adaptation", AdaptationEffect::new);
 
+    public static final RegistryObject<MobEffect> DEAFENING =
+            EFFECTS.register("deafening", DeafeningEffect::new);
+
     public static void register(IEventBus bus) {
         EFFECTS.register(bus);
     }
