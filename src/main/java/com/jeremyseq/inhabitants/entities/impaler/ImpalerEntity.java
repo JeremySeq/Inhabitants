@@ -1,5 +1,8 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -24,6 +27,9 @@ import software.bernie.geckolib.core.object.PlayState;
 
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+
+    public static final int THORN_DAMAGE = 6;
+    public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int attackAnimTimer = 0;
 
@@ -108,8 +114,18 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
         boolean result = super.hurt(source, amount);
+        if (!this.isSpiked() && this.getHealth() <= this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
+            this.entityData.set(SPIKED, true);
+            this.triggerAnim("rage", "rage");
+            return result;
+        }
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
+        }
+        if (this.isSpiked()) {
+            if (source.getDirectEntity() instanceof LivingEntity livingEntity) {
+                livingEntity.hurt(this.damageSources().mobAttack(this), THORN_DAMAGE);
+            }
         }
         return result;
     }
@@ -121,6 +137,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 .triggerableAnim("hurt", RawAnimation.begin().then("hurt", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
                 .triggerableAnim("bite", RawAnimation.begin().then("bite", Animation.LoopType.PLAY_ONCE)));
+        controllers.add(new AnimationController<>(this, "rage", 0, state -> PlayState.STOP)
+                .triggerableAnim("rage", RawAnimation.begin().then("rage", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
@@ -133,9 +151,22 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         return PlayState.CONTINUE;
     }
 
+    /**
+     * @return whether the impaler has its spikes out.
+     */
+    public boolean isSpiked() {
+        return this.entityData.get(SPIKED);
+    }
+
     @Override
     public float getStepHeight() {
         return 1.5f;
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(SPIKED, false);
     }
 
     @Override

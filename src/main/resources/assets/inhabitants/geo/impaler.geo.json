@@ -675,7 +675,7 @@
 					]
 				},
 				{
-					"name": "7",
+					"name": "spikes8",
 					"parent": "righthand",
 					"pivot": [-10.99998, 22.99995, -11.49999],
 					"cubes": [
@@ -694,7 +694,7 @@
 					]
 				},
 				{
-					"name": "8",
+					"name": "spikes7",
 					"parent": "righthand",
 					"pivot": [-9.5, 22, -10.5],
 					"cubes": [
@@ -713,7 +713,7 @@
 					]
 				},
 				{
-					"name": "9",
+					"name": "spikes6",
 					"parent": "righthand",
 					"pivot": [-9, 26, -10.5],
 					"cubes": [
@@ -751,7 +751,7 @@
 					]
 				},
 				{
-					"name": "4",
+					"name": "spikes3",
 					"parent": "lefthand",
 					"pivot": [9, 26, -10.5],
 					"cubes": [
@@ -770,7 +770,7 @@
 					]
 				},
 				{
-					"name": "5",
+					"name": "spikes4",
 					"parent": "lefthand",
 					"pivot": [9.5, 22, -10.5],
 					"cubes": [
@@ -789,7 +789,7 @@
 					]
 				},
 				{
-					"name": "6",
+					"name": "spikes5",
 					"parent": "lefthand",
 					"pivot": [9, 18, -10.5],
 					"cubes": [
