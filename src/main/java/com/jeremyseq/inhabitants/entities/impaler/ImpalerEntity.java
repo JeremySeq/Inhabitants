@@ -47,8 +47,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     }
 
     protected void registerGoals() {
-        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 20f));
-        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 20f));
+        this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
         this.addBehaviourGoals();
     }
 
@@ -57,10 +57,10 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         this.goalSelector.addGoal(2, new FleeSunGoal(this, 1.0D));
         this.goalSelector.addGoal(3, new BreakTorchGoal(this, 1));
         this.goalSelector.addGoal(4, new SprintAtTargetGoal(this, 1.4D, 6.0D));
-        this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0D, false));
+        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, false));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
     }
 
     @Override
