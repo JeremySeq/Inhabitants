@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -81,11 +80,9 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
         if (this.isSprinting() && !pSprinting) {
             // stop sprinting
-            Inhabitants.LOGGER.debug("stop sprinting");
             this.triggerAnim("sprint", "stopSprint");
         } else if (!this.isSprinting() && pSprinting) {
             // start sprinting
-            Inhabitants.LOGGER.debug("start sprinting");
             this.triggerAnim("sprint", "startSprint");
         }
 
