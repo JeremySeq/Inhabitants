@@ -1,10 +1,14 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -23,6 +27,8 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
+
+import java.util.List;
 
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -134,6 +140,13 @@ public class ImpalerEntity extends Monster implements GeoEntity {
             this.rageAnimTimer--;
             if (this.rageAnimTimer == 0) {
                 EntityUtil.shockwave(this, 10, 10);
+                this.level().playSound(null, this.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 10f, 0.9F);
+                // give nearby players the concussion effect
+                double radius = 15.0D;
+                List<Player> players = this.level().getEntitiesOfClass(Player.class, this.getBoundingBox().inflate(radius));
+                for (Player player : players) {
+                    player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 300, 0));
+                }
             }
         }
     }

@@ -4,11 +4,14 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -70,6 +73,17 @@ public class EntityUtil {
                 // this has a max damage of shockwave_damage at the center and falls off to 0 at the edge
                 float damage = (float) (shockwave_damage * (1 - Math.min(distance / shockwave_radius, 1)));
 
+                // if the affected entity is a player blocking with a shield, damage the shield instead
+                if (affected instanceof Player player && player.isBlocking() && isFacing(user, player)) {
+                    int shieldDamage = (int) Math.max(30, damage*3);
+                    damageShield(player, shieldDamage);
+
+                    // disable the shield
+                    player.disableShield(true);
+
+                    player.level().playSound(null, player.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F + player.getRandom().nextFloat() * 0.2F);
+                }
+
                 if (user instanceof Player player) {
                     affected.hurt(player.damageSources().playerAttack(player), damage);
                 } else {
@@ -101,6 +115,24 @@ public class EntityUtil {
                 double py = user.getY();
 
                 serverLevel.sendParticles(crackParticles, px, py, pz, 5, 0.1, 0.01, 0.1, 0.05);
+            }
+        }
+    }
+
+    /**
+     * @return true if defender’s look vector is roughly toward attacker (120deg cone)
+     */
+    public static boolean isFacing(LivingEntity attacker, Player defender) {
+        Vec3 toAttacker = attacker.position().subtract(defender.position()).normalize();
+        return defender.getLookAngle().normalize().dot(toAttacker) > 0.5D;
+    }
+
+    public static void damageShield(Player player, int amount) {
+        for (InteractionHand hand : InteractionHand.values()) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (stack.getItem() instanceof ShieldItem) {
+                stack.hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(hand));
+                break;
             }
         }
     }

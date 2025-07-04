@@ -52,7 +52,7 @@ public class ModEffectEvents {
     @SubscribeEvent
     public static void onPlaySound(PlaySoundEvent event) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null && mc.player.hasEffect(ModEffects.DEAFENING.get())) {
+        if (mc.player != null && mc.player.hasEffect(ModEffects.CONCUSSION.get())) {
             event.setSound(null);
         }
     }
