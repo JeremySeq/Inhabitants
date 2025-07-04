@@ -25,7 +25,8 @@ public class BreakTorchGoal extends Goal {
     public boolean canUse() {
         if (mob.getRandom().nextDouble() > chance) return false;
 
-        for (BlockPos pos : BlockPos.betweenClosed(mob.blockPosition().offset(-6, -3, -6), mob.blockPosition().offset(6, 3, 6))) {
+        BlockPos mobPos = mob.blockPosition();
+        for (BlockPos pos : BlockPos.betweenClosed(mobPos.offset(-6, -3, -6), mobPos.offset(6, 3, 6))) {
             BlockState state = mob.level().getBlockState(pos);
             if (isLightBlock(state.getBlock())) {
                 torchPos = pos.immutable();
@@ -36,19 +37,37 @@ public class BreakTorchGoal extends Goal {
     }
 
     @Override
-    public void tick() {
-        if (torchPos != null && mob.distanceToSqr(Vec3.atCenterOf(torchPos)) < 4) {
-            mob.level().destroyBlock(torchPos, false);
-        }
+    public boolean canContinueToUse() {
+        return torchPos != null &&
+                mob.level().getBlockState(torchPos).getBlock() != Blocks.AIR &&
+                mob.distanceToSqr(Vec3.atCenterOf(torchPos)) <= 64.0;
     }
 
     @Override
     public void start() {
-        if (torchPos != null && mob.distanceToSqr(Vec3.atCenterOf(torchPos)) < 4) {
-            mob.level().destroyBlock(torchPos, false);
-        } else if (torchPos != null) {
+        if (torchPos != null) {
             mob.getNavigation().moveTo(torchPos.getX(), torchPos.getY(), torchPos.getZ(), 1.0D);
         }
+    }
+
+    @Override
+    public void tick() {
+        if (torchPos == null) return;
+
+        if (mob.distanceToSqr(Vec3.atCenterOf(torchPos)) < 3) {
+            BlockState state = mob.level().getBlockState(torchPos);
+            if (isLightBlock(state.getBlock())) {
+                mob.level().destroyBlock(torchPos, false);
+            }
+            torchPos = null;
+        } else {
+            mob.getNavigation().moveTo(torchPos.getX(), torchPos.getY(), torchPos.getZ(), 1.0D);
+        }
+    }
+
+    @Override
+    public void stop() {
+        torchPos = null;
     }
 
     private boolean isLightBlock(Block block) {
