@@ -12,12 +12,14 @@ public class SprintAtTargetGoal extends Goal {
     private final PathfinderMob mob;
     private final double sprintSpeedMod;
     private final double stopDistanceSqr;
+    private final double startDistanceSqr;
     private LivingEntity target;
 
-    public SprintAtTargetGoal(PathfinderMob mob, double sprintSpeedMod, double stopDistance) {
+    public SprintAtTargetGoal(PathfinderMob mob, double sprintSpeedMod, double startDistance, double stopDistance) {
         this.mob = mob;
         this.sprintSpeedMod = sprintSpeedMod;
         this.stopDistanceSqr = stopDistance * stopDistance;
+        this.startDistanceSqr = startDistance * startDistance;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE));
     }
 
@@ -25,7 +27,7 @@ public class SprintAtTargetGoal extends Goal {
     public boolean canUse() {
         LivingEntity potential = mob.getTarget();
         if (!(potential instanceof Player player) || !player.isAlive()) return false;
-        return mob.distanceToSqr(player) > stopDistanceSqr;
+        return mob.distanceToSqr(player) > startDistanceSqr;
     }
 
     @Override
