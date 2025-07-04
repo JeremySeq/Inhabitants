@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishEntity;
+import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
@@ -80,6 +81,7 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.BOGRE.get(), BogreRenderer::new);
         EntityRenderers.register(ModEntities.BOGRE_CAULDRON.get(), BogreCauldronRenderer::new);
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
+        EntityRenderers.register(ModEntities.ABYSSFISH.get(), AbyssfishRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
     }
