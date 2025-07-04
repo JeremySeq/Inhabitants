@@ -6,8 +6,6 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -16,7 +14,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -309,7 +306,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             attackWindup--;
             if (attackWindup == 0) {
                 // create shockwave effect
-                shockwave(this);
+                EntityUtil.shockwave(this, SHOCKWAVE_RADIUS, SHOCKWAVE_DAMAGE);
 
                 attackPostDelay = 15;
                 attackCooldown = ATTACK_COOLDOWN_TICKS;
@@ -627,67 +624,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     private void setRoaring(boolean roaring) {
         entityData.set(ROAR_ANIM, roaring);
     }
-
-    public static void shockwave(LivingEntity user) {
-        AABB shockwaveArea = new AABB(user.getX() - SHOCKWAVE_RADIUS, user.getY() - 1, user.getZ() - SHOCKWAVE_RADIUS,
-                user.getX() + SHOCKWAVE_RADIUS, user.getY() + 2, user.getZ() + SHOCKWAVE_RADIUS);
-        List<LivingEntity> affectedEntities = user.level().getEntitiesOfClass(LivingEntity.class, shockwaveArea,
-                entity -> !entity.isSpectator() && entity.isAlive());
-
-        for (LivingEntity affected : affectedEntities) {
-            if (affected instanceof Player player) {
-                if (player.isCreative()) {
-                    continue;
-                }
-            }
-            double dx = user.getX() - affected.getX();
-            double dz = user.getZ() - affected.getZ();
-            double distance = Math.sqrt(dx * dx + dz * dz);
-            if (distance > SHOCKWAVE_RADIUS) {
-                continue;
-            }
-            if (distance > 0.1) {
-                affected.knockback(SHOCKWAVE_KNOCKBACK, dx / distance, dz / distance);
-
-                // do damage, falling off based on distance
-                // this has a max damage of SHOCKWAVE_DAMAGE at the center and falls off to 0 at the edge
-                float damage = (float) (SHOCKWAVE_DAMAGE * (1 - Math.min(distance / SHOCKWAVE_RADIUS, 1)));
-
-                if (user instanceof Player player) {
-                    affected.hurt(player.damageSources().playerAttack(player), damage);
-                } else {
-                    affected.hurt(user.damageSources().mobAttack(user), damage);
-                }
-            }
-        }
-
-        // add visual and sound effects for the shockwave
-        if (user.level() instanceof ServerLevel serverLevel) {
-            user.playSound(SoundEvents.GENERIC_EXPLODE, 1.0f, 1.0f);
-
-            // cloud ring
-            for (int i = 0; i < 20; i++) {
-                double angle = 2 * Math.PI * i / 20;
-                double px = user.getX() + Math.cos(angle) * SHOCKWAVE_RADIUS;
-                double pz = user.getZ() + Math.sin(angle) * SHOCKWAVE_RADIUS;
-                serverLevel.sendParticles(ParticleTypes.CLOUD, px, user.getY(), pz, 1, 0, 0, 0, 0);
-            }
-
-            // crack-like particles around center
-            BlockState state = user.getBlockStateOn();
-            BlockParticleOption crackParticles = new BlockParticleOption(ParticleTypes.BLOCK, state);
-            for (int i = 0; i < 40; i++) {
-                double angle = 2 * Math.PI * i / 40;
-                double radius = SHOCKWAVE_RADIUS * (0.3 + 0.7 * Math.random()); // inner to outer ring
-                double px = user.getX() + Math.cos(angle) * radius;
-                double pz = user.getZ() + Math.sin(angle) * radius;
-                double py = user.getY();
-
-                serverLevel.sendParticles(crackParticles, px, py, pz, 5, 0.1, 0.01, 0.1, 0.05);
-            }
-        }
-    }
-
 
     @Override
     protected void defineSynchedData() {

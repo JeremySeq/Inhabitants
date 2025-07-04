@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import com.jeremyseq.inhabitants.entities.EntityUtil;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -30,6 +31,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int attackAnimTimer = 0;
+    private int rageAnimTimer = 0;
 
     public ImpalerEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -127,6 +129,13 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 }
             }
         }
+
+        if (this.rageAnimTimer > 0) {
+            this.rageAnimTimer--;
+            if (this.rageAnimTimer == 0) {
+                EntityUtil.shockwave(this, 10, 10);
+            }
+        }
     }
 
     @Override
@@ -144,6 +153,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         if (!this.isSpiked() && this.getHealth() <= this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
             this.entityData.set(SPIKED, true);
             this.triggerAnim("rage", "rage");
+            this.rageAnimTimer = 10;
             return result;
         }
         if (result && !level().isClientSide) {
