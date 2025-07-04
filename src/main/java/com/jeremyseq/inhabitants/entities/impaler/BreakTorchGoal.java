@@ -41,13 +41,23 @@ public class BreakTorchGoal extends Goal {
 
         BlockPos mobPos = mob.blockPosition();
         torchPos = null;
+        double closestDistanceSq = Double.MAX_VALUE;
 
-        BlockPos.betweenClosed(mobPos.offset(-RANGE_XZ, -RANGE_Y, -RANGE_XZ), mobPos.offset( RANGE_XZ,  RANGE_Y,  RANGE_XZ)).forEach(pos -> {
-            if (torchPos == null && !recentlyFailed.containsKey(pos)) {
-                Block block = mob.level().getBlockState(pos).getBlock();
-                if (isLightBlock(block)) torchPos = pos.immutable();
+        for (BlockPos pos : BlockPos.betweenClosed(
+                mobPos.offset(-RANGE_XZ, -RANGE_Y, -RANGE_XZ),
+                mobPos.offset( RANGE_XZ,  RANGE_Y,  RANGE_XZ))) {
+
+            if (recentlyFailed.containsKey(pos)) continue;
+
+            Block block = mob.level().getBlockState(pos).getBlock();
+            if (!isLightBlock(block)) continue;
+
+            double distSq = mob.distanceToSqr(Vec3.atCenterOf(pos));
+            if (distSq < closestDistanceSq) {
+                closestDistanceSq = distSq;
+                torchPos = pos.immutable();
             }
-        });
+        }
 
         if (torchPos != null) ticksTrying = 0;
         return torchPos != null;
