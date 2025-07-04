@@ -9,6 +9,7 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 public class WarpedClamRenderer extends GeoEntityRenderer<WarpedClamEntity> {
     public WarpedClamRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new WarpedClamModel());
+        this.shadowRadius = 0.5f;
     }
 
     @Override
