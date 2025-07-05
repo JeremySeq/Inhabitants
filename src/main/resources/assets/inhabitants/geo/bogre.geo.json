@@ -593,7 +593,8 @@
 				{
 					"name": "fish",
 					"parent": "leftarm",
-					"pivot": [13.8, 38.8, -0.6]
+					"pivot": [16.5, 11, -5.5],
+					"rotation": [0, 90, 0]
 				},
 				{
 					"name": "rightarm",
