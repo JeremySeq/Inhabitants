@@ -8,6 +8,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -172,9 +173,9 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
         }
-        if (this.isSpiked()) {
+        if (this.isSpiked() && !source.is(DamageTypes.THORNS)) {
             if (source.getDirectEntity() instanceof LivingEntity livingEntity) {
-                livingEntity.hurt(this.damageSources().mobAttack(this), THORN_DAMAGE);
+                livingEntity.hurt(this.damageSources().thorns(this), THORN_DAMAGE);
             }
         }
         return result;
