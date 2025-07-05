@@ -119,7 +119,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     private static final int DEATH_ANIMATION_DURATION = 50;
 
     private static final double SHOCKWAVE_RADIUS = 7;
-    private static final float SHOCKWAVE_KNOCKBACK = 3f;
     private static final float SHOCKWAVE_DAMAGE = 32f; // damage at the center of the shockwave
 
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
@@ -134,7 +133,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0F)
-                .add(Attributes.MOVEMENT_SPEED, .15f).build();
+                .add(Attributes.MOVEMENT_SPEED, .2f).build();
     }
 
     @Override
