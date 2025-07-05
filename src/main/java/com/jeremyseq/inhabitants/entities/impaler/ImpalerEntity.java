@@ -49,12 +49,12 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_DAMAGE, 15f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
-                .add(Attributes.FOLLOW_RANGE, 20f)
+                .add(Attributes.FOLLOW_RANGE, 30f)
                 .add(Attributes.MOVEMENT_SPEED, .25f).build();
     }
 
     protected void registerGoals() {
-        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 20f));
+        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 30f, 1));
         this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
         this.addBehaviourGoals();
     }
@@ -62,7 +62,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new RestrictSunGoal(this));
         this.goalSelector.addGoal(2, new FleeSunGoal(this, 1.0D));
-        this.goalSelector.addGoal(3, new SprintAtTargetGoal(this, 1.4D, 8, 5));
+        this.goalSelector.addGoal(3, new SprintAtTargetGoal(this, 1.4D, 7, 2));
         this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(5, new BreakTorchGoal(this, 1));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D));
