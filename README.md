@@ -31,3 +31,8 @@ A glowing fish found deep in the ocean. It can be caught while fishing and cooke
 
 ![Abyssfish](images/abyssfish.gif)
 
+**Impaler**
+
+An aggressive cave-dwelling mob. When its health drops below half, it enters a spiked rage state, triggering a powerful shockwave and damaging attackers with thorns.
+
+![Impaler](images/impaler.gif)
