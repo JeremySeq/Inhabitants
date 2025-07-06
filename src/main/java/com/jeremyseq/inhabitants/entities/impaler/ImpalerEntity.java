@@ -84,6 +84,9 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
         if (this.isSpiked() && this.getHealth() > this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
             this.entityData.set(SPIKED, false);
+        } else if (!this.isSpiked() && this.getHealth() <= this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
+            // for when the impaler is loaded in with low health
+            this.entityData.set(SPIKED, true);
         }
     }
 
