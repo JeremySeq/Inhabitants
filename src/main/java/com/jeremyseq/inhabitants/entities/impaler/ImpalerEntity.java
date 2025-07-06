@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import com.jeremyseq.inhabitants.ModParticles;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -36,6 +38,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     public static final int THORN_DAMAGE = 6;
     public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> RAGE_TRIGGER = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int attackAnimTimer = 0;
     private int rageAnimTimer = 0;
@@ -126,6 +129,20 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> pKey) {
+        super.onSyncedDataUpdated(pKey);
+        if (this.level().isClientSide && pKey == RAGE_TRIGGER) {
+            if (this.entityData.get(RAGE_TRIGGER)) {
+                Vec3 pos = new Vec3(getX(), getY() + 0.5, getZ());
+                Vec3 lookAngle = new Vec3(getLookAngle().x, 0, getLookAngle().z).normalize();
+                pos = pos.add(lookAngle.scale(4));
+                float yaw = (float) Math.atan2(lookAngle.z, lookAngle.x);
+                this.level().addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, 0, yaw, 0);
+            }
+        }
+    }
+
+    @Override
     protected void customServerAiStep() {
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
@@ -136,6 +153,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 }
             }
         }
+        entityData.set(RAGE_TRIGGER, this.rageAnimTimer == 0);
 
         if (this.rageAnimTimer > 0) {
             this.rageAnimTimer--;
@@ -225,6 +243,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(SPIKED, false);
+        entityData.define(RAGE_TRIGGER, false);
     }
 
     @Override

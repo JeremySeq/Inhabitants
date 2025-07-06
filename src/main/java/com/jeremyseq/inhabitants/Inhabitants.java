@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
+import com.jeremyseq.inhabitants.entities.impaler.ScreamParticle;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
 import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
 import com.jeremyseq.inhabitants.items.ModItems;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -45,6 +47,7 @@ public class Inhabitants
 
         ModBlocks.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
+        ModParticles.PARTICLES.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -82,6 +85,11 @@ public class Inhabitants
                 ));
                 DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(), new ImpalerSpikeDispenserBehavior());
             });
+        }
+
+        @SubscribeEvent
+        public static void registerParticles(RegisterParticleProvidersEvent evt) {
+            evt.registerSpriteSet(ModParticles.IMPALER_SCREAM.get(), ScreamParticle.Factory::new);
         }
     }
 }
