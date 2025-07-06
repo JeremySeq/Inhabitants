@@ -20,7 +20,7 @@ public class SprintAtTargetGoal extends Goal {
         this.sprintSpeedMod = sprintSpeedMod;
         this.stopDistanceSqr = stopDistance * stopDistance;
         this.startDistanceSqr = startDistance * startDistance;
-        this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+        this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
     @Override
