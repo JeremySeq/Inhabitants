@@ -2,6 +2,8 @@ package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
+import com.jeremyseq.inhabitants.items.pottery.CustomSherdItem;
+import com.jeremyseq.inhabitants.items.pottery.ModPottery;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.Item;
