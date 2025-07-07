@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.items;
 
-import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
+import com.jeremyseq.inhabitants.entities.EntityUtil;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,7 +15,7 @@ public class GiantBoneItem extends SwordItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        BogreEntity.shockwave(pPlayer);
+        EntityUtil.shockwave(pPlayer, 7, 25f);
         pPlayer.getCooldowns().addCooldown(this, 100);
 
         return super.use(pLevel, pPlayer, pUsedHand);
