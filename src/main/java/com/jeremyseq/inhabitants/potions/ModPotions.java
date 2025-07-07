@@ -17,14 +17,6 @@ public class ModPotions {
             POTIONS.register("immunity", () ->
                     new Potion(new MobEffectInstance(ModEffects.IMMUNITY.get(), 20 * 60)));
 
-    public static final RegistryObject<Potion> ADAPTATION_POTION =
-            POTIONS.register("adaptation", () ->
-                    new Potion("adaptation", new MobEffectInstance(ModEffects.ADAPTATION.get(), 20 * 60 * 3)));
-
-    public static final RegistryObject<Potion> LONG_ADAPTATION_POTION =
-            POTIONS.register("long_adaptation", () ->
-                    new Potion("adaptation", new MobEffectInstance(ModEffects.ADAPTATION.get(), 20 * 60 * 8)));
-
     public static void register(IEventBus bus) {
         POTIONS.register(bus);
     }

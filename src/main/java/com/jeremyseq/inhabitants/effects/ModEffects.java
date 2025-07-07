@@ -14,9 +14,6 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> IMMUNITY =
             EFFECTS.register("immunity", ImmunityEffect::new);
 
-    public static final RegistryObject<MobEffect> ADAPTATION =
-            EFFECTS.register("adaptation", AdaptationEffect::new);
-
     public static final RegistryObject<MobEffect> CONCUSSION =
             EFFECTS.register("concussion", ConcussionEffect::new);
 
