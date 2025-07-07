@@ -42,6 +42,7 @@ public class Inhabitants
         ModBlocks.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
         ModParticles.PARTICLES.register(modEventBus);
+        ModLootModifiers.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
