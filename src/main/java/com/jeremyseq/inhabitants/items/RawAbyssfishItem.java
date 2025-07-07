@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -26,18 +27,18 @@ public class RawAbyssfishItem extends Item {
             .build();
 
     @Override
-    public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
+    public @NotNull ItemStack finishUsingItem(@NotNull ItemStack pStack, Level pLevel, @NotNull LivingEntity pLivingEntity) {
         if (!pLevel.isClientSide && pLivingEntity instanceof Player player) {
             // Add oxygen
             int maxAir = player.getMaxAirSupply(); // usually 300
             int currentAir = player.getAirSupply();
-            player.setAirSupply(Math.min(currentAir + 100, maxAir));
+            player.setAirSupply(Math.min(currentAir + 120, maxAir));
         }
         return super.finishUsingItem(pStack, pLevel, pLivingEntity);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level world, List<Component> tooltip, @NotNull TooltipFlag flag) {
         tooltip.add(Component.literal("§bGrants extra oxygen when eaten!").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.literal("A delicacy from the deep abyss...").withStyle(ChatFormatting.DARK_PURPLE));
     }
