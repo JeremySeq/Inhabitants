@@ -324,4 +324,27 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         entityData.define(HAS_PEARL, true);
         entityData.define(OPEN, false);
     }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+
+        tag.putBoolean("hasPearl", hasPearl());
+        tag.putInt("pearlRegenTimer", this.pearlRegenTimer);
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+
+        if (tag.contains("hasPearl")) {
+            this.setHasPearl(tag.getBoolean("hasPearl"));
+        }
+
+        if (tag.contains("pearlRegenTimer")) {
+            this.pearlRegenTimer = tag.getInt("pearlRegenTimer");
+        } else {
+            this.pearlRegenTimer = 0;
+        }
+    }
 }
