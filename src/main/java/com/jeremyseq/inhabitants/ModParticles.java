@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants;
 
+import com.jeremyseq.inhabitants.entities.impaler.RageParticle;
 import com.jeremyseq.inhabitants.entities.impaler.ScreamParticle;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -20,8 +21,14 @@ public class ModParticles {
             PARTICLES.register("impaler_scream",
                     () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> IMPALER_RAGE =
+            PARTICLES.register("impaler_rage",
+                    () -> new SimpleParticleType(false));
+
+
     @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent evt) {
         evt.registerSpriteSet(ModParticles.IMPALER_SCREAM.get(), ScreamParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.IMPALER_RAGE.get(), RageParticle.Factory::new);
     }
 }

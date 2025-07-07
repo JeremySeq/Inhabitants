@@ -8,6 +8,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -136,6 +137,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         super.onSyncedDataUpdated(pKey);
         if (this.level().isClientSide && pKey == RAGE_TRIGGER) {
             if (this.entityData.get(RAGE_TRIGGER)) {
+                this.spawnRageParticles();
                 Vec3 pos = new Vec3(getX(), getY() + 0.5, getZ());
                 Vec3 lookAngle = new Vec3(getLookAngle().x, 0, getLookAngle().z).normalize();
                 pos = pos.add(lookAngle.scale(4));
@@ -144,6 +146,42 @@ public class ImpalerEntity extends Monster implements GeoEntity {
             }
         }
     }
+
+    private void spawnRageParticles() {
+
+        RandomSource rand = this.level().random;
+
+        float halfW  = this.getBbWidth() * 0.5f;
+        float height = this.getBbHeight();
+        Vec3 centre  = new Vec3(
+                this.getX(),
+                this.getY() + height * 0.5,
+                this.getZ()
+        );
+
+        for (int i = 0; i < 16; i++) {
+            double px = this.getX() + (rand.nextDouble() * 2 - 1) * halfW;
+            double py = this.getY() + rand.nextDouble() * height;
+            double pz = this.getZ() + (rand.nextDouble() * 2 - 1) * halfW;
+
+            double offX = px - centre.x;
+            double offY = py - centre.y;
+            double offZ = pz - centre.z;
+
+            double scale = 0.05;
+            double dx = offX * scale;
+            double dy = offY * scale + 0.02;
+            double dz = offZ * scale;
+
+            this.level().addParticle(
+                    ModParticles.IMPALER_RAGE.get(),
+                    px, py, pz,
+                    dx, dy, dz
+            );
+        }
+    }
+
+
 
     @Override
     protected void customServerAiStep() {
