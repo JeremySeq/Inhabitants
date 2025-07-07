@@ -284,7 +284,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(SPIKED, false);
-        entityData.define(RAGE_TRIGGER, false);
+        entityData.define(RAGE_TRIGGER, true);
     }
 
     @Override
