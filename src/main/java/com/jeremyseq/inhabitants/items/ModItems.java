@@ -65,6 +65,9 @@ public class ModItems {
     public static final RegistryObject<Item> SLINGSHOT = ITEMS.register("slingshot",
             () -> new SlingshotItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> LASSO = ITEMS.register("lasso",
+            () -> new LassoItem(new Item.Properties().stacksTo(1)));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
