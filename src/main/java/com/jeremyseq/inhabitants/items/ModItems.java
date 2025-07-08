@@ -65,6 +65,9 @@ public class ModItems {
     public static final RegistryObject<Item> ANCIENT_FLUTE = ITEMS.register("ancient_flute",
             () -> new AncientFluteItem(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> LASSO = ITEMS.register("lasso",
+            () -> new LassoItem(new Item.Properties().stacksTo(1)));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
