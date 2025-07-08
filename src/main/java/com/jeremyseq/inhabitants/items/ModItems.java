@@ -62,6 +62,9 @@ public class ModItems {
     public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
             () -> new ImpalerSpikeItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> SLINGSHOT = ITEMS.register("slingshot",
+            () -> new SlingshotItem(new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
