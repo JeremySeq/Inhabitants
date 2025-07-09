@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron;
 
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -87,15 +88,29 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
         return true;
     }
 
+    private void snapToBlockCenter() {
+        BlockPos pos = this.blockPosition();
+        double cx = pos.getX() + 0.5D;
+        double cy = pos.getY();
+        double cz = pos.getZ() + 0.5D;
+        this.setPos(cx, cy, cz);
+    }
 
     @Override
     public void tick() {
         super.tick();
 
+        if (this.tickCount == 1 && !level().isClientSide) {
+            snapToBlockCenter();
+        }
+
         if (!placedBlock && !level().isClientSide) {
-            level().setBlock(this.blockPosition(), ModBlocks.INVISIBLE_CAULDRON_BLOCK.get().defaultBlockState(), 3);
+            level().setBlock(this.blockPosition(),
+                    ModBlocks.INVISIBLE_CAULDRON_BLOCK.get().defaultBlockState(),
+                    3);
             placedBlock = true;
         }
+
 
         if (level().isClientSide) {
             double x = getX();
