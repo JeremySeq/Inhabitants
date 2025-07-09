@@ -38,7 +38,7 @@ public class ModEntities {
     public static final RegistryObject<EntityType<BogreCauldronEntity>> BOGRE_CAULDRON =
             REGISTRY.register("bogre_cauldron",
                     () -> EntityType.Builder.of(BogreCauldronEntity::new, MobCategory.MONSTER)
-                            .sized(2f, 2f)
+                            .sized(2f, 1.3f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre_cauldron").toString()));
 
     public static final RegistryObject<EntityType<WarpedClamEntity>> WARPED_CLAM =
