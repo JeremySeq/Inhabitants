@@ -2,10 +2,12 @@ package com.jeremyseq.inhabitants.entities.bogre;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
+import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -23,6 +25,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -56,6 +59,8 @@ public class BogreEntity extends Monster implements GeoEntity {
         MAKE_CHOWDER,
         CARVE_BONE
     }
+
+    boolean pathSet = false;
 
     public State state = State.CAUTIOUS;
     // used for different textures, 0 or 1
@@ -394,6 +399,11 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
     }
 
+    @Override
+    protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
+        return new PrecisePathNavigation(this, pLevel);
+    }
+
     /**
      * The Bogre attempts to make chowder from a fish dropped by a player.
      * The fish should be droppedFishItem.
@@ -404,16 +414,45 @@ public class BogreEntity extends Monster implements GeoEntity {
                 this.state = State.CAUTIOUS;
                 return;
             }
-            double distance = this.distanceToSqr(cauldronPos.getX() + 0.5, cauldronPos.getY(), cauldronPos.getZ() + 0.5);
-            distance = Math.sqrt(distance);
-            if (distance > 3) {
-                // move to the cauldron if not close enough
-                this.moveTo(cauldronPos, 1);
+
+            // find the cauldron entity at the cauldronPos
+            List<BogreCauldronEntity> entities = this.level().getEntitiesOfClass(
+                    BogreCauldronEntity.class,
+                    new AABB(cauldronPos),
+                    entity -> !entity.isRemoved()
+            );
+            if (entities.isEmpty()) {
+                Inhabitants.LOGGER.debug("No Bogre Cauldron found at: {}", cauldronPos);
+                this.state = State.CAUTIOUS;
                 return;
             }
 
-            // close enough to start making chowder
-            this.navigation.stop();
+            // find the target block, which is 3 blocks in front of the cauldron in the direction it is facing
+            BogreCauldronEntity bogreCauldron = entities.get(0);
+            Direction direction = bogreCauldron.getDirection();
+            BlockPos targetPos = cauldronPos.relative(direction, 3);
+            Vec3 targetCenter = Vec3.atBottomCenterOf(targetPos);
+
+            double distSqr = this.distanceToSqr(targetCenter);
+
+            PrecisePathNavigation preciseNav = (PrecisePathNavigation) this.getNavigation();
+
+            if (!pathSet && distSqr > .3) {
+                // starting path to cauldron
+                preciseNav.preciseMoveTo(targetCenter, 1.0D);
+                pathSet = true;
+                return;
+            }
+
+            if (distSqr > .3) {
+                // walking to cauldron
+                return;
+            }
+
+            // arrived at cauldron
+            pathSet = false;
+            this.getNavigation().stop();
+
             Inhabitants.LOGGER.debug("TICKING!");
             this.lookAt(EntityAnchorArgument.Anchor.FEET, cauldronPos.getCenter());
             this.lookAt(EntityAnchorArgument.Anchor.EYES, cauldronPos.getCenter());
@@ -423,6 +462,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 entityData.set(COOKING_ANIM, false);
                 entityData.set(COOKING_ANIM, true);
             }
+
             chowderTicks++;
             if (chowderTicks >= CHOWDER_TIME_TICKS) {
                 Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
@@ -699,7 +739,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
         return this.getFishHeld();
     }
-    
+
     private void setFishHeld(ItemStack fishHeld) {
         this.entityData.set(FISH_HELD, fishHeld);
     }

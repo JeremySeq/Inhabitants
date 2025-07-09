@@ -1,16 +1,21 @@
 package com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron;
 
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
+import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Rotation;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -28,6 +33,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
     public BogreCauldronEntity(EntityType<?> type, Level level) {
         super(type, level);
         this.noPhysics = true;
+        this.setNoGravity(true);
         this.health = 5f;
     }
 
@@ -41,6 +47,16 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
         }
     }
 
+    @Override
+    public @NotNull InteractionResult interact(Player pPlayer, @NotNull InteractionHand pHand) {
+        // allows creative player to rotate the cauldron (just for devs)
+        if (pPlayer.isCreative() && pPlayer.getItemInHand(pHand).getItem() == ModItems.GIANT_BONE.get()) {
+            this.setYRot(this.rotate(Rotation.CLOCKWISE_90));
+            return InteractionResult.SUCCESS;
+        }
+
+        return super.interact(pPlayer, pHand);
+    }
 
     @Override
     public boolean isPickable() {
