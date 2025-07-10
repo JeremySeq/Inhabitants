@@ -30,6 +30,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.COOKED_ABYSSFISH.get());
                         pOutput.accept(ModItems.ABYSSFISH_BUCKET.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
+                        pOutput.accept(ModItems.IMPALER_SPIKE.get());
                     })
                     .build());
 

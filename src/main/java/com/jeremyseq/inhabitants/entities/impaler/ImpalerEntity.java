@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.entities.impaler;
 import com.jeremyseq.inhabitants.ModParticles;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
+import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -33,6 +34,7 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 
 import java.util.List;
+import java.util.Random;
 
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -89,6 +91,12 @@ public class ImpalerEntity extends Monster implements GeoEntity {
             // for when the impaler is loaded in with low health
             this.entityData.set(SPIKED, true);
         }
+    }
+
+    @Override
+    protected void dropCustomDeathLoot(@NotNull DamageSource source, int looting, boolean recentlyHit) {
+        super.dropCustomDeathLoot(source, looting, recentlyHit);
+        this.spawnAtLocation(new ItemStack(ModItems.IMPALER_SPIKE.get(), new Random().nextInt(2, 4)));
     }
 
     @Override
