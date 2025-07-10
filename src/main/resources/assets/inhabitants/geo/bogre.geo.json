@@ -37,7 +37,7 @@
 				{
 					"name": "leftleg",
 					"parent": "Ogre",
-					"pivot": [8.4, 13.6, 0],
+					"pivot": [8.4, 12.4, 0],
 					"cubes": [
 						{
 							"origin": [2.4, 0.4, -6],

@@ -74,7 +74,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> ATTACK_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> DEATH_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static float FORGET_RANGE = 35f;
     public static float ROAR_RANGE = 24f;
@@ -83,14 +82,14 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     public BlockPos cauldronPos = null;
 
-    private static final int ROAR_TICKS = 100; // how long a roar animation lasts (server)
+    private static final int ROAR_TICKS = 45; // how long a roar animation lasts (server)
 
     private int roaringTick = 0;
     private Player roaredPlayer = null; // the player that the Bogre is currently roaring at
     private final List<Player> warnedPlayers = new ArrayList<>();
 
     // CARVE_BONE
-    private static final int BONE_CARVE_TIME_TICKS = 200; // time it takes to carve a bone
+    private static final int BONE_CARVE_TIME_TICKS = 160; // time it takes to carve a bone
     private int boneCarveTicks = 0; // counts down while carving a bone
     private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
 
@@ -101,7 +100,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     private ItemEntity droppedFishItem = null;
     private Player droppedFishPlayer = null; // the player that dropped the fish item
     private static final double FISH_REACH_DISTANCE = 3;
-    private static final int CHOWDER_TIME_TICKS = 280;
+    private static final int CHOWDER_TIME_TICKS = 135;
     private static final int DROP_FISH_OFFSET = 56; // at what time the Bogre should drop the fish item after starting to make chowder
 
     private double chowderTicks = 0; // used both on client and server to time cooking
@@ -116,12 +115,9 @@ public class BogreEntity extends Monster implements GeoEntity {
     private int attackPostDelay = -1; // counts down after damage, finishing attack animation
 
     private static final int ATTACK_COOLDOWN_TICKS = 60; // time between attacks
-    private static final int ATTACK_OFFSET = 25; // windup time before damage
+    private static final int ATTACK_OFFSET = 19; // windup time before damage
 
     private boolean randomChance = false; // used to trigger a rare idle animation
-
-    private int deathAnimationTicks = 0;
-    private static final int DEATH_ANIMATION_DURATION = 50;
 
     private static final double SHOCKWAVE_RADIUS = 7;
     private static final float SHOCKWAVE_DAMAGE = 32f; // damage at the center of the shockwave
@@ -148,7 +144,34 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+        controllerRegistrar.add(new AnimationController<>(this, "defaults_controller", 0, this::defaults));
+        controllerRegistrar.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
+                .triggerableAnim("hurt", RawAnimation.begin().then("taking_damage", Animation.LoopType.PLAY_ONCE)));
         controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+
+    private <T extends GeoAnimatable> PlayState defaults(AnimationState<T> animationState) {
+        if (animationState.isMoving()) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
+        } else {
+            if (randomChance) {
+                animationState.getController().setAnimation(RawAnimation.begin().then("idle_rare", Animation.LoopType.PLAY_ONCE));
+                if (animationState.getController().hasAnimationFinished()) {
+                    animationState.getController().forceAnimationReset();
+                    randomChance = false;
+                    animationState.getController().forceAnimationReset();
+                }
+                return PlayState.CONTINUE;
+            }
+
+            animationState.getController().setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                animationState.getController().forceAnimationReset();
+                randomChance = new Random().nextFloat() < 0.1f; // chance to trigger a rare idle animation
+            }
+        }
+        return PlayState.CONTINUE;
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
@@ -179,11 +202,6 @@ public class BogreEntity extends Monster implements GeoEntity {
             return PlayState.CONTINUE;
         }
 
-        if (entityData.get(DEATH_ANIM)) {
-            animationState.getController().setAnimation(RawAnimation.begin().then("death", Animation.LoopType.HOLD_ON_LAST_FRAME));
-            return PlayState.CONTINUE;
-        }
-
         if (entityData.get(ATTACK_ANIM)) {
             animationState.getController().setAnimation(RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE));
             if (animationState.getController().hasAnimationFinished()) {
@@ -191,26 +209,6 @@ public class BogreEntity extends Monster implements GeoEntity {
                 animationState.getController().forceAnimationReset();
             }
             return PlayState.CONTINUE;
-        }
-
-        if (animationState.isMoving()) {
-            animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
-        } else {
-            if (randomChance) {
-                animationState.getController().setAnimation(RawAnimation.begin().then("idle_rare", Animation.LoopType.PLAY_ONCE));
-                if (animationState.getController().hasAnimationFinished()) {
-                    animationState.getController().forceAnimationReset();
-                    randomChance = false;
-                    animationState.getController().forceAnimationReset();
-                }
-                return PlayState.CONTINUE;
-            }
-
-            animationState.getController().setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.PLAY_ONCE));
-            if (animationState.getController().hasAnimationFinished()) {
-                animationState.getController().forceAnimationReset();
-                randomChance = new Random().nextFloat() < 0.1f; // chance to trigger a rare idle animation
-            }
         }
 
         return PlayState.CONTINUE;
@@ -266,6 +264,10 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(DamageSource pSource, float pAmount) {
+        boolean result = super.hurt(pSource, pAmount);
+        if (result && !level().isClientSide) {
+            this.triggerAnim("hurt", "hurt");
+        }
         // if attacked by a player, switch to cautious state and set the player as target
         this.state = State.CAUTIOUS;
         if (pSource.getEntity() instanceof Player player && player.isAlive() && !player.isCreative()) {
@@ -276,7 +278,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             tamedPlayers.remove(player.getUUID());
             this.setTarget(player);
         }
-        return super.hurt(pSource, pAmount);
+        return result;
     }
 
     /**
@@ -671,7 +673,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(ATTACK_ANIM, false);
         entityData.define(COOKING_ANIM, false);
         entityData.define(CARVING_ANIM, false);
-        entityData.define(DEATH_ANIM, false);
         entityData.define(FISH_HELD, ItemStack.EMPTY);
         entityData.define(TEXTURE_TYPE, getBiomeTextureType());
     }
@@ -742,28 +743,6 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private void setFishHeld(ItemStack fishHeld) {
         this.entityData.set(FISH_HELD, fishHeld);
-    }
-
-    @Override
-    protected void tickDeath() {
-        if (!this.level().isClientSide) {
-            if (this.entityData.get(DEATH_ANIM)) {
-                deathAnimationTicks++;
-                if (deathAnimationTicks >= DEATH_ANIMATION_DURATION) {
-                    super.tickDeath();
-                }
-            } else {
-                super.tickDeath();
-            }
-        }
-    }
-
-    @Override
-    public void die(@NotNull DamageSource cause) {
-        if (!this.level().isClientSide) {
-            this.entityData.set(DEATH_ANIM, true);
-        }
-        super.die(cause);
     }
 
     @Override
