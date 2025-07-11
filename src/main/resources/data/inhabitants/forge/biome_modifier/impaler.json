@@ -6,6 +6,6 @@
     "category": "monster",
     "weight": 60,
     "minCount": 1,
-    "maxCount": 3
+    "maxCount": 1
   }
 }
