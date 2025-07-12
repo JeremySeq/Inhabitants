@@ -15,7 +15,7 @@ import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 
 public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
-    private static final float scale = 1.2f;
+    private static final float scale = 1.1f;
 
     public BogreRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new BogreModel());
