@@ -73,9 +73,9 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
-    public static float FORGET_RANGE = 35f;
-    public static float ROAR_RANGE = 24f;
-    public static float HOSTILE_RANGE = 18f;
+    public static float FORGET_RANGE = 20f;
+    public static float ROAR_RANGE = 12f;
+    public static float HOSTILE_RANGE = 5f;
     public static final double MAX_CAULDRON_DIST_SQR = 24*24;
 
     public BlockPos cauldronPos = null;
