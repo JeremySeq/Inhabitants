@@ -14,9 +14,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -88,6 +88,33 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
         return true;
     }
 
+    /**
+     * Un-waterlogs blocks below cauldron and relights campfire if necessary.
+     * This is needed because sometimes when the bogre lair is generated, water floods the slabs and extinguishes the campfire.
+     */
+    private void fixBlocksUnderCauldron() {
+        if (level().isClientSide) return;
+
+        BlockPos center = this.blockPosition().below();
+
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                BlockPos pos = center.offset(dx, 0, dz);
+                BlockState state = level().getBlockState(pos);
+
+                if (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED)) {
+                    level().setBlock(pos, state.setValue(BlockStateProperties.WATERLOGGED, false), 3);
+                }
+            }
+        }
+
+        BlockState state = level().getBlockState(center);
+
+        if (state.getBlock() instanceof CampfireBlock && !state.getValue(CampfireBlock.LIT)) {
+            level().setBlock(center, state.setValue(CampfireBlock.LIT, true), 3);
+        }
+    }
+
     private void snapToBlockCenter() {
         BlockPos pos = this.blockPosition();
         double cx = pos.getX() + 0.5D;
@@ -102,6 +129,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
 
         if (this.tickCount == 1 && !level().isClientSide) {
             snapToBlockCenter();
+            fixBlocksUnderCauldron();
         }
 
         if (!placedBlock && !level().isClientSide) {
