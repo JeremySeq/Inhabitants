@@ -89,6 +89,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     // CARVE_BONE
     private static final int BONE_CARVE_TIME_TICKS = 160; // time it takes to carve a bone
+    private static final int BONE_CARVE_DESTROY_BONES_TICKS = 130; // when to destroy the bone blocks
     private int boneCarveTicks = 0; // counts down while carving a bone
     private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
 
@@ -211,18 +212,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         return true;
     }
 
-//    @Override
-//    public void tick() {
-//        super.tick();
-//        if (this.level().isClientSide) {
-//            if (this.entityData.get(COOKING_ANIM)) {
-//                chowderTicks++;
-//            } else {
-//                chowderTicks = 0;
-//            }
-//        }
-//    }
-
     @Override
     public void customServerAiStep() {
         if (cauldronPos == null || !isValidCauldron(cauldronPos)) {
@@ -295,13 +284,15 @@ public class BogreEntity extends Monster implements GeoEntity {
             return;
         }
 
-        // ensure the bone blocks are still valid
-        for (BlockPos pos : boneBlockPositions) {
-            BlockState state = this.level().getBlockState(pos);
-            if (!state.is(Blocks.BONE_BLOCK)) {
-                Inhabitants.LOGGER.debug("Bogre found invalid bone block at: {}", pos);
-                this.state = State.CAUTIOUS; // revert to cautious state if any block is not a bone block
-                return;
+        // ensure the bone blocks are still valid, if they haven't been removed
+        if (this.boneCarveTicks < BONE_CARVE_DESTROY_BONES_TICKS) {
+            for (BlockPos pos : boneBlockPositions) {
+                BlockState state = this.level().getBlockState(pos);
+                if (!state.is(Blocks.BONE_BLOCK)) {
+                    Inhabitants.LOGGER.debug("Bogre found invalid bone block at: {}", pos);
+                    this.state = State.CAUTIOUS; // revert to cautious state if any block is not a bone block
+                    return;
+                }
             }
         }
 
@@ -323,22 +314,21 @@ public class BogreEntity extends Monster implements GeoEntity {
             entityData.set(CARVING_ANIM, true);
         }
         boneCarveTicks++;
-
-        if (boneCarveTicks >= BONE_CARVE_TIME_TICKS) {
+        if (boneCarveTicks >= BONE_CARVE_TIME_TICKS + 40) {
+            this.state = State.CAUTIOUS;
+            boneCarveTicks = 0;
+        } else if (boneCarveTicks == BONE_CARVE_TIME_TICKS) {
             Inhabitants.LOGGER.debug("BONE CARVING COMPLETE!");
-
+            this.triggerAnim("grab", "grab");
+            EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.GIANT_BONE.get()), .3f, 0.3f);
+        } else if (boneCarveTicks == BONE_CARVE_DESTROY_BONES_TICKS) {
             // remove the bone blocks
             for (BlockPos pos : boneBlockPositions) {
                 if (this.level().getBlockState(pos).is(Blocks.BONE_BLOCK)) {
                     this.level().destroyBlock(pos, false); // remove block without drops
                 }
             }
-
-            EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.GIANT_BONE.get()), .3f, 0.3f);
             this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F); // some kind of cracking/carving sound
-
-            this.state = State.CAUTIOUS;
-            boneCarveTicks = 0;
         }
     }
 
