@@ -4,6 +4,7 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
+import com.jeremyseq.inhabitants.entities.goals.CooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
@@ -19,10 +20,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -45,6 +43,7 @@ import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 
 import javax.annotation.Nullable;
@@ -71,7 +70,6 @@ public class BogreEntity extends Monster implements GeoEntity {
      * On server side, this is used to determine if the Bogre is currently roaring and is set to false after ROAR_TICKS
      */
     public static final EntityDataAccessor<Boolean> ROAR_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> ATTACK_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -110,12 +108,8 @@ public class BogreEntity extends Monster implements GeoEntity {
 
 
     // ATTACK
-    private int attackCooldown = 0;
-    private int attackWindup = -1;
-    private int attackPostDelay = -1; // counts down after damage, finishing attack animation
-
-    private static final int ATTACK_COOLDOWN_TICKS = 60; // time between attacks
-    private static final int ATTACK_OFFSET = 19; // windup time before damage
+    private static final int ATTACK_DELAY = 19; // ticks before the shockwave is triggered after the attack animation starts
+    private int attackAnimTimer = 0;
 
     private boolean randomChance = false; // used to trigger a rare idle animation
 
@@ -131,7 +125,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         return Monster.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 400.0F)
                 .add(Attributes.ATTACK_DAMAGE, 30F)
-                .add(Attributes.ATTACK_SPEED, 1.0f)
+                .add(Attributes.ATTACK_SPEED, .5)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0F)
                 .add(Attributes.MOVEMENT_SPEED, .2f).build();
@@ -139,7 +133,8 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(7, new ConditionalStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.0D, false, 40));
+        this.goalSelector.addGoal(7, new BogreConditionalStrollGoal(this, 1.0D));
     }
 
     @Override
@@ -148,6 +143,8 @@ public class BogreEntity extends Monster implements GeoEntity {
         controllerRegistrar.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
                 .triggerableAnim("hurt", RawAnimation.begin().then("taking_damage", Animation.LoopType.PLAY_ONCE)));
         controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
+        controllerRegistrar.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
+                .triggerableAnim("attack", RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE)));
     }
 
 
@@ -201,17 +198,16 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
             return PlayState.CONTINUE;
         }
-
-        if (entityData.get(ATTACK_ANIM)) {
-            animationState.getController().setAnimation(RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE));
-            if (animationState.getController().hasAnimationFinished()) {
-                entityData.set(ATTACK_ANIM, false);
-                animationState.getController().forceAnimationReset();
-            }
-            return PlayState.CONTINUE;
-        }
-
         return PlayState.CONTINUE;
+    }
+
+    @Override
+    public boolean doHurtTarget(@NotNull Entity target) {
+        if (!level().isClientSide && this.attackAnimTimer == 0) {
+            triggerAnim("attack", "attack");
+            this.attackAnimTimer = ATTACK_DELAY;
+        }
+        return true;
     }
 
     @Override
@@ -241,16 +237,23 @@ public class BogreEntity extends Monster implements GeoEntity {
             this.tamedPlayers.clear(); // clear tamed players if no cauldron is found
         }
 
-        if (this.getTarget() != null) {
-            if (this.distanceTo(this.getTarget()) > FORGET_RANGE || !this.getTarget().isAlive() || this.getTarget().isDeadOrDying()) {
-                this.setTarget(null);
+        // attack animation timer
+        if (this.attackAnimTimer > 0) {
+            this.attackAnimTimer--;
+            if (this.attackAnimTimer == 0) {
+                EntityUtil.shockwave(this, SHOCKWAVE_RADIUS, SHOCKWAVE_DAMAGE);
             }
         }
 
-        // attack target
-        if (attackCooldown > 0 || attackWindup > 0 || this.getTarget() != null) {
-            attackPlayerAiStep();
-            return;
+        if (this.getTarget() != null) {
+            if (this.distanceTo(this.getTarget()) > FORGET_RANGE || !this.getTarget().isAlive() || this.getTarget().isDeadOrDying()) {
+                this.setTarget(null);
+            } else if (this.getTarget() instanceof Player player && (player.isCreative() || player.isSpectator())) {
+                this.setTarget(null);
+            } else {
+                // if the target is still valid, do not do custom AI step
+                return;
+            }
         }
 
         if (this.state == State.CAUTIOUS) {
@@ -263,7 +266,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    public boolean hurt(DamageSource pSource, float pAmount) {
+    public boolean hurt(@NotNull DamageSource pSource, float pAmount) {
         boolean result = super.hurt(pSource, pAmount);
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
@@ -279,69 +282,6 @@ public class BogreEntity extends Monster implements GeoEntity {
             this.setTarget(player);
         }
         return result;
-    }
-
-    /**
-     * Attacks the target.
-     */
-    private void attackPlayerAiStep() {
-        LivingEntity target = this.getTarget();
-
-        // cancel target if it's invalid
-        if (target != null && (!target.isAlive() || target.isDeadOrDying())) {
-            this.setTarget(null);
-            target = null;
-        }
-
-        // tick down cooldown
-        if (attackCooldown > 0) {
-            attackCooldown--;
-        }
-
-        // handle animationn finish even if no target
-        if (attackPostDelay > 0) {
-            attackPostDelay--;
-            if (attackPostDelay == 0) {
-                entityData.set(ATTACK_ANIM, false);
-            }
-            return; // still finishing the animation
-        }
-
-        // handle windup - but only if a valid target is still around
-        if (attackWindup > 0) {
-            attackWindup--;
-            if (attackWindup == 0) {
-                // create shockwave effect
-                EntityUtil.shockwave(this, SHOCKWAVE_RADIUS, SHOCKWAVE_DAMAGE);
-
-                attackPostDelay = 15;
-                attackCooldown = ATTACK_COOLDOWN_TICKS;
-                attackWindup = -1;
-            }
-            return;
-        }
-
-        if (target == null) {
-            return;
-        } else if (target instanceof Player player) {
-            if (player.isCreative() || player.isSpectator()) {
-                this.setTarget(null);
-                return;
-            }
-        }
-
-        double attackReach = this.getBbWidth() * 1.5f + target.getBbWidth();
-        double distanceSq = this.distanceToSqr(target);
-
-        if (distanceSq <= attackReach * attackReach && attackCooldown <= 0 && attackWindup < 0) {
-            attackWindup = ATTACK_OFFSET;
-            entityData.set(ATTACK_ANIM, false);
-            entityData.set(ATTACK_ANIM, true);
-            return;
-        }
-
-        BlockPos targetPos = new BlockPos((int) target.getX(), (int) target.getY(), (int) target.getZ());
-        this.moveTo(targetPos, 1);
     }
 
     /**
@@ -670,7 +610,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(ROAR_ANIM, false);
-        entityData.define(ATTACK_ANIM, false);
         entityData.define(COOKING_ANIM, false);
         entityData.define(CARVING_ANIM, false);
         entityData.define(FISH_HELD, ItemStack.EMPTY);

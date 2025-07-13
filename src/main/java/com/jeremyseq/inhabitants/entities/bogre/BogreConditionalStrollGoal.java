@@ -3,10 +3,10 @@ package com.jeremyseq.inhabitants.entities.bogre;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.phys.Vec3;
 
-public class ConditionalStrollGoal extends WaterAvoidingRandomStrollGoal {
+public class BogreConditionalStrollGoal extends WaterAvoidingRandomStrollGoal {
     private final BogreEntity bogre;
 
-    public ConditionalStrollGoal(BogreEntity bogre, double speed) {
+    public BogreConditionalStrollGoal(BogreEntity bogre, double speed) {
         super(bogre, speed);
         this.bogre = bogre;
     }
