@@ -1,27 +1,21 @@
 {
-  "parent": "minecraft:item/handheld",
+  "parent": "item/handheld",
+  "loader": "forge:separate_transforms",
   "textures": {
-    "layer0": "inhabitants:item/giant_bone"
+    "layer0": "inhabitants:item/giant_bone_gui"
   },
-  "display": {
+  "base": {
+    "parent": "inhabitants:item/giant_bone_handheld"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "inhabitants:item/giant_bone_gui"
+    },
+    "fixed": {
+      "parent": "inhabitants:item/giant_bone_gui"
+    },
     "ground": {
-      "rotation": [-15, -90, 0],
-      "scale": [1.5, 1.5, 1.5]
-    },
-    "thirdperson_righthand": {
-      "rotation": [-15, -90, 0],
-      "translation": [0, 5, 3],
-      "scale": [1.5, 1.5, 1.5]
-    },
-    "firstperson_righthand": {
-      "rotation": [-45, -90, 0],
-      "translation": [0, 5, 0],
-      "scale": [1.5, 1.5, 1.5]
-    },
-    "firstperson_lefthand": {
-      "rotation": [-15, -90, 0],
-      "translation": [0, 5, 0],
-      "scale": [1.5, 1.5, 1.5]
+      "parent": "inhabitants:item/giant_bone_gui"
     }
   }
 }
