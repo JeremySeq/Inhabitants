@@ -9,6 +9,7 @@ import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -367,8 +368,18 @@ public class BogreEntity extends Monster implements GeoEntity {
             // find the target block, which is 3 blocks in front of the cauldron in the direction it is facing
             BogreCauldronEntity bogreCauldron = entities.get(0);
             Direction direction = bogreCauldron.getDirection();
-            BlockPos targetPos = cauldronPos.relative(direction, 3);
-            Vec3 targetCenter = Vec3.atBottomCenterOf(targetPos);
+            Direction dirLeft = direction.getCounterClockWise(Direction.Axis.Y);
+
+            // offsets for where the bogre should stand relative to cauldron (facing forward)
+            final float forwardDist = 2.25f;
+            final float leftDist = .9f;
+
+            Vec3i forwardI = direction.getNormal();
+            Vec3i leftI = dirLeft.getNormal();
+            Vec3 forward = new Vec3(forwardI.getX(), forwardI.getY(), forwardI.getZ()).scale(forwardDist);
+            Vec3 left = new Vec3(leftI.getX(), leftI.getY(), leftI.getZ()).scale(leftDist);
+
+            Vec3 targetCenter = Vec3.atBottomCenterOf(cauldronPos).add(forward).add(left);
 
             double distSqr = this.distanceToSqr(targetCenter);
 
