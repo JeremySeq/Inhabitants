@@ -29,14 +29,21 @@ public class CooldownMeleeAttackGoal extends Goal {
     private static final long COOLDOWN_BETWEEN_CAN_USE_CHECKS = 20L;
     private int failedPathFindingPenalty = 0;
     private final boolean canPenalize = false;
+    private final boolean setSprinting;
 
     public CooldownMeleeAttackGoal(PathfinderMob mob, double speedModifier, boolean followTargetEvenIfNotSeen, int attackIntervalTicks) {
+        this(mob, speedModifier, followTargetEvenIfNotSeen, attackIntervalTicks, false);
+    }
+
+    public CooldownMeleeAttackGoal(PathfinderMob mob, double speedModifier, boolean followTargetEvenIfNotSeen, int attackIntervalTicks, boolean setSprinting) {
         this.mob = mob;
         this.speedModifier = speedModifier;
         this.followTargetEvenIfNotSeen = followTargetEvenIfNotSeen;
         this.attackInterval = attackIntervalTicks;
+        this.setSprinting = setSprinting;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
+
 
     @Override
     public boolean canUse() {
@@ -78,6 +85,9 @@ public class CooldownMeleeAttackGoal extends Goal {
         this.mob.setAggressive(true);
         this.ticksUntilNextPathRecalculation = 0;
         this.ticksUntilNextAttack = 0;
+        if (this.setSprinting) {
+            this.mob.setSprinting(true);
+        }
     }
 
     @Override
@@ -88,6 +98,9 @@ public class CooldownMeleeAttackGoal extends Goal {
         }
         this.mob.setAggressive(false);
         this.mob.getNavigation().stop();
+        if (this.setSprinting) {
+            this.mob.setSprinting(false);
+        }
     }
 
     @Override

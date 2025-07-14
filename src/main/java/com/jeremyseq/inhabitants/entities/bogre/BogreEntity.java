@@ -74,7 +74,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
-    public static float FORGET_RANGE = 20f;
+    public static float FORGET_RANGE = 25f;
     public static float ROAR_RANGE = 12f;
     public static float HOSTILE_RANGE = 5f;
     public static final double MAX_CAULDRON_DIST_SQR = 24*24;
@@ -133,7 +133,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.0D, false, 40));
+        this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.4f, false, 40, true));
         this.goalSelector.addGoal(7, new BogreConditionalStrollGoal(this, 1.0D));
     }
 
@@ -152,7 +152,11 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private <T extends GeoAnimatable> PlayState defaults(AnimationState<T> animationState) {
         if (animationState.isMoving()) {
-            animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
+            if (this.isSprinting()) {
+                animationState.getController().setAnimation(RawAnimation.begin().then("run", Animation.LoopType.LOOP));
+            } else {
+                animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
+            }
         } else {
             if (randomChance) {
                 animationState.getController().setAnimation(RawAnimation.begin().then("idle_rare", Animation.LoopType.PLAY_ONCE));
