@@ -434,12 +434,10 @@ public class BogreEntity extends Monster implements GeoEntity {
             pathSet = false;
             this.getNavigation().stop();
 
-            Inhabitants.LOGGER.debug("TICKING!");
             this.lookAt(EntityAnchorArgument.Anchor.FEET, cauldronPos.getCenter());
             this.lookAt(EntityAnchorArgument.Anchor.EYES, cauldronPos.getCenter());
             // start cooking animation
             if (getCookingTicks() == 10) {
-                Inhabitants.LOGGER.debug("STARTING CHOWDER ANIMATION!");
                 triggerAnim("grab", "grab");
             } else if (getCookingTicks() == 25) {
                 entityData.set(COOKING_ANIM, false);
@@ -625,7 +623,6 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private boolean moveTo(BlockPos pos, double speed, boolean checkCauldronDistance) {
         if (checkCauldronDistance && this.cauldronPos != null && this.cauldronPos.distToCenterSqr(pos.getX(), pos.getY(), pos.getZ()) > MAX_CAULDRON_DIST_SQR) {
-            Inhabitants.LOGGER.debug("Bogre is too far from cauldron, not moving to position: {}", pos);
             return false;
         }
         this.getNavigation().moveTo(this.getNavigation().createPath(pos, 0), speed);
