@@ -95,7 +95,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
 
     // MAKE CHOWDER
-    public static final EntityDataAccessor<ItemStack> FISH_HELD = // if the Bogre has picked up the fish item
+    public static final EntityDataAccessor<ItemStack> ITEM_HELD = // if the Bogre has picked up the fish item
             SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.ITEM_STACK);
 
     private ItemEntity droppedFishItem = null;
@@ -103,6 +103,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     private static final double FISH_REACH_DISTANCE = 3;
     private static final int CHOWDER_TIME_TICKS = 160;
     private static final int DROP_FISH_OFFSET = 12; // at what time the Bogre should drop the fish item after starting to make chowder
+    private int chowderThrowDelay = -1;
 
     // list of players who have tamed the Bogre
     private final Set<UUID> tamedPlayers = new HashSet<>();
@@ -342,12 +343,44 @@ public class BogreEntity extends Monster implements GeoEntity {
         return new PrecisePathNavigation(this, pLevel);
     }
 
+    private void throwHeldItem() {
+        assert !this.level().isClientSide();
+        this.triggerAnim("grab", "grab");
+        EntityUtil.throwItemStack(this.level(), this, this.getItemHeld(), .3f, 0);
+        setItemHeld(ItemStack.EMPTY);
+    }
+
     /**
      * The Bogre attempts to make chowder from a fish dropped by a player.
      * The fish should be droppedFishItem.
      */
     private void makeChowderAiStep() {
-        if (!this.getFishHeld().isEmpty()) {
+        if (!this.getItemHeld().isEmpty() && this.getItemHeld().is(ModItems.FISH_SNOT_CHOWDER.get())) {
+            // chowder is dropped after a short delay during which the bogre turns to the player
+            if (droppedFishPlayer != null) {
+                if (chowderThrowDelay == -1) {
+                    this.lookAt(EntityAnchorArgument.Anchor.FEET, droppedFishPlayer.position());
+                    chowderThrowDelay = 20; // short delay before throwing chowder
+                    return;
+                } else if (chowderThrowDelay > 0) {
+                    // wait
+                    chowderThrowDelay--;
+                    return;
+                } else if (chowderThrowDelay == 0) {
+                    throwHeldItem();
+                    this.state = State.CAUTIOUS;
+                    droppedFishPlayer = null;
+                    chowderThrowDelay = -1;
+                    return;
+                }
+            } else {
+                // fallback if no player
+                throwHeldItem();
+                this.state = State.CAUTIOUS;
+                chowderThrowDelay = -1;
+                return;
+            }
+        } else if (!this.getItemHeld().isEmpty()) {
             if (cauldronPos == null) {
                 this.state = State.CAUTIOUS;
                 return;
@@ -419,17 +452,13 @@ public class BogreEntity extends Monster implements GeoEntity {
 
                 // chowder complete
 
-                EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()), .3f, 0.5f);
-
                 droppedFishPlayer.sendSystemMessage(Component.literal("The Bogre has made chowder from the fish you dropped!"));
                 if (!tamedPlayers.contains(droppedFishPlayer.getUUID())) {
                     droppedFishPlayer.sendSystemMessage(Component.literal("You have tamed the Bogre!"));
                 }
                 this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
                 tamedPlayers.add(droppedFishPlayer.getUUID()); // add the player that dropped the fish to the tamed list
-                this.setFishHeld(ItemStack.EMPTY); // reset the holding fish state
-                droppedFishPlayer = null; // reset the dropped fish player
-                this.state = State.CAUTIOUS;
+                this.setItemHeld(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()));
                 setCookingTicks(0);
             }
 
@@ -448,7 +477,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             return;
         }
 
-        if (this.getFishHeld().isEmpty()) {
+        if (this.getItemHeld().isEmpty()) {
             this.triggerAnim("grab", "grab");
             this.getNavigation().stop();
             ItemStack fishStack = droppedFishItem.getItem();
@@ -461,7 +490,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
 
             Inhabitants.LOGGER.debug("Picked up one fish");
-            this.setFishHeld(new ItemStack(fishItem, 1)); // set the holding fish state
+            this.setItemHeld(new ItemStack(fishItem, 1)); // set the holding fish state
             droppedFishItem = null; // reset the dropped fish item
             return;
         }
@@ -622,7 +651,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(COOKING_ANIM, false);
         entityData.define(COOKING_TICKS, 0);
         entityData.define(CARVING_ANIM, false);
-        entityData.define(FISH_HELD, ItemStack.EMPTY);
+        entityData.define(ITEM_HELD, ItemStack.EMPTY);
         entityData.define(TEXTURE_TYPE, getBiomeTextureType());
     }
 
@@ -673,25 +702,25 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
 
-    public ItemStack getFishHeld() {
-        return this.entityData.get(FISH_HELD);
+    public ItemStack getItemHeld() {
+        return this.entityData.get(ITEM_HELD);
     }
 
     /**
      * Used specifically by the client to determine what to render in the Bogre's hand.
      */
-    public ItemStack getAnimateFishHeld() {
-        if (!this.getFishHeld().isEmpty()) {
+    public ItemStack getAnimateItemHeld() {
+        if (!this.getItemHeld().isEmpty() && !this.getItemHeld().is(ModItems.FISH_SNOT_CHOWDER.get())) {
             // if the chowder animation is at the drop fish offset, return an empty stack
             if (this.getCookingTicks() >= DROP_FISH_OFFSET) {
                 return ItemStack.EMPTY;
             }
         }
-        return this.getFishHeld();
+        return this.getItemHeld();
     }
 
-    private void setFishHeld(ItemStack fishHeld) {
-        this.entityData.set(FISH_HELD, fishHeld);
+    private void setItemHeld(ItemStack itemHeld) {
+        this.entityData.set(ITEM_HELD, itemHeld);
     }
 
     @Override
