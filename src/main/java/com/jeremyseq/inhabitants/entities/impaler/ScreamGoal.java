@@ -25,7 +25,8 @@ public class ScreamGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return !mob.screamed && mob.getHealth() <= mob.getAttributeValue(Attributes.MAX_HEALTH)/2;
+        return mob.getTarget() != null && mob.screamCooldown == 0 && mob.getHealth() <= mob.getAttributeValue(Attributes.MAX_HEALTH)/2
+                && mob.getTarget().distanceToSqr(mob) <= 25;
     }
 
     @Override
@@ -44,7 +45,7 @@ public class ScreamGoal extends Goal {
 
     @Override
     public void stop() {
-        mob.screamed = true;
+        mob.screamCooldown = ImpalerEntity.SCREAM_COOLDOWN;
     }
 
     @Override
@@ -63,7 +64,7 @@ public class ScreamGoal extends Goal {
             double radius = 15.0D;
             List<Player> players = mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(radius));
             for (Player player : players) {
-                player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 300, 0));
+                player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 200, 0));
             }
         }
     }

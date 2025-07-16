@@ -2,7 +2,6 @@ package com.jeremyseq.inhabitants.entities.impaler;
 
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
@@ -26,8 +25,8 @@ public class SprintAtTargetGoal extends Goal {
     @Override
     public boolean canUse() {
         LivingEntity potential = mob.getTarget();
-        if (!(potential instanceof Player player) || !player.isAlive()) return false;
-        return mob.distanceToSqr(player) > startDistanceSqr;
+        if (potential == null || !potential.isAlive()) return false;
+        return mob.distanceToSqr(potential) > startDistanceSqr;
     }
 
     @Override

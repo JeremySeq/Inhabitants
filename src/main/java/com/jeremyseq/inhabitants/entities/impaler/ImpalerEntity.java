@@ -13,6 +13,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.AbstractVillager;
@@ -35,7 +36,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     public static final int THORN_DAMAGE = 6;
-    public boolean screamed = false;
+    public static final int SCREAM_COOLDOWN = 300;
+    public int screamCooldown = 0;
     public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> SCREAM_TRIGGER = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -47,7 +49,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     public static AttributeSupplier setAttributes() {
         return Monster.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 40f)
+                .add(Attributes.MAX_HEALTH, 50f)
                 .add(Attributes.ATTACK_DAMAGE, 15f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
@@ -70,20 +72,20 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(7, new BreakTorchGoal(this, 1));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, false));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, false));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
     }
 
     @Override
     public void tick() {
         super.tick();
 
+        screamCooldown = Math.max(0, screamCooldown - 1);
+
         // regenerate health over time
         if (this.getTarget() == null && this.tickCount % 60 == 0 && this.getHealth() < this.getMaxHealth()) {
             this.heal(1.0F);
-        }
-        if (screamed && this.getHealth() > this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
-            screamed = false;
         }
     }
 
@@ -276,14 +278,14 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.putBoolean("screamed", this.screamed);
+        tag.putInt("screamCooldown", this.screamCooldown);
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.contains("screamed")) {
-            this.screamed = tag.getBoolean("screamed");
+        if (tag.contains("screamCooldown")) {
+            this.screamCooldown = tag.getInt("screamCooldown");
         }
     }
 
