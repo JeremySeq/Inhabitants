@@ -1,18 +1,14 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
 import com.jeremyseq.inhabitants.ModParticles;
-import com.jeremyseq.inhabitants.effects.ModEffects;
-import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -33,18 +29,17 @@ import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 
-import java.util.List;
 import java.util.Random;
 
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     public static final int THORN_DAMAGE = 6;
+    public boolean screamed = false;
     public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> RAGE_TRIGGER = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> SCREAM_TRIGGER = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int attackAnimTimer = 0;
-    private int rageAnimTimer = 0;
 
     public ImpalerEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -69,10 +64,12 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new RestrictSunGoal(this));
         this.goalSelector.addGoal(2, new FleeSunGoal(this, 1.0D));
-        this.goalSelector.addGoal(3, new SprintAtTargetGoal(this, 1.4D, 7, 2));
-        this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.0D, true));
-        this.goalSelector.addGoal(5, new BreakTorchGoal(this, 1));
-        this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(3, new RageGoal(this));
+        this.goalSelector.addGoal(4, new ScreamGoal(this));
+        this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 2));
+        this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
+        this.goalSelector.addGoal(7, new BreakTorchGoal(this, 1));
+        this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, false));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
     }
@@ -85,11 +82,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         if (this.getTarget() == null && this.tickCount % 60 == 0 && this.getHealth() < this.getMaxHealth()) {
             this.heal(1.0F);
         }
-        if (this.isSpiked() && this.getHealth() > this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
-            this.entityData.set(SPIKED, false);
-        } else if (!this.isSpiked() && this.getHealth() <= this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
-            // for when the impaler is loaded in with low health
-            this.entityData.set(SPIKED, true);
+        if (screamed && this.getHealth() > this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
+            screamed = false;
         }
     }
 
@@ -143,8 +137,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> pKey) {
         super.onSyncedDataUpdated(pKey);
-        if (this.level().isClientSide && pKey == RAGE_TRIGGER) {
-            if (this.entityData.get(RAGE_TRIGGER)) {
+        if (this.level().isClientSide && pKey == SCREAM_TRIGGER) {
+            if (this.entityData.get(SCREAM_TRIGGER)) {
                 this.spawnRageParticles();
                 Vec3 pos = new Vec3(getX(), getY() + 0.5, getZ());
                 Vec3 lookAngle = new Vec3(getLookAngle().x, 0, getLookAngle().z).normalize();
@@ -193,27 +187,15 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     @Override
     protected void customServerAiStep() {
+        if (this.getTarget() == null) {
+            this.getEntityData().set(SPIKED, false);
+        }
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
             if (this.attackAnimTimer == 0) {
                 LivingEntity target = getTarget();
                 if (target != null && distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target)) {
                     super.doHurtTarget(target);
-                }
-            }
-        }
-        entityData.set(RAGE_TRIGGER, this.rageAnimTimer == 0);
-
-        if (this.rageAnimTimer > 0) {
-            this.rageAnimTimer--;
-            if (this.rageAnimTimer == 0) {
-                EntityUtil.shockwave(this, 10, 10);
-                this.level().playSound(null, this.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 10f, 0.9F);
-                // give nearby players the concussion effect
-                double radius = 15.0D;
-                List<Player> players = this.level().getEntitiesOfClass(Player.class, this.getBoundingBox().inflate(radius));
-                for (Player player : players) {
-                    player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 300, 0));
                 }
             }
         }
@@ -231,12 +213,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
         boolean result = super.hurt(source, amount);
-        if (!this.isSpiked() && this.getHealth() <= this.getAttributeValue(Attributes.MAX_HEALTH)/2) {
-            this.entityData.set(SPIKED, true);
-            this.triggerAnim("rage", "rage");
-            this.rageAnimTimer = 10;
-            return result;
-        }
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
         }
@@ -257,6 +233,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 .triggerableAnim("bite", RawAnimation.begin().then("bite", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "rage", 0, state -> PlayState.STOP)
                 .triggerableAnim("rage", RawAnimation.begin().then("rage", Animation.LoopType.PLAY_ONCE)));
+        controllers.add(new AnimationController<>(this, "scream", 0, state -> PlayState.STOP)
+                .triggerableAnim("scream", RawAnimation.begin().then("scream", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "sprint", 0, state -> PlayState.STOP)
                 .triggerableAnim("startSprint", RawAnimation.begin().then("stepping on four", Animation.LoopType.PLAY_ONCE))
                 .triggerableAnim("stopSprint", RawAnimation.begin().then("stepping on two", Animation.LoopType.PLAY_ONCE)));
@@ -292,7 +270,21 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(SPIKED, false);
-        entityData.define(RAGE_TRIGGER, true);
+        entityData.define(SCREAM_TRIGGER, true);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putBoolean("screamed", this.screamed);
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains("screamed")) {
+            this.screamed = tag.getBoolean("screamed");
+        }
     }
 
     @Override

@@ -675,7 +675,7 @@
 					]
 				},
 				{
-					"name": "spikes8",
+					"name": "spikes6",
 					"parent": "righthand",
 					"pivot": [-10.99998, 22.99995, -11.49999],
 					"cubes": [
@@ -713,7 +713,7 @@
 					]
 				},
 				{
-					"name": "spikes6",
+					"name": "spikes8",
 					"parent": "righthand",
 					"pivot": [-9, 26, -10.5],
 					"cubes": [
