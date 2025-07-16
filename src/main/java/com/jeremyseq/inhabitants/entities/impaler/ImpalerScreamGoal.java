@@ -7,7 +7,6 @@ import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 
@@ -25,7 +24,7 @@ public class ImpalerScreamGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return mob.getTarget() != null && mob.screamCooldown == 0 && mob.getHealth() <= mob.getAttributeValue(Attributes.MAX_HEALTH)/2
+        return mob.getTarget() != null && mob.screamCooldown == 0
                 && mob.getTarget().distanceToSqr(mob) <= 25;
     }
 
