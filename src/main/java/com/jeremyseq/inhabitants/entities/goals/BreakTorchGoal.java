@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.entities.impaler;
+package com.jeremyseq.inhabitants.entities.goals;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

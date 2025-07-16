@@ -1,6 +1,8 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
 import com.jeremyseq.inhabitants.ModParticles;
+import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
+import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -66,8 +68,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new RestrictSunGoal(this));
         this.goalSelector.addGoal(2, new FleeSunGoal(this, 1.0D));
-        this.goalSelector.addGoal(3, new RageGoal(this));
-        this.goalSelector.addGoal(4, new ScreamGoal(this));
+        this.goalSelector.addGoal(3, new ImpalerRageGoal(this));
+        this.goalSelector.addGoal(4, new ImpalerScreamGoal(this));
         this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 2));
         this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(7, new BreakTorchGoal(this, 1));

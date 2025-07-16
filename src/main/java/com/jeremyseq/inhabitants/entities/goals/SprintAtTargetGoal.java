@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.entities.impaler;
+package com.jeremyseq.inhabitants.entities.goals;
 
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.LivingEntity;

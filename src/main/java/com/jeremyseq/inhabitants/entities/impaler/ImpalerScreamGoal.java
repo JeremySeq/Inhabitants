@@ -14,11 +14,11 @@ import net.minecraft.world.entity.player.Player;
 import java.util.EnumSet;
 import java.util.List;
 
-public class ScreamGoal extends Goal {
+public class ImpalerScreamGoal extends Goal {
     private final ImpalerEntity mob;
     private int screamTimer = 0;
 
-    public ScreamGoal(ImpalerEntity mob) {
+    public ImpalerScreamGoal(ImpalerEntity mob) {
         this.mob = mob;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }

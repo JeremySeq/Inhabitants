@@ -5,11 +5,11 @@ import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
-public class RageGoal extends Goal {
+public class ImpalerRageGoal extends Goal {
     private final ImpalerEntity mob;
     private int rageTimer = 0;
 
-    public RageGoal(ImpalerEntity mob) {
+    public ImpalerRageGoal(ImpalerEntity mob) {
         this.mob = mob;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
