@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants;
 import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishAmbienceParticle;
 import com.jeremyseq.inhabitants.entities.impaler.RageParticle;
 import com.jeremyseq.inhabitants.entities.impaler.ScreamParticle;
+import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamPearlAmbienceParticle;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
@@ -30,11 +31,16 @@ public class ModParticles {
             PARTICLES.register("abyssfish_ambience",
                     () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> WARPED_CLAM_PEARL_AMBIENCE =
+            PARTICLES.register("warped_clam_pearl_ambience",
+                    () -> new SimpleParticleType(false));
+
 
     @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent evt) {
         evt.registerSpriteSet(ModParticles.IMPALER_SCREAM.get(), ScreamParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.IMPALER_RAGE.get(), RageParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.ABYSSFISH_AMBIENCE.get(), AbyssfishAmbienceParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), WarpedClamPearlAmbienceParticle.Factory::new);
     }
 }

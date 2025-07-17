@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.warped_clam;
 
+import com.jeremyseq.inhabitants.ModParticles;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -155,19 +156,25 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         }
 
         // particles if clam has pearl
-        if (hasPearl() && level().isClientSide && level().random.nextFloat() < 0.1f) {
-            for (int i = 0; i < 8; i++) {
-                double x = getX() + (random.nextDouble() - 0.5);
-                double y = getY() + 0.7 + random.nextDouble() * 0.4;
-                double z = getZ() + (random.nextDouble() - 0.5);
+        if (hasPearl() && level().isClientSide && tickCount % 20 == 0) {
+            double centerX = getX();
+            double centerY = getY() + this.getBbHeight()/2;
+            double centerZ = getZ();
 
-                double dx = (random.nextDouble() - 0.5) * 0.02;
-                double dy = random.nextDouble() * 0.01;
-                double dz = (random.nextDouble() - 0.5) * 0.02;
+            int particleCount = 12;
+            double speed = 0.05;
 
-                level().addParticle(ParticleTypes.PORTAL, x, y, z, dx, dy, dz);
+            for (int i = 0; i < particleCount; i++) {
+                double angle = (2 * Math.PI / particleCount) * i;
+
+                double dx = Math.cos(angle) * speed;
+                double dy = 0;
+                double dz = Math.sin(angle) * speed;
+
+                level().addParticle(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), centerX, centerY, centerZ, dx, dy, dz);
             }
         }
+
     }
 
     @Override
