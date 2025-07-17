@@ -8,16 +8,19 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.Node;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
 /**
  * Same as {@link net.minecraft.world.entity.ai.goal.MeleeAttackGoal}, but with a customizable cooldown between attacks.
+ * Can also handle overshooting path nodes.
  */
 public class CooldownMeleeAttackGoal extends Goal {
     protected final PathfinderMob mob;
     private final double speedModifier;
     private final boolean followTargetEvenIfNotSeen;
+    private final boolean overshootFix;
     private Path path;
     private double pathedTargetX;
     private double pathedTargetY;
@@ -30,20 +33,24 @@ public class CooldownMeleeAttackGoal extends Goal {
     private int failedPathFindingPenalty = 0;
     private final boolean canPenalize = false;
     private final boolean setSprinting;
+    private int lookTick = 0;
 
     public CooldownMeleeAttackGoal(PathfinderMob mob, double speedModifier, boolean followTargetEvenIfNotSeen, int attackIntervalTicks) {
-        this(mob, speedModifier, followTargetEvenIfNotSeen, attackIntervalTicks, false);
+        this(mob, speedModifier, followTargetEvenIfNotSeen, attackIntervalTicks, false, false);
     }
 
-    public CooldownMeleeAttackGoal(PathfinderMob mob, double speedModifier, boolean followTargetEvenIfNotSeen, int attackIntervalTicks, boolean setSprinting) {
+    /**
+     * @param overshootFix enables some tricks to prevent rapid turning that typically happens when the mob is moving fast downhill.
+     */
+    public CooldownMeleeAttackGoal(PathfinderMob mob, double speedModifier, boolean followTargetEvenIfNotSeen, int attackIntervalTicks, boolean setSprinting, boolean overshootFix) {
         this.mob = mob;
         this.speedModifier = speedModifier;
         this.followTargetEvenIfNotSeen = followTargetEvenIfNotSeen;
         this.attackInterval = attackIntervalTicks;
         this.setSprinting = setSprinting;
+        this.overshootFix = overshootFix;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
-
 
     @Override
     public boolean canUse() {
@@ -113,7 +120,10 @@ public class CooldownMeleeAttackGoal extends Goal {
         LivingEntity target = this.mob.getTarget();
         if (target == null) return;
 
-        this.mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+        // Only update look every 3 ticks. Does this do anything? idk
+        if (lookTick++ % 3 == 0) {
+            this.mob.getLookControl().setLookAt(target, 10.0F, 10.0F);
+        }
 
         double distanceToTargetSq = this.mob.getPerceivedTargetDistanceSquareForMeleeAttack(target);
         this.ticksUntilNextPathRecalculation = Math.max(this.ticksUntilNextPathRecalculation - 1, 0);
@@ -154,6 +164,21 @@ public class CooldownMeleeAttackGoal extends Goal {
             }
 
             this.ticksUntilNextPathRecalculation = this.adjustedTickDelay(this.ticksUntilNextPathRecalculation);
+        }
+
+        // handle overshooting a path node
+        if (this.overshootFix) {
+            Path currentPath = this.mob.getNavigation().getPath();
+            if (currentPath != null && !currentPath.isDone()) {
+                int nextNodeIndex = currentPath.getNextNodeIndex();
+                if (nextNodeIndex < currentPath.getNodeCount()) {
+                    Vec3 nextNodePos = currentPath.getNode(nextNodeIndex).asVec3();
+                    double distToNext = this.mob.position().distanceToSqr(nextNodePos);
+                    if (distToNext > 8) {
+                        currentPath.advance();
+                    }
+                }
+            }
         }
 
         this.ticksUntilNextAttack = Math.max(this.ticksUntilNextAttack - 1, 0);

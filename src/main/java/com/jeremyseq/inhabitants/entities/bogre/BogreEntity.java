@@ -135,7 +135,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.4f, false, 40, true));
+        this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.4f, false, 40, true, true));
         this.goalSelector.addGoal(7, new BogreConditionalStrollGoal(this, 1.0D));
     }
 
