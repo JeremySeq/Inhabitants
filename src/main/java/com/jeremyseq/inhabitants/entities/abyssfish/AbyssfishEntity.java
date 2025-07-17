@@ -51,7 +51,7 @@ public class AbyssfishEntity extends AbstractSchoolingFish implements GeoEntity 
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide && tickCount % 6 == 0) {
+        if (level().isClientSide && tickCount % 12 == 0) {
             double x = getX() + (random.nextDouble() - 0.5) * 0.4;
             double y = getY() + (random.nextDouble() - 0.5) * 0.4;
             double z = getZ() + (random.nextDouble() - 0.5) * 0.4;
