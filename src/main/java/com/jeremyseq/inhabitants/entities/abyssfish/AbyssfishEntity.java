@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.abyssfish;
 
+import com.jeremyseq.inhabitants.ModParticles;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -45,6 +46,26 @@ public class AbyssfishEntity extends AbstractSchoolingFish implements GeoEntity 
         this.goalSelector.addGoal(1, new PanicGoal(this, 1.25D));
         this.goalSelector.addGoal(2, new RandomSwimmingGoal(this, 1.0D, 40));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 6.0F));
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (level().isClientSide && tickCount % 6 == 0) {
+            double x = getX() + (random.nextDouble() - 0.5) * 0.4;
+            double y = getY() + (random.nextDouble() - 0.5) * 0.4;
+            double z = getZ() + (random.nextDouble() - 0.5) * 0.4;
+
+            double xSpeed = (random.nextDouble() - 0.5) * 0.01;
+            double ySpeed = 0.005 + random.nextDouble() * 0.005;
+            double zSpeed = (random.nextDouble() - 0.5) * 0.01;
+
+            level().addParticle(
+                    ModParticles.ABYSSFISH_AMBIENCE.get(),
+                    x, y, z,
+                    xSpeed, ySpeed, zSpeed
+            );
+        }
     }
 
     @Override

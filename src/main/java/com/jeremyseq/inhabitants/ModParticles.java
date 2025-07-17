@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants;
 
+import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishAmbienceParticle;
 import com.jeremyseq.inhabitants.entities.impaler.RageParticle;
 import com.jeremyseq.inhabitants.entities.impaler.ScreamParticle;
 import net.minecraft.core.particles.ParticleType;
@@ -25,10 +26,15 @@ public class ModParticles {
             PARTICLES.register("impaler_rage",
                     () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> ABYSSFISH_AMBIENCE =
+            PARTICLES.register("abyssfish_ambience",
+                    () -> new SimpleParticleType(false));
+
 
     @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent evt) {
         evt.registerSpriteSet(ModParticles.IMPALER_SCREAM.get(), ScreamParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.IMPALER_RAGE.get(), RageParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.ABYSSFISH_AMBIENCE.get(), AbyssfishAmbienceParticle.Factory::new);
     }
 }
