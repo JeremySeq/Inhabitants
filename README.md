@@ -13,26 +13,12 @@ So far, 10 new mobs are planned, each with unique behaviors and interactions.
 
 The following mobs are fully implemented and functional in the game.
 
-**Bogre**
 
-A large ogre-like creature that lives in the swamp. It moves slowly but hits hard. You can tame it with fish; it can make chowder for you and can carve bones into weapons.
+![Bogre](images/bogre.png)
 
-![Bogre](images/bogre.gif)
 
-**Warped Clam**
+![Warped Clam](images/warped_clam.png)
 
-A passive End creature that launches players into the air when stepped on, which is especially useful if you have an Elytra. It only takes damage when it opens. Players can use a brush on it to harvest ender pearls and can pick it up using a shovel.
+![Abyssfish](images/pitfish.png)
 
-![Warped Clam](images/warped_clam.gif)
-
-**Abyssfish**
-
-A glowing fish found deep in the ocean. It can be caught while fishing and cooked like cod, or brewed into a Potion of Adaptation that lets you see clearly underwater and in lava.
-
-![Abyssfish](images/abyssfish.gif)
-
-**Impaler**
-
-An aggressive cave-dwelling mob. When its health drops below half, it enters a spiked rage state, triggering a powerful shockwave and damaging attackers with thorns.
-
-![Impaler](images/impaler.gif)
+![Impaler](images/impaler.png)
