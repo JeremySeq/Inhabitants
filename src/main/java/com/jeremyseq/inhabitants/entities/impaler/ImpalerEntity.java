@@ -47,6 +47,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     public ImpalerEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        this.setMaxUpStep(1.5f);
     }
 
     public static AttributeSupplier setAttributes() {
@@ -263,11 +264,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
      */
     public boolean isSpiked() {
         return this.entityData.get(SPIKED);
-    }
-
-    @Override
-    public float getStepHeight() {
-        return 1.5f;
     }
 
     @Override
