@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.warped_clam;
 
 import com.jeremyseq.inhabitants.ModParticles;
+import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -48,6 +49,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
     public static final EntityDataAccessor<Boolean> HAS_PEARL = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int pearlRegenTimer = 0; // Ticks until pearl regenerates
+    private int launchCooldown = 0; // ticks until next launch can happen
     private int launchDelayTicks = 0;
     private int popDelayTicks = 0;
     private boolean lastOpenState = false;
@@ -87,10 +89,19 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
     }
 
     @Override
+    protected void playHurtSound(@NotNull DamageSource pSource) {
+        level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                ModSoundEvents.WARPED_CLAM_OPENED_DAMAGE.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
+    }
+
+    @Override
     public boolean hurt(@NotNull DamageSource pSource, float pAmount) {
         if (!this.isOpen() && pSource.getEntity() instanceof LivingEntity) {
+            level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                    ModSoundEvents.WARPED_CLAM_CLOSED_DAMAGE.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
             return false;
         }
+        this.closeClam();
         return super.hurt(pSource, pAmount);
     }
 
@@ -127,7 +138,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         }
 
         // Check for players standing on top and trigger launch delay
-        if (!level().isClientSide && launchDelayTicks == 0) {
+        if (!level().isClientSide && launchDelayTicks == 0 && launchCooldown <= 0 && !isOpen()) {
             AABB topBox = getBoundingBox().move(0, 0.4, 0); // slightly above the clam
             List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, topBox);
             entities.remove(this);
@@ -136,6 +147,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
                 entityData.set(FLING_ANIM, false);
                 entityData.set(FLING_ANIM, true);
                 launchDelayTicks = 8;
+                launchCooldown = 30;
             }
         }
 
@@ -147,11 +159,17 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             }
         }
 
+        if (launchCooldown < 0) {
+            launchCooldown = 0;
+        } else if (launchCooldown > 0) {
+            launchCooldown--;
+        }
+
         // handle pearl pop delay
         if (popDelayTicks > 0) {
             popDelayTicks--;
             if (popDelayTicks == 0) {
-                entityData.set(OPEN, false);
+                this.closeClam();
             }
         }
 
@@ -196,11 +214,11 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             if (!level().isClientSide) {
                 entityData.set(OPEN, true);
                 popDelayTicks = 20*15; // how long clam stays open
-
-                level().playSound(null, getX(), getY(), getZ(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.NEUTRAL, 3.0f, 1.0f);
-
                 // play the brushing sound
                 level().playSound(null, getX(), getY(), getZ(), SoundEvents.BRUSH_SAND, SoundSource.PLAYERS, 1.0f, 1.0f);
+
+                level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                        ModSoundEvents.WARPED_CLAM_OPENING.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
 
                 // spawn brushing particles like suspicious sand
                 ((ServerLevel) level()).sendParticles(
@@ -218,13 +236,20 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             return InteractionResult.sidedSuccess(level().isClientSide);
         } else if (hasPearl() && isOpen()) {
             popPearl();
-            entityData.set(OPEN, false);
+            this.closeClam();
             entityData.set(HAS_PEARL, false);
             return InteractionResult.sidedSuccess(level().isClientSide);
         }
         return super.mobInteract(player, hand);
     }
 
+    private void closeClam() {
+        if (!level().isClientSide) {
+            entityData.set(OPEN, false);
+            level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                    ModSoundEvents.WARPED_CLAM_CLOSING.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
+        }
+    }
 
     private void launchEntity() {
         AABB box = getBoundingBox().move(0, 0.4, 0);

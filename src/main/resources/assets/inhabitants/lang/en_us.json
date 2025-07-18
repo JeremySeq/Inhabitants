@@ -27,5 +27,10 @@
   "advancement.inhabitants.david_and_goliath.title": "David and Goliath",
   "advancement.inhabitants.david_and_goliath.description": "Defeat the mighty Bogre.",
   "advancement.inhabitants.ate_fish_snot_chowder.title": "Is this even edible?",
-  "advancement.inhabitants.ate_fish_snot_chowder.description": "Eat fish-snot chowder."
+  "advancement.inhabitants.ate_fish_snot_chowder.description": "Eat fish-snot chowder.",
+
+  "sounds.inhabitants.warped_clam.closing": "Warped Clam closes",
+  "sounds.inhabitants.warped_clam.opening": "Warped Clam opens",
+  "sounds.inhabitants.warped_clam.closed_damage": "Warped Clam clanks",
+  "sounds.inhabitants.warped_clam.opened_damage": "Warped Clam hurts"
 }

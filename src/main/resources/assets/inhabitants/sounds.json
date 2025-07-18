@@ -1,0 +1,50 @@
+{
+  "warped_clam.closing": {
+    "subtitle": "sounds.inhabitants.warped_clam.closing",
+    "sounds": [
+      {
+        "name": "inhabitants:warped_clam/clam_closing",
+        "stream": false
+      }
+    ]
+  },
+  "warped_clam.opening": {
+    "subtitle": "sounds.inhabitants.warped_clam.opening",
+    "sounds": [
+      {
+        "name": "inhabitants:warped_clam/clam_opening",
+        "stream": false
+      }
+    ]
+  },
+  "warped_clam.closed_damage": {
+    "subtitle": "sounds.inhabitants.warped_clam.closed_damage",
+    "sounds": [
+      {
+        "name": "inhabitants:warped_clam/clam_closed_damage_0",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:warped_clam/clam_closed_damage_1",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "warped_clam.opened_damage": {
+    "subtitle": "sounds.inhabitants.warped_clam.opened_damage",
+    "sounds": [
+      {
+        "name": "inhabitants:warped_clam/clam_opened_damage_0",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:warped_clam/clam_opened_damage_1",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  }
+}
