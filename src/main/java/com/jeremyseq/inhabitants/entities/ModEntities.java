@@ -13,6 +13,8 @@ import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
+import com.jeremyseq.inhabitants.entities.zinger.ZingerEntity;
+import com.jeremyseq.inhabitants.entities.zinger.ZingerRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -68,12 +70,19 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
 
+    public static final RegistryObject<EntityType<ZingerEntity>> ZINGER =
+            REGISTRY.register("zinger",
+                    () -> EntityType.Builder.of(ZingerEntity::new, MobCategory.CREATURE)
+                            .sized(5f, 2.5f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "zinger").toString()));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.ABYSSFISH.get(), AbyssfishEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
+        event.put(ModEntities.ZINGER.get(), ZingerEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -84,5 +93,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.ABYSSFISH.get(), AbyssfishRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
+        EntityRenderers.register(ModEntities.ZINGER.get(), ZingerRenderer::new);
     }
 }
