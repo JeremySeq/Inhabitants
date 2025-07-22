@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.entities.zinger;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.goals.ConditionalStrollGoal;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -30,9 +31,19 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class ZingerEntity extends PathfinderMob implements GeoEntity {
+
+    private static final TicketType<ZingerEntity> ZINGER_TICKET = TicketType.create(
+            "zinger",
+            Comparator.comparingInt(System::identityHashCode)
+    );
+
+    private static final int CHUNK_RADIUS = 1; // 1 = 3x3 area
+    private ChunkPos lastCenterChunk;
+
     public static final EntityDataAccessor<String> FLIGHT_STATE = SynchedEntityData.defineId(ZingerEntity.class, EntityDataSerializers.STRING);
 
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -101,6 +112,32 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     @Override
     protected void customServerAiStep() {
         super.customServerAiStep();
+
+        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+            ChunkPos currentCenter = new ChunkPos(this.blockPosition());
+
+            if (lastCenterChunk == null || !lastCenterChunk.equals(currentCenter)) {
+                // unload old surrounding chunks
+                if (lastCenterChunk != null) {
+                    for (int dx = -CHUNK_RADIUS; dx <= CHUNK_RADIUS; dx++) {
+                        for (int dz = -CHUNK_RADIUS; dz <= CHUNK_RADIUS; dz++) {
+                            ChunkPos pos = new ChunkPos(lastCenterChunk.x + dx, lastCenterChunk.z + dz);
+                            serverLevel.getChunkSource().removeRegionTicket(ZINGER_TICKET, pos, 2, this);
+                        }
+                    }
+                }
+
+                // load new surrounding chunks
+                for (int dx = -CHUNK_RADIUS; dx <= CHUNK_RADIUS; dx++) {
+                    for (int dz = -CHUNK_RADIUS; dz <= CHUNK_RADIUS; dz++) {
+                        ChunkPos pos = new ChunkPos(currentCenter.x + dx, currentCenter.z + dz);
+                        serverLevel.getChunkSource().addRegionTicket(ZINGER_TICKET, pos, 2, this);
+                    }
+                }
+
+                lastCenterChunk = currentCenter;
+            }
+        }
 
         // Find player named "Dev"
         Player devPlayer = null;
@@ -306,6 +343,31 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(FLIGHT_STATE, FlightState.GROUNDED.name());
+    }
+
+    @Override
+    public void remove(@NotNull RemovalReason reason) {
+        super.remove(reason);
+
+        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel && lastCenterChunk != null) {
+            for (int dx = -CHUNK_RADIUS; dx <= CHUNK_RADIUS; dx++) {
+                for (int dz = -CHUNK_RADIUS; dz <= CHUNK_RADIUS; dz++) {
+                    ChunkPos pos = new ChunkPos(lastCenterChunk.x + dx, lastCenterChunk.z + dz);
+                    serverLevel.getChunkSource().removeRegionTicket(ZINGER_TICKET, pos, 2, this);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
+        super.addAdditionalSaveData(pCompound);
+
+        // saves the chunk pos to be loaded in later
+        if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
+            ChunkPos pos = new ChunkPos(this.blockPosition());
+            ZingerChunkData.get(serverLevel).addZingerChunk(pos);
+        }
     }
 
     @Override
