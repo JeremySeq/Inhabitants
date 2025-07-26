@@ -10,10 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
@@ -29,10 +26,13 @@ import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class ZingerEntity extends PathfinderMob implements GeoEntity {
 
@@ -47,6 +47,8 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     public static final EntityDataAccessor<String> FLIGHT_STATE = SynchedEntityData.defineId(ZingerEntity.class, EntityDataSerializers.STRING);
 
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+    private UUID ownerUUID;
+
     public enum FlightState {
         GROUNDED,
         TAKING_OFF,
@@ -140,22 +142,15 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         }
 
         // Find player named "Dev"
-        Player devPlayer = null;
         List<? extends Player> players = this.level().players();
         for (Player player : players) {
             if ("Dev".equals(player.getName().getString())) {
-                devPlayer = player;
+                setOwnerUUID(player.getUUID());
                 break;
             }
         }
 
-        if (devPlayer != null && !devPlayer.isCreative()) {
-            this.setTarget(devPlayer);
-        } else {
-            this.setTarget(null);
-        }
-
-        var target = this.getTarget();
+        LivingEntity target = this.getTarget();
         boolean hasTarget = target != null;
 
         switch (getFlightState()) {
@@ -339,6 +334,21 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         return FlightState.valueOf(this.entityData.get(FLIGHT_STATE));
     }
 
+    /**
+     * @return the UUID of the player who owns this Zinger.
+     */
+    public UUID getOwnerUUID() {
+        return this.ownerUUID;
+    }
+
+    private void setOwnerUUID(UUID ownerUUID) {
+        if (!Objects.equals(this.ownerUUID, ownerUUID)) {
+            ZingerManager.unregisterZinger(this);
+            this.ownerUUID = ownerUUID;
+            ZingerManager.registerZinger(this);
+        }
+    }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
@@ -362,11 +372,37 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
+        if (this.getOwnerUUID() != null) {
+            pCompound.putUUID("OwnerUUID", this.getOwnerUUID());
+        }
 
         // saves the chunk pos to be loaded in later
         if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
             ChunkPos pos = new ChunkPos(this.blockPosition());
             ZingerChunkData.get(serverLevel).addZingerChunk(pos);
+        }
+    }
+
+    @Override
+    public void onAddedToWorld() {
+        super.onAddedToWorld();
+        ZingerManager.registerZinger(this);
+    }
+
+    @Override
+    public void onRemovedFromWorld() {
+        super.onRemovedFromWorld();
+        ZingerManager.unregisterZinger(this);
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
+        super.readAdditionalSaveData(pCompound);
+
+        if (pCompound.contains("OwnerUUID")) {
+            setOwnerUUID(pCompound.getUUID("OwnerUUID"));
+        } else {
+            setOwnerUUID(null);
         }
     }
 

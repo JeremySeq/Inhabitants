@@ -31,6 +31,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.ABYSSFISH_BUCKET.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
+                        pOutput.accept(ModItems.ANCIENT_FLUTE.get());
                     })
                     .build());
 
