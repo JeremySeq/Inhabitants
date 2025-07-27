@@ -73,7 +73,7 @@ public class ModEntities {
     public static final RegistryObject<EntityType<ZingerEntity>> ZINGER =
             REGISTRY.register("zinger",
                     () -> EntityType.Builder.of(ZingerEntity::new, MobCategory.CREATURE)
-                            .sized(5f, 2.5f)
+                            .sized(3f, 2.5f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "zinger").toString()));
 
     @SubscribeEvent

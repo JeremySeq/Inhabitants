@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.zinger;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.goals.ConditionalStrollGoal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -9,6 +8,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -29,10 +30,8 @@ import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class ZingerEntity extends PathfinderMob implements GeoEntity {
 
@@ -61,10 +60,20 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
 
     private double takeoffYTarget = -1;
 
+    @Nullable
+    private Vec3 targetPosition;
+
+    public Vec3 nestPosition = new Vec3(0, 140, 0);
+
     public ZingerEntity(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.moveControl = new FlyingMoveControl(this, 20, false);
         this.setPersistenceRequired();
+    }
+
+    public boolean isAtNest() {
+        if (this.nestPosition == null) return false;
+        return this.position().distanceToSqr(nestPosition) < 10;
     }
 
     @Override
@@ -84,7 +93,8 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new ConditionalStrollGoal<>(this, 1, (zingerEntity -> !zingerEntity.isFlying())));
+        this.goalSelector.addGoal(1, new ZingerReturnToNestGoal(this));
+        this.goalSelector.addGoal(2, new ConditionalStrollGoal<>(this, 1, (zingerEntity -> !zingerEntity.isFlying())));
     }
 
     @Override
@@ -112,9 +122,38 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     }
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected @NotNull InteractionResult mobInteract(@NotNull Player pPlayer, @NotNull InteractionHand pHand) {
+        if (pPlayer.getUUID().equals(this.getOwnerUUID())) {
+            if (pPlayer.startRiding(this, true)) {
+                return InteractionResult.SUCCESS;
+            }
+        }
+        return super.mobInteract(pPlayer, pHand);
+    }
 
+    @Override
+    protected void positionRider(@NotNull Entity passenger, @NotNull MoveFunction pCallback) {
+        if (this.hasPassenger(passenger)) {
+            double offsetY = -.4f;
+            float yawRad = (float) Math.toRadians(this.getYRot());
+
+            double xOffset = -Math.sin(yawRad) * 0.3;
+            double zOffset = Math.cos(yawRad) * 0.3;
+
+            passenger.setPos(
+                    this.getX() + xOffset,
+                    this.getY() + offsetY,
+                    this.getZ() + zOffset
+            );
+        }
+    }
+
+    @Override
+    public boolean shouldRiderSit() {
+        return false;
+    }
+
+    private void handleChunkLoadingTick() {
         if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
             ChunkPos currentCenter = new ChunkPos(this.blockPosition());
 
@@ -140,8 +179,14 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
                 lastCenterChunk = currentCenter;
             }
         }
+    }
 
-        // Find player named "Dev"
+    @Override
+    protected void customServerAiStep() {
+        super.customServerAiStep();
+        this.handleChunkLoadingTick();
+
+        // just for testing, set owner to "Dev"
         List<? extends Player> players = this.level().players();
         for (Player player : players) {
             if ("Dev".equals(player.getName().getString())) {
@@ -151,11 +196,22 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         }
 
         LivingEntity target = this.getTarget();
+        Vec3 customTarget = this.getTargetPosition();
+
         boolean hasTarget = target != null;
+        boolean hasCustomTarget = customTarget != null;
+
+        Vec3 destination = null;
+
+        if (hasTarget) {
+            destination = target.position().add(0, HOVER_HEIGHT, 0);
+        } else if (hasCustomTarget) {
+            destination = customTarget;
+        }
 
         switch (getFlightState()) {
             case GROUNDED -> {
-                if (hasTarget) {
+                if (destination != null) {
                     setFlightState(FlightState.TAKING_OFF);
                     this.setNoGravity(true);
                     takeoffYTarget = this.getY() + HOVER_HEIGHT;
@@ -165,30 +221,30 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
                 handleTakeoff();
             }
             case HOVERING -> {
-                if (!hasTarget) {
+                if (destination == null) {
                     setFlightState(FlightState.LANDING);
                 } else {
-                    Vec3 desiredHoverPos = target.position().add(0, HOVER_HEIGHT, 0);
-                    double dist = this.position().distanceTo(desiredHoverPos);
+                    double dist = this.position().distanceTo(destination);
                     if (dist > 12) {
                         setFlightState(FlightState.FLYING);
                     } else {
-                        handleHovering(target);
+                        handleHovering(destination);
                     }
                 }
             }
             case FLYING -> {
-                if (!hasTarget) {
+                if (destination == null) {
                     setFlightState(FlightState.LANDING);
                 } else {
-                    Vec3 hoverTarget = target.position().add(0, HOVER_HEIGHT, 0);
-
-                    // close enough to hover
-                    if (Math.abs(this.getY() - hoverTarget.y) < 1.0 &&
-                            this.position().distanceTo(hoverTarget) < 10) {
+                    double dist = this.position().distanceTo(destination);
+                    if (dist < 10) {
                         setFlightState(FlightState.HOVERING);
+                        if (hasCustomTarget) {
+                            // Arrived at custom target
+                            setTargetPosition(null);
+                        }
                     } else {
-                        handleFlying(hoverTarget);
+                        handleFlying(destination);
                     }
                 }
             }
@@ -201,7 +257,6 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
                 }
             }
         }
-        Inhabitants.LOGGER.debug(String.valueOf(this.getFlightState()));
     }
 
     private void handleFlying(Vec3 targetPos) {
@@ -268,12 +323,10 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         }
     }
 
-    private void handleHovering(Entity target) {
-        if (target == null) return;
+    private void handleHovering(Vec3 targetPos) {
 
-        Vec3 targetPos = target.position();
         double hoverX = targetPos.x;
-        double hoverY = targetPos.y + HOVER_HEIGHT;
+        double hoverY = targetPos.y;
         double hoverZ = targetPos.z;
 
         Vec3 currentPos = this.position();
@@ -294,7 +347,7 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         this.setDeltaMovement(dx, dy, dz);
 
         // Keep looking at target
-        this.getLookControl().setLookAt(target.getX(), target.getY(), target.getZ(), 10, 10);
+//        this.getLookControl().setLookAt(target.getX(), target.getY(), target.getZ(), 10, 10);
     }
 
 
@@ -332,6 +385,15 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
 
     public FlightState getFlightState() {
         return FlightState.valueOf(this.entityData.get(FLIGHT_STATE));
+    }
+
+    public void setTargetPosition(@Nullable Vec3 pos) {
+        this.targetPosition = pos;
+    }
+
+    @Nullable
+    public Vec3 getTargetPosition() {
+        return this.targetPosition;
     }
 
     /**
