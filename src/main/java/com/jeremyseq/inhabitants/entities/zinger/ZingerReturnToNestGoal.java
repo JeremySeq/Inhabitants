@@ -19,7 +19,7 @@ public class ZingerReturnToNestGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return !this.zinger.isAtNest();
+        return !this.zinger.isAtNest() && this.zinger.returningToNest;
     }
 
     @Override

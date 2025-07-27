@@ -103,7 +103,7 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new ZingerReturnToNestGoal(this));
-        this.goalSelector.addGoal(2, new ConditionalStrollGoal<>(this, 1, (zingerEntity -> !zingerEntity.isFlying())));
+        this.goalSelector.addGoal(3, new ConditionalStrollGoal<>(this, 1, (zingerEntity -> !zingerEntity.isFlying())));
     }
 
     @Override
@@ -116,7 +116,18 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     }
 
     public void triggerReturnToNest() {
+        this.setTarget(null);
         this.returningToNest = true;
+    }
+
+    public void triggerFlyToOwner() {
+        if (this.getOwnerUUID() != null) {
+            Player owner = this.level().getPlayerByUUID(this.getOwnerUUID());
+            if (owner != null) {
+                this.returningToNest = false;
+                this.setTarget(owner);
+            }
+        }
     }
 
     @Override

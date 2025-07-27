@@ -27,14 +27,20 @@ public class AncientFluteItem extends Item {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
 
         if (pIsSelected && pEntity instanceof Player player && !pLevel.isClientSide) {
+            boolean hasZinger = !ZingerManager.getOwnedZingers(player).isEmpty();
+            if (!hasZinger) {
+                player.displayClientMessage(Component.literal("You don't own any Zingers."), true);
+                return;
+            }
+
             ZingerEntity zinger = getZingerOnTheWay(player);
-            if (zinger != null) {
+            if (this.getZingerNearby(player) != null) {
+                player.displayClientMessage(Component.literal("Your Zinger is nearby — Right-click to send home."), true);
+            } else if (zinger != null) {
                 Vec2 zingerPos = new Vec2((float) zinger.getX(), (float) zinger.getZ());
                 Vec2 playerPos = new Vec2((float) player.getX(), (float) player.getZ());
                 int dist = (int) Math.sqrt(playerPos.distanceToSqr(zingerPos));
-                player.displayClientMessage(Component.literal("Your Zinger is on the way! (" + dist + " blocks away)"), true);
-            } else if (this.getZingerNearby(player) != null) {
-                player.displayClientMessage(Component.literal("Your Zinger is nearby. Right-click to send them home."), true);
+                player.displayClientMessage(Component.literal("Your Zinger is on the way! (" + dist + " blocks away) — Right-click to cancel."), true);
             } else {
                 player.displayClientMessage(Component.literal("Right-click to call your Zinger."), true);
             }
@@ -68,11 +74,12 @@ public class AncientFluteItem extends Item {
 
         if (!pLevel.isClientSide) {
 
-            if (this.getZingerOnTheWay(pPlayer) != null) {
-                pPlayer.sendSystemMessage(Component.literal("Your Zinger is already on the way!"));
-                return InteractionResultHolder.consume(stack);
-            } else if (this.getZingerNearby(pPlayer) != null) {
+            if (this.getZingerNearby(pPlayer) != null) {
                 Objects.requireNonNull(this.getZingerNearby(pPlayer)).triggerReturnToNest();
+                return InteractionResultHolder.consume(stack);
+            } else if (this.getZingerOnTheWay(pPlayer) != null) {
+                pPlayer.sendSystemMessage(Component.literal("Zinger returning to nest."));
+                Objects.requireNonNull(this.getZingerOnTheWay(pPlayer)).triggerReturnToNest();
                 return InteractionResultHolder.consume(stack);
             }
 
@@ -91,7 +98,7 @@ public class AncientFluteItem extends Item {
 
             if (nearest != null) {
                 pPlayer.sendSystemMessage(Component.literal("Calling your Zinger..."));
-                nearest.setTarget(pPlayer);
+                nearest.triggerFlyToOwner();
             } else {
                 pPlayer.sendSystemMessage(Component.literal("You don't own any Zingers."));
             }
