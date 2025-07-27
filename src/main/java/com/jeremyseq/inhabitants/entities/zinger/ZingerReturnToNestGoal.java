@@ -26,16 +26,10 @@ public class ZingerReturnToNestGoal extends Goal {
     public void stop() {
         this.zinger.ejectPassengers();
         this.zinger.setTargetPosition(null);
-        super.stop();
     }
 
     @Override
     public void start() {
-        super.start();
-    }
-
-    @Override
-    public void tick() {
         this.zinger.setTargetPosition(zinger.nestPosition);
     }
 }

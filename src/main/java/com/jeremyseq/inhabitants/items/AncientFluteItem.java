@@ -55,6 +55,12 @@ public class AncientFluteItem extends Item {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
 
         if (!pLevel.isClientSide) {
+
+            if (this.getZingerOnTheWay(pPlayer) != null) {
+                pPlayer.sendSystemMessage(Component.literal("Your Zinger is already on the way!"));
+                return InteractionResultHolder.consume(stack);
+            }
+
             List<ZingerEntity> zingers = ZingerManager.getOwnedZingers(pPlayer);
 
             ZingerEntity nearest = null;

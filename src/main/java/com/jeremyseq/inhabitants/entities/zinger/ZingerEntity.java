@@ -20,6 +20,8 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -55,10 +57,6 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         LANDING,
         HOVERING
     }
-
-    private static final int HOVER_HEIGHT = 10;
-
-    private double takeoffYTarget = -1;
 
     @Nullable
     private Vec3 targetPosition;
@@ -125,6 +123,7 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     protected @NotNull InteractionResult mobInteract(@NotNull Player pPlayer, @NotNull InteractionHand pHand) {
         if (pPlayer.getUUID().equals(this.getOwnerUUID())) {
             if (pPlayer.startRiding(this, true)) {
+                this.setTarget(null); // clear target when mounting
                 return InteractionResult.SUCCESS;
             }
         }
@@ -203,10 +202,11 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
 
         Vec3 destination = null;
 
-        if (hasTarget) {
-            destination = target.position().add(0, HOVER_HEIGHT, 0);
-        } else if (hasCustomTarget) {
+
+        if (hasCustomTarget) {
             destination = customTarget;
+        } else if (hasTarget) {
+            destination = target.position().add(0, 2, 0);
         }
 
         switch (getFlightState()) {
@@ -214,7 +214,6 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
                 if (destination != null) {
                     setFlightState(FlightState.TAKING_OFF);
                     this.setNoGravity(true);
-                    takeoffYTarget = this.getY() + HOVER_HEIGHT;
                 }
             }
             case TAKING_OFF -> {
@@ -224,8 +223,8 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
                 if (destination == null) {
                     setFlightState(FlightState.LANDING);
                 } else {
-                    double dist = this.position().distanceTo(destination);
-                    if (dist > 12) {
+                    double xyDist = this.getXZDistanceTo(destination);
+                    if (xyDist > 12) {
                         setFlightState(FlightState.FLYING);
                     } else {
                         handleHovering(destination);
@@ -236,15 +235,11 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
                 if (destination == null) {
                     setFlightState(FlightState.LANDING);
                 } else {
-                    double dist = this.position().distanceTo(destination);
+                    double dist = this.getXZDistanceTo(destination);
                     if (dist < 10) {
                         setFlightState(FlightState.HOVERING);
-                        if (hasCustomTarget) {
-                            // Arrived at custom target
-                            setTargetPosition(null);
-                        }
                     } else {
-                        handleFlying(destination);
+                        handleFlying(new Vec2((float) destination.x, (float) destination.z));
                     }
                 }
             }
@@ -259,40 +254,45 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         }
     }
 
-    private void handleFlying(Vec3 targetPos) {
-        double forwardSpeed = .6;
+    private double getXZDistanceTo(Vec3 targetPos) {
+        return Math.sqrt(Math.pow(this.getX() - targetPos.x, 2) + Math.pow(this.getZ() - targetPos.z, 2));
+    }
+    private double getXZDistanceTo(Vec2 targetPos) {
+        return Math.sqrt(Math.pow(this.getX() - targetPos.x, 2) + Math.pow(this.getZ() - targetPos.y, 2));
+    }
+
+    private void handleFlying(Vec2 targetXZ) {
+        double forwardSpeed = 1.5;
         double turnRate = 8.0; // degrees per tick
         double climbRate = 1; // controls vertical smoothing
 
-        if (targetPos != null) {
-            // compute desired yaw to face the target position
-            double dx = targetPos.x - this.getX();
-            double dz = targetPos.z - this.getZ();
-            float desiredYaw = (float)(Math.atan2(dz, dx) * (180 / Math.PI)) - 90;
+        double targetX = targetXZ.x;
+        double targetZ = targetXZ.y;
+        double targetY = this.getFlyHeight();
 
-            // smoothly rotate toward the target yaw
-            float currentYaw = this.getYRot();
-            float newYaw = rotateTowards(currentYaw, desiredYaw, (float) turnRate);
-            this.setYRot(newYaw);
-            this.yBodyRot = newYaw;
-            this.yHeadRot = newYaw;
+        // compute desired yaw to face the target position
+        double dx = targetX - this.getX();
+        double dz = targetZ - this.getZ();
+        float desiredYaw = (float)(Math.atan2(dz, dx) * (180 / Math.PI)) - 90;
 
-            // compute vertical adjustment
-            double dy = (targetPos.y) - (this.getY() + this.getBbHeight() / 2);
-            double verticalMotion = dy * climbRate;
-            verticalMotion = Math.max(Math.min(verticalMotion, 0.3), -0.3); // clamp
+        // smoothly rotate toward the target yaw
+        float currentYaw = this.getYRot();
+        float newYaw = rotateTowards(currentYaw, desiredYaw, (float) turnRate);
+        this.setYRot(newYaw);
+        this.yBodyRot = newYaw;
+        this.yHeadRot = newYaw;
 
-            // fly forward in the direction we're facing
-            Vec3 forward = Vec3.directionFromRotation(0, newYaw).scale(forwardSpeed);
-            Vec3 motion = new Vec3(forward.x, verticalMotion, forward.z);
-            this.setDeltaMovement(motion);
+        // compute vertical adjustment
+        double dy = (targetY) - (this.getY() + this.getBbHeight() / 2);
+        double verticalMotion = dy * climbRate;
+        verticalMotion = Math.max(Math.min(verticalMotion, 0.3), -0.3); // clamp
 
-            this.getLookControl().setLookAt(targetPos.x, targetPos.y, targetPos.z, 10, 10);
-        } else {
-            // if no target, glide forward with no vertical movement
-            Vec3 forward = Vec3.directionFromRotation(0, this.getYRot()).scale(forwardSpeed);
-            this.setDeltaMovement(new Vec3(forward.x, this.getDeltaMovement().y * 0.9, forward.z));
-        }
+        // fly forward in the direction we're facing
+        Vec3 forward = Vec3.directionFromRotation(0, newYaw).scale(forwardSpeed);
+        Vec3 motion = new Vec3(forward.x, verticalMotion, forward.z);
+        this.setDeltaMovement(motion);
+
+        this.getLookControl().setLookAt(targetX, targetY, targetZ, 10, 10);
     }
 
     private float rotateTowards(float current, float target, float maxChange) {
@@ -337,19 +337,15 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         double dz = hoverZ - currentPos.z;
 
         // Smooth motion toward target position
-        double horizontalSpeed = 0.1;
-        double verticalSpeed = 0.1;
+        double horizontalSpeed = 0.15;
+        double verticalSpeed = .4;
 
         dx = Mth.clamp(dx * 0.3, -horizontalSpeed, horizontalSpeed);
         dy = Mth.clamp(dy * 0.3, -verticalSpeed, verticalSpeed);
         dz = Mth.clamp(dz * 0.3, -horizontalSpeed, horizontalSpeed);
 
         this.setDeltaMovement(dx, dy, dz);
-
-        // Keep looking at target
-//        this.getLookControl().setLookAt(target.getX(), target.getY(), target.getZ(), 10, 10);
     }
-
 
 
     private void handleTakeoff() {
@@ -367,9 +363,13 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         this.getLookControl().setLookAt(this.getX() + lookVec.x, this.getY() + ascendSpeed, this.getZ() + lookVec.z, 10, 10);
 
         // Check if reached target altitude, then switch to flying
-        if (this.getY() >= takeoffYTarget - 0.5) {
+        if (this.getY() >= getFlyHeight()) {
             setFlightState(FlightState.FLYING);
         }
+    }
+
+    private int getFlyHeight() {
+        return this.level().getHeight(Heightmap.Types.MOTION_BLOCKING, (int) this.getX(), (int) this.getZ()) + 100;
     }
 
 
