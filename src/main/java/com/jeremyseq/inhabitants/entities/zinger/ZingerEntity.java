@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.zinger;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.goals.ConditionalStrollGoal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -166,7 +165,6 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         }
 
         if (pPlayer.getUUID().equals(this.getOwnerUUID()) && pHand == InteractionHand.MAIN_HAND) {
-            Inhabitants.LOGGER.debug(pPlayer.getItemInHand(pHand).getItem().toString());
             if (pPlayer.getItemInHand(pHand).is(Items.CHEST)) {
                 if (!this.hasChest) {
                     this.hasChest = true;
@@ -241,11 +239,8 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
 
         // just for testing, set owner to "Dev"
         List<? extends Player> players = this.level().players();
-        for (Player player : players) {
-            if ("Dev".equals(player.getName().getString())) {
-                setOwnerUUID(player.getUUID());
-                break;
-            }
+        if (!players.isEmpty()) {
+            setOwnerUUID(players.get(0).getUUID());
         }
 
         LivingEntity target = this.getTarget();
