@@ -55,7 +55,7 @@ public class ModItems {
             () -> new ForgeSpawnEggItem(ModEntities.IMPALER, 0xA0925B, 0xC8C4BF, new Item.Properties()));
 
     public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
-            () -> new ImpalerSpikeItem(new Item.Properties()));
+            () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> ANCIENT_FLUTE = ITEMS.register("ancient_flute",
             () -> new AncientFluteItem(new Item.Properties().stacksTo(1)));
