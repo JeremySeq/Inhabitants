@@ -14,7 +14,7 @@ public class ZingerReturnToNestGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return this.zinger.hasExactlyOnePlayerPassenger();
+        return this.zinger.returningToNest;
     }
 
     @Override
@@ -24,12 +24,14 @@ public class ZingerReturnToNestGoal extends Goal {
 
     @Override
     public void stop() {
+        this.zinger.returningToNest = false;
         this.zinger.ejectPassengers();
         this.zinger.setTargetPosition(null);
     }
 
     @Override
     public void start() {
+        this.zinger.returningToNest = true;
         this.zinger.setTargetPosition(zinger.nestPosition);
     }
 }

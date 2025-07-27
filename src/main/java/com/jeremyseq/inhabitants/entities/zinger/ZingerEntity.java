@@ -1,15 +1,17 @@
 package com.jeremyseq.inhabitants.entities.zinger;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.goals.ConditionalStrollGoal;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.*;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -18,11 +20,14 @@ import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -43,12 +48,18 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
     );
 
     private static final int CHUNK_RADIUS = 1; // 1 = 3x3 area
+
+    protected boolean returningToNest = false;
     private ChunkPos lastCenterChunk;
 
     public static final EntityDataAccessor<String> FLIGHT_STATE = SynchedEntityData.defineId(ZingerEntity.class, EntityDataSerializers.STRING);
 
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+
+    private final SimpleContainer chestInventory = new SimpleContainer(27); // 3x9
+
     private UUID ownerUUID;
+    private boolean hasChest = false;
 
     public enum FlightState {
         GROUNDED,
@@ -104,6 +115,10 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         return this.getFlightState() != FlightState.GROUNDED;
     }
 
+    public void triggerReturnToNest() {
+        this.returningToNest = true;
+    }
+
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
@@ -119,15 +134,43 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         return PlayState.CONTINUE;
     }
 
+    public Container getChestInventory() {
+        return chestInventory;
+    }
+
     @Override
-    protected @NotNull InteractionResult mobInteract(@NotNull Player pPlayer, @NotNull InteractionHand pHand) {
-        if (pPlayer.getUUID().equals(this.getOwnerUUID())) {
+    public @NotNull InteractionResult interactAt(@NotNull Player pPlayer, @NotNull Vec3 pVec, @NotNull InteractionHand pHand) {
+        if (this.level().isClientSide) return super.interactAt(pPlayer, pVec, pHand);
+
+        if (pPlayer.isShiftKeyDown()) {
+
+            // open chest inventory
+            if (this.hasChest) {
+                NetworkHooks.openScreen((ServerPlayer) pPlayer, new SimpleMenuProvider(
+                        (id, playerInv, player) -> new ZingerChestMenu(id, playerInv, this.chestInventory),
+                        Component.literal("Zinger Chest")
+                ));
+            }
+            return InteractionResult.SUCCESS;
+        }
+
+        if (pPlayer.getUUID().equals(this.getOwnerUUID()) && pHand == InteractionHand.MAIN_HAND) {
+            Inhabitants.LOGGER.debug(pPlayer.getItemInHand(pHand).getItem().toString());
+            if (pPlayer.getItemInHand(pHand).is(Items.CHEST)) {
+                if (!this.hasChest) {
+                    this.hasChest = true;
+                    pPlayer.getItemInHand(pHand).shrink(1);
+                }
+                return InteractionResult.SUCCESS;
+            }
+
             if (pPlayer.startRiding(this, true)) {
                 this.setTarget(null); // clear target when mounting
+                triggerReturnToNest();
                 return InteractionResult.SUCCESS;
             }
         }
-        return super.mobInteract(pPlayer, pHand);
+        return super.interactAt(pPlayer, pVec, pHand);
     }
 
     @Override
@@ -251,6 +294,21 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
                     this.setDeltaMovement(Vec3.ZERO);
                 }
             }
+        }
+    }
+
+    @Override
+    protected void dropCustomDeathLoot(@NotNull DamageSource pSource, int pLooting, boolean pRecentlyHit) {
+        super.dropCustomDeathLoot(pSource, pLooting, pRecentlyHit);
+        if (this.hasChest) {
+            // drop the chest contents
+            for (int i = 0; i < this.chestInventory.getContainerSize(); i++) {
+                ItemStack stack = this.chestInventory.getItem(i);
+                if (!stack.isEmpty()) {
+                    this.spawnAtLocation(stack);
+                }
+            }
+            this.chestInventory.clearContent();
         }
     }
 
@@ -437,6 +495,7 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
         if (this.getOwnerUUID() != null) {
             pCompound.putUUID("OwnerUUID", this.getOwnerUUID());
         }
+        pCompound.putBoolean("hasChest", this.hasChest);
 
         // saves the chunk pos to be loaded in later
         if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
@@ -465,6 +524,10 @@ public class ZingerEntity extends PathfinderMob implements GeoEntity {
             setOwnerUUID(pCompound.getUUID("OwnerUUID"));
         } else {
             setOwnerUUID(null);
+        }
+
+        if (pCompound.contains("hasChest")) {
+            this.hasChest = pCompound.getBoolean("hasChest");
         }
     }
 

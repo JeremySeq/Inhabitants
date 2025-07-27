@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class AncientFluteItem extends Item {
     public AncientFluteItem(Properties pProperties) {
@@ -32,6 +33,8 @@ public class AncientFluteItem extends Item {
                 Vec2 playerPos = new Vec2((float) player.getX(), (float) player.getZ());
                 int dist = (int) Math.sqrt(playerPos.distanceToSqr(zingerPos));
                 player.displayClientMessage(Component.literal("Your Zinger is on the way! (" + dist + " blocks away)"), true);
+            } else if (this.getZingerNearby(player) != null) {
+                player.displayClientMessage(Component.literal("Your Zinger is nearby. Right-click to send them home."), true);
             } else {
                 player.displayClientMessage(Component.literal("Right-click to call your Zinger."), true);
             }
@@ -50,6 +53,15 @@ public class AncientFluteItem extends Item {
         return null;
     }
 
+    private @Nullable ZingerEntity getZingerNearby(Player player) {
+        for (ZingerEntity zinger : ZingerManager.getOwnedZingers(player)) {
+            if (zinger.distanceToSqr(player) < 225) {
+                return zinger;
+            }
+        }
+        return null;
+    }
+
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
@@ -58,6 +70,9 @@ public class AncientFluteItem extends Item {
 
             if (this.getZingerOnTheWay(pPlayer) != null) {
                 pPlayer.sendSystemMessage(Component.literal("Your Zinger is already on the way!"));
+                return InteractionResultHolder.consume(stack);
+            } else if (this.getZingerNearby(pPlayer) != null) {
+                Objects.requireNonNull(this.getZingerNearby(pPlayer)).triggerReturnToNest();
                 return InteractionResultHolder.consume(stack);
             }
 
