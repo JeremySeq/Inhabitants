@@ -1,5 +1,7 @@
 package com.jeremyseq.inhabitants;
 
+import com.jeremyseq.inhabitants.gui.ModMenuTypes;
+import com.jeremyseq.inhabitants.gui.client.ZingerChestScreen;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
@@ -8,6 +10,7 @@ import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.potions.ModPotions;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CrossbowItem;
@@ -45,6 +48,7 @@ public class Inhabitants
 
         ModBlocks.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
+        ModMenuTypes.MENU_TYPES.register(modEventBus);
         ModParticles.PARTICLES.register(modEventBus);
         ModLootModifiers.register(modEventBus);
         ModSoundEvents.register(modEventBus);
@@ -76,6 +80,7 @@ public class Inhabitants
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
+            MenuScreens.register(ModMenuTypes.ZINGER_CHEST.get(), ZingerChestScreen::new);
             event.enqueueWork(() -> {
                 DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(), new ImpalerSpikeDispenserBehavior());
             });

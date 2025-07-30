@@ -1,10 +1,10 @@
-package com.jeremyseq.inhabitants.entities.zinger;
+package com.jeremyseq.inhabitants.gui;
 
 import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +12,12 @@ import org.jetbrains.annotations.NotNull;
 public class ZingerChestMenu extends AbstractContainerMenu {
     private final Container chest;
 
+    public ZingerChestMenu(int id, Inventory playerInventory) {
+        this(id, playerInventory, new SimpleContainer(27));
+    }
+
     public ZingerChestMenu(int id, Inventory playerInv, Container chest) {
-        super(MenuType.GENERIC_9x3, id);
+        super(ModMenuTypes.ZINGER_CHEST.get(), id);
         this.chest = chest;
 
         checkContainerSize(chest, 27);

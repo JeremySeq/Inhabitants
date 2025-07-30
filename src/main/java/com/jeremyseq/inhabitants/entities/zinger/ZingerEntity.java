@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.zinger;
 
 import com.jeremyseq.inhabitants.entities.goals.ConditionalStrollGoal;
+import com.jeremyseq.inhabitants.gui.ZingerChestMenu;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
