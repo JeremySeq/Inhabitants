@@ -1,10 +1,12 @@
 # Inhabitants
 _Work in Progress_
 
+**1.20.1 Forge**
+
+**Requires Geckolib**
+
 A Minecraft mod that adds new fictional fauna.
 So far, 10 new mobs are planned, each with unique behaviors and interactions.
-
-*Requires Geckolib*
 
 ## Credits
 - [@JeremySeq](https://jeremyseq.dev/): lead coder
