@@ -8,6 +8,7 @@ import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
 import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.potions.ModPotions;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -52,6 +53,7 @@ public class Inhabitants
         ModParticles.PARTICLES.register(modEventBus);
         ModLootModifiers.register(modEventBus);
         ModSoundEvents.register(modEventBus);
+        ModNetworking.register();
 
         MinecraftForge.EVENT_BUS.register(this);
 

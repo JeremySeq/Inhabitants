@@ -7,6 +7,8 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
+import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
+import com.jeremyseq.inhabitants.entities.gazer.GazerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
@@ -76,6 +78,12 @@ public class ModEntities {
                             .sized(3f, 2.5f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "zinger").toString()));
 
+    public static final RegistryObject<EntityType<GazerEntity>> GAZER =
+            REGISTRY.register("gazer",
+                    () -> EntityType.Builder.of(GazerEntity::new, MobCategory.CREATURE)
+                            .sized(.8f, .8f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "gazer").toString()));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
@@ -83,6 +91,7 @@ public class ModEntities {
         event.put(ModEntities.ABYSSFISH.get(), AbyssfishEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
         event.put(ModEntities.ZINGER.get(), ZingerEntity.setAttributes());
+        event.put(ModEntities.GAZER.get(), GazerEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -94,5 +103,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
         EntityRenderers.register(ModEntities.ZINGER.get(), ZingerRenderer::new);
+        EntityRenderers.register(ModEntities.GAZER.get(), GazerRenderer::new);
     }
 }
