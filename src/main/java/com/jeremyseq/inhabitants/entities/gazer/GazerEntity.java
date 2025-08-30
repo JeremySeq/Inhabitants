@@ -64,7 +64,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         this.goalSelector.addGoal(2, new GazerWanderGoal(this, 5.0D));
 
         // Look around when IDLE
-        this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(3, new GazerLookAroundGoal(this));
     }
 
     @Override
@@ -90,7 +90,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     private void handleInsidePod() {
         // This entity may actually be despawned; state mostly for reference
         this.setInvisible(true);
-//        this.setNoAi(true);
     }
 
     private void handleIdle() {
@@ -107,7 +106,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     }
 
     private void handleBeingControlled() {
-        // TODO: get player movement and move gazer accordingly
     }
 
     private void handleReturning() {

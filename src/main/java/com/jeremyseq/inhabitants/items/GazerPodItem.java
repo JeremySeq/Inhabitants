@@ -5,7 +5,6 @@ import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,7 +23,6 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class GazerPodItem extends Item {
-//    public GazerEntity gazerEntity = null; // The currently controlled gazer
 
     public GazerPodItem(Properties properties) {
         super(properties);
@@ -81,6 +79,7 @@ public class GazerPodItem extends Item {
 
             return InteractionResultHolder.success(stack);
         }
+
         // called on client to start control gazer
 //        if (level.isClientSide && player == Minecraft.getInstance().player) {
 //            GazerEntity gazerEntity = (GazerEntity) level.getEntity(getGazerId(stack));
