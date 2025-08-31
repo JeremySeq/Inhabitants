@@ -80,28 +80,6 @@ public class GazerPodItem extends Item {
             return InteractionResultHolder.success(stack);
         }
 
-        // called on client to start control gazer
-//        if (level.isClientSide && player == Minecraft.getInstance().player) {
-//            GazerEntity gazerEntity = (GazerEntity) level.getEntity(getGazerId(stack));
-//            assert gazerEntity != null;
-//            if (gazerEntity.currentState != GazerEntity.GazerState.BEING_CONTROLLED || gazerEntity.podOwner == null || !gazerEntity.podOwner.equals(player.getUUID())) {
-//                // Can't control a gazer that's not in the right state or has an owner already
-//                return super.use(level, player, hand);
-//            }
-//
-//            Minecraft mc = Minecraft.getInstance();
-//
-//            // switch camera to gazer
-//            Inhabitants.LOGGER.debug("Switching camera to gazer");
-//            if (mc.getCameraEntity() != gazerEntity) {
-//                mc.setCameraEntity(gazerEntity);
-//            }
-//
-//            // Start sending input to the server each tick
-//            // ControlClientTickEventHandler.startSendingInput();
-//            return InteractionResultHolder.success(stack);
-//        }
-
         return super.use(level, player, hand);
     }
 
@@ -112,7 +90,7 @@ public class GazerPodItem extends Item {
             if (!hasGazer(stack)) {
                 // Capture gazer
                 setHasGazer(stack, true);
-                gazer.enterPod(); // calls discard()
+//                gazer.enterPod(); // calls discard()
                 return InteractionResult.SUCCESS;
             }
         }

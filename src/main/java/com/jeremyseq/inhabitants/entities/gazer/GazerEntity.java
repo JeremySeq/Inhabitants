@@ -1,22 +1,25 @@
 package com.jeremyseq.inhabitants.entities.gazer;
 
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.FlyingMob;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.Pose;
+import com.jeremyseq.inhabitants.Inhabitants;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class GazerEntity extends FlyingMob implements GeoEntity {
@@ -24,14 +27,17 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     public GazerState currentState = GazerState.IDLE;
     public UUID podOwner; // player UUID holding pod (if following)
+    public UUID podOwner;
 
     public GazerEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        this.noPhysics = true;
+        this.setNoGravity(true);
     }
 
     public static AttributeSupplier setAttributes() {
         return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 50f)
+                .add(Attributes.MAX_HEALTH, 600f)
                 .add(Attributes.FLYING_SPEED, 2f)
                 .add(Attributes.FOLLOW_RANGE, 16.0D)
                 .build();
@@ -53,6 +59,16 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     @Override
     public double getEyeY() {
         return super.getEyeY();
+    }
+
+    @Override
+    public boolean isNoGravity() {
+        return true;
+    }
+
+    @Override
+    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
+        // do nothing, bat doesn’t take fall damage
     }
 
     @Override
@@ -83,6 +99,16 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             case BEING_CONTROLLED -> handleBeingControlled();
             case RETURNING -> handleReturning();
         }
+    }
+
+    @Override
+    public boolean isAlwaysTicking() {
+        return true;
+    }
+
+    @Override
+    public boolean requiresCustomPersistence() {
+        return true;
     }
 
     // ----- Behavior Handlers -----
@@ -116,7 +142,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     public void enterPod() {
         this.currentState = GazerState.INSIDE_POD;
-        this.discard(); // remove from world, mark pod NBT as occupied
+        this.discard(); // remove from world
     }
 
     public void exitPod(Player owner, boolean controlled) {
