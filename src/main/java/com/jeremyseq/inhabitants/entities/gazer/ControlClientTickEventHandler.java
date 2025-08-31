@@ -29,7 +29,7 @@ public class ControlClientTickEventHandler {
 
             int gazerId = gazer.getId();
 
-            float yaw = mc.player.getYHeadRot();
+            float yaw = mc.player.getYHeadRot() % 360F;
             float pitch = mc.player.getXRot();
 
             // Send input packet to the server
