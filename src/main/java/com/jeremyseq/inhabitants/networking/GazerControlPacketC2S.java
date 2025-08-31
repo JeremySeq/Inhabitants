@@ -1,11 +1,9 @@
 package com.jeremyseq.inhabitants.networking;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -60,6 +58,8 @@ public class GazerControlPacketC2S {
 
     public static void handle(GazerControlPacketC2S msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
+//            Inhabitants.LOGGER.debug("SERVER: Received GazerControlPacketC2S: gazerId={}, forward={}, back={}, left={}, right={}, jump={}, sneak={}, yaw={}, pitch={}",
+//                    msg.gazerId, msg.forward, msg.back, msg.left, msg.right, msg.jump, msg.sneak, msg.yaw, msg.pitch);
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return; // sanity check
 
@@ -67,32 +67,22 @@ public class GazerControlPacketC2S {
             Entity e = player.level().getEntity(msg.gazerId);
             if (!(e instanceof GazerEntity gazer)) return;
 
-            if (gazer.currentState != GazerEntity.GazerState.BEING_CONTROLLED) return;
-
-            // Apply movement
-            Vec3 motion = Vec3.ZERO;
             double speed = 0.3;
 
-//            if (msg.forward) motion = motion.add(0, 0, -speed);
-//            if (msg.back)    motion = motion.add(0, 0, speed);
-//            if (msg.left)    motion = motion.add(-speed, 0, 0);
-//            if (msg.right)   motion = motion.add(speed, 0, 0);
-//            if (msg.jump)    motion = motion.add(0, 0.5, 0);
-//            if (msg.sneak)   motion = motion.add(0, -0.5, 0);
-
-//            gazer.setDeltaMovement(motion);
-
             // Set rotation from packet
+//            assert gazer != null;
             gazer.setYRot(msg.yaw);
             gazer.setXRot(msg.pitch);
             gazer.setYHeadRot(msg.yaw);
+            gazer.yBodyRot = msg.yaw;
 
+            // apply movement relative to yaw
             moveRelativeToYaw(gazer, msg.yaw, msg.forward, msg.back, msg.left, msg.right, msg.jump, msg.sneak, speed);
 
-            Inhabitants.LOGGER.debug("Gazer {} controlled by player {}: pos=({}, {}, {}), rot=({}, {})",
-                    gazer.getId(), player.getGameProfile().getName(),
-                    gazer.getX(), gazer.getY(), gazer.getZ(),
-                    gazer.getYRot(), gazer.getXRot());
+//            Inhabitants.LOGGER.debug("SERVER: Gazer {} controlled by player {}: pos=({}, {}, {}), rot=({}, {})",
+//                    gazer.getId(), player.getGameProfile().getName(),
+//                    gazer.getX(), gazer.getY(), gazer.getZ(),
+//                    gazer.getYRot(), gazer.getXRot());
         });
         ctx.get().setPacketHandled(true);
     }

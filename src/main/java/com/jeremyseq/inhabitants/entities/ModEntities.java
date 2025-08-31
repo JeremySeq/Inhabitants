@@ -83,7 +83,9 @@ public class ModEntities {
     public static final RegistryObject<EntityType<GazerEntity>> GAZER =
             REGISTRY.register("gazer",
                     () -> EntityType.Builder.of(GazerEntity::new, MobCategory.CREATURE)
-                            .sized(.8f, .8f)
+                            .sized(.5f, .5f)
+                            .clientTrackingRange(256)
+                            .updateInterval(1)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "gazer").toString()));
 
     public static final RegistryObject<EntityType<WishfishEntity>> WISHFISH =
