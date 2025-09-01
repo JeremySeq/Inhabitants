@@ -81,7 +81,7 @@ public class ModItems {
                     new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).rarity(Rarity.EPIC))
     );
 
-    public static final RegistryObject<Item> GAZER_POD = ITEMS.register("gazer_pod_helmet",
+    public static final RegistryObject<Item> GAZER_POD = ITEMS.register("gazer_pod_item",
             () -> new GazerPodItem(new Item.Properties().stacksTo(1)));
 
     public static void register(IEventBus eventBus) {
