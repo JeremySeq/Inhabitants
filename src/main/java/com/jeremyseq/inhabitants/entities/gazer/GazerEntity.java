@@ -1,15 +1,12 @@
 package com.jeremyseq.inhabitants.entities.gazer;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -18,15 +15,12 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class GazerEntity extends FlyingMob implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public GazerState currentState = GazerState.IDLE;
-    public UUID podOwner; // player UUID holding pod (if following)
     public UUID podOwner;
 
     public GazerEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
@@ -93,10 +87,9 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         super.tick();
 
         switch (currentState) {
-            case INSIDE_POD -> handleInsidePod();
-            case IDLE -> handleIdle();
-            case FOLLOWING_PLAYER -> handleFollowingPlayer();
-            case BEING_CONTROLLED -> handleBeingControlled();
+//            case IDLE -> handleIdle();
+//            case FOLLOWING_PLAYER -> handleFollowingPlayer();
+//            case BEING_CONTROLLED -> handleBeingControlled();
             case RETURNING -> handleReturning();
         }
     }
@@ -111,28 +104,29 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         return true;
     }
 
+    @Override
+    public void remove(RemovalReason reason) {
+        super.remove(reason);
+    }
+
+
     // ----- Behavior Handlers -----
 
-    private void handleInsidePod() {
-        // This entity may actually be despawned; state mostly for reference
-        this.setInvisible(true);
-    }
-
-    private void handleIdle() {
-        // Float lazily near pod
-
-    }
-
-    private void handleFollowingPlayer() {
-        if (podOwner == null) return;
-        Player player = this.level().getPlayerByUUID(podOwner);
-        if (player != null) {
-            this.getNavigation().moveTo(player, 1.0D);
-        }
-    }
-
-    private void handleBeingControlled() {
-    }
+//    private void handleIdle() {
+//        // Float lazily near pod
+//
+//    }
+//
+//    private void handleFollowingPlayer() {
+//        if (podOwner == null) return;
+//        Player player = this.level().getPlayerByUUID(podOwner);
+//        if (player != null) {
+//            this.getNavigation().moveTo(player, 1.0D);
+//        }
+//    }
+//
+//    private void handleBeingControlled() {
+//    }
 
     private void handleReturning() {
         // Path back to pod block or pod item in player’s hand
