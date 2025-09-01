@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -78,38 +79,9 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             setHasGazer(player.getItemInHand(hand), false);
 
             Inhabitants.LOGGER.debug("Releasing gazer with ID {}", gazerEntity.getId());
-
-//            ModNetworking.CHANNEL.sendTo(new GazerCameraPacketS2C(gazerEntity.getId(), true),
-//                    serverPlayer.connection.connection,
-//                    NetworkDirection.PLAY_TO_CLIENT);
         }
-
         return InteractionResultHolder.success(stack);
-//        return super.use(level, player, hand);
     }
-
-    @Override
-    public boolean onDroppedByPlayer(ItemStack item, Player player) {
-        return super.onDroppedByPlayer(item, player);
-    }
-
-//    @Override
-//    public void onInventoryTick(ItemStack stack, Level level, Player player, int slotIndex, int selectedIndex) {
-//        if (player.isDeadOrDying() && !hasGazer(stack)) {
-//            if (getGazerId(stack) != -1) {
-//                // Clear gazer ID if player dies and pod is empty
-//                setGazerId(stack, -1);
-//            } else {
-//                // If player dies and pod has a gazer, just ensure it's marked as empty
-//                GazerEntity gazer = (GazerEntity) level.getEntity(getGazerId(stack));
-//
-//                assert gazer != null;
-//                gazer.podOwner = null; // clear owner to prevent issues
-//                gazer.currentState = GazerEntity.GazerState.IDLE; // set to idle state
-//            }
-//        }
-//        super.onInventoryTick(stack, level, player, slotIndex, selectedIndex);
-//    }
 
     // ===== Right Click Entity =====
     @Override
@@ -118,21 +90,30 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             if (!hasGazer(player.getItemInHand(hand))) {
                 setHasGazer(player.getItemInHand(hand), true);
                 setGazerId(player.getItemInHand(hand), -1);
-                gazer.enterPod(); // calls discard()
+                gazer.enterPod();
                 return InteractionResult.SUCCESS;
             }
         }
         return super.interactLivingEntity(stack, player, target, hand);
     }
 
+    @Override
+    public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+        if (!hasGazer(stack)) {
+            return super.canEquip(stack, armorType, entity);
+        }
+        return false;
+    }
+
     // ===== Tooltip =====
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (hasGazer(stack)) {
-            tooltip.add(net.minecraft.network.chat.Component.literal("Contains a Gazer"));
+            tooltip.add(Component.literal("Contains a Gazer"));
         } else {
-            tooltip.add(net.minecraft.network.chat.Component.literal("Empty Pod"));
+            tooltip.add(Component.literal("Empty Pod"));
         }
+
         super.appendHoverText(stack, level, tooltip, flag);
     }
 
