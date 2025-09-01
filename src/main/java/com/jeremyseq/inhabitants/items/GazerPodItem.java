@@ -4,8 +4,6 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.items.armor.GazerPodArmorRenderer;
-import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
-import com.jeremyseq.inhabitants.networking.ModNetworking;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -19,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.network.NetworkDirection;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -70,26 +67,25 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             GazerEntity gazerEntity = ModEntities.GAZER.get().create(level);
 
             assert gazerEntity != null;
-            gazerEntity.podOwner = player.getUUID();
             gazerEntity.moveTo(player.getX(), player.getY() + 1, player.getZ(), player.getYRot(), player.getXRot());
             level.addFreshEntity(gazerEntity);
 
-            setGazerId(stack, gazerEntity.getId());
+            setGazerId(player.getItemInHand(hand), gazerEntity.getId());
 
-            gazerEntity.exitPod(player, true);
+            gazerEntity.exitPod(player, false);
+            gazerEntity.podOwner = player.getUUID();
 
-            setHasGazer(stack, false);
+            setHasGazer(player.getItemInHand(hand), false);
 
             Inhabitants.LOGGER.debug("Releasing gazer with ID {}", gazerEntity.getId());
 
-            ModNetworking.CHANNEL.sendTo(new GazerCameraPacketS2C(gazerEntity.getId(), true),
-                    serverPlayer.connection.connection,
-                    NetworkDirection.PLAY_TO_CLIENT);
-
-            return InteractionResultHolder.success(stack);
+//            ModNetworking.CHANNEL.sendTo(new GazerCameraPacketS2C(gazerEntity.getId(), true),
+//                    serverPlayer.connection.connection,
+//                    NetworkDirection.PLAY_TO_CLIENT);
         }
 
-        return super.use(level, player, hand);
+        return InteractionResultHolder.success(stack);
+//        return super.use(level, player, hand);
     }
 
     @Override
@@ -121,6 +117,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
         if (target instanceof GazerEntity gazer) {
             if (!hasGazer(player.getItemInHand(hand))) {
                 setHasGazer(player.getItemInHand(hand), true);
+                setGazerId(player.getItemInHand(hand), -1);
                 gazer.enterPod(); // calls discard()
                 return InteractionResult.SUCCESS;
             }
