@@ -25,6 +25,20 @@ public class ModNetworking {
                 GazerControlPacketC2S::decode,
                 GazerControlPacketC2S::handle
         );
+        CHANNEL.registerMessage(
+                packetId++,
+                GazerStartControlC2S.class,
+                GazerStartControlC2S::encode,
+                GazerStartControlC2S::decode,
+                GazerStartControlC2S::handle
+        );
+        CHANNEL.registerMessage(
+                packetId++,
+                GazerStopControlC2S.class,
+                GazerStopControlC2S::encode,
+                GazerStopControlC2S::decode,
+                GazerStopControlC2S::handle
+        );
 
         // Server → Client
         CHANNEL.registerMessage(

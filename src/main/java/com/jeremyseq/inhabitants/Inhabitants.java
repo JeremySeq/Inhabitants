@@ -6,6 +6,7 @@ import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
+import com.jeremyseq.inhabitants.items.GazerPodItem;
 import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
@@ -95,6 +96,12 @@ public class Inhabitants
                 }
                 return 0.0F;
             });
+
+            ItemProperties.register(
+                ModItems.GAZER_POD.get(),
+                ResourceLocation.fromNamespaceAndPath(MODID, "has_gazer"),
+                (stack, level, entity, seed) -> GazerPodItem.hasGazer(stack) ? 1.0F : 0.0F
+            );
         }
     }
 }

@@ -71,7 +71,7 @@ public class ModItems {
     public static final RegistryObject<Item> LASSO = ITEMS.register("lasso",
             () -> new LassoItem(new Item.Properties().stacksTo(1)));
 
-    public static final RegistryObject<Item> GAZER_POD = ITEMS.register("gazer_pod_helmet",
+    public static final RegistryObject<Item> GAZER_POD = ITEMS.register("gazer_pod_item",
             () -> new GazerPodItem(new Item.Properties().stacksTo(1)));
 
     public static void register(IEventBus eventBus) {

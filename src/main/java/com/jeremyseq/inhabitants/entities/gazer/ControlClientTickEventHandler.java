@@ -4,6 +4,9 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.networking.GazerControlPacketC2S;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientChunkCache;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -34,6 +37,12 @@ public class ControlClientTickEventHandler {
 
             // Send input packet to the server
             ModNetworking.CHANNEL.sendToServer(new GazerControlPacketC2S(gazerId, forward, back, left, right, jump, sneak, yaw, pitch));
+
+//            Inhabitants.LOGGER.debug("CLIENT: Gazer {} controlled by player {}: pos=({}, {}, {}), rot=({}, {})",
+//                    gazer.getId(), mc.player.getGameProfile().getName(),
+//                    gazer.getX(), gazer.getY(), gazer.getZ(),
+//                    gazer.getYRot(), gazer.getXRot());
+
         }
     }
 
@@ -45,5 +54,46 @@ public class ControlClientTickEventHandler {
         if (mc.getCameraEntity() instanceof GazerEntity) {
             event.setCanceled(true); // Cancel the hand rendering
         }
+    }
+
+    private static void forceChunksAround(Minecraft mc, BlockPos center, int radius) {
+        if (mc.level == null) return;
+
+        ClientChunkCache chunkCache = mc.level.getChunkSource();
+
+        int centerChunkX = center.getX() >> 4;
+        int centerChunkZ = center.getZ() >> 4;
+
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                int chunkX = centerChunkX + dx;
+                int chunkZ = centerChunkZ + dz;
+
+                // Force the chunk to be loaded by requesting it from the server
+                chunkCache.getChunk(chunkX, chunkZ, ChunkStatus.FULL, true);
+            }
+        }
+    }
+
+    private static boolean gazerIsApproachingUnloadedChunk(Minecraft mc, GazerEntity gazer) {
+        // Player position
+        double px = mc.player.getX();
+        double pz = mc.player.getZ();
+
+        // Gazer position
+        double gx = gazer.getX();
+        double gz = gazer.getZ();
+
+        // Render distance in chunks
+        int renderDistanceChunks = mc.options.renderDistance().get();
+        double maxDistanceBlocks = renderDistanceChunks * 16; // 1 chunk = 16 blocks
+
+        // Distance in XZ plane
+        double dx = gx - px;
+        double dz = gz - pz;
+        double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
+
+        // 90% of render distance
+        return horizontalDistance >= maxDistanceBlocks * 0.9;
     }
 }

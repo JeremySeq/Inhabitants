@@ -1,14 +1,21 @@
 package com.jeremyseq.inhabitants.entities.gazer;
 
+import com.jeremyseq.inhabitants.items.GazerPodItem;
+import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
+import com.jeremyseq.inhabitants.networking.ModNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -21,11 +28,10 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public GazerState currentState = GazerState.IDLE;
-    public UUID podOwner;
+    public UUID podOwner = null;
 
     public GazerEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        this.noPhysics = true;
         this.setNoGravity(true);
     }
 
@@ -38,11 +44,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     }
 
     public enum GazerState {
-        INSIDE_POD,         // Hidden inside a pod block/item (not visible in world)
         IDLE,               // Floating near the pod
-        FOLLOWING_PLAYER,   // Following the player with the empty pod item
         BEING_CONTROLLED,   // Player is “possessing” the gazer
-        RETURNING           // Pathfinding back to pod or player’s pod item
     }
 
     @Override
@@ -67,8 +70,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-        // follow player holding pod item when FOLLOWING_PLAYER
-        this.goalSelector.addGoal(1, new FollowPodHolderGoal(this));
+        // follow player holding pod item when IDLE
+//        this.goalSelector.addGoal(1, new FollowPodHolderGoal(this));
 
         // Random floating movement when IDLE
         this.goalSelector.addGoal(2, new GazerWanderGoal(this, 5.0D));
@@ -86,11 +89,22 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public void tick() {
         super.tick();
 
-        switch (currentState) {
-//            case IDLE -> handleIdle();
-//            case FOLLOWING_PLAYER -> handleFollowingPlayer();
-//            case BEING_CONTROLLED -> handleBeingControlled();
-            case RETURNING -> handleReturning();
+        // if being controlled, check owner validity
+        if (currentState == GazerState.BEING_CONTROLLED) {
+            ServerPlayer owner = (ServerPlayer) this.level().getPlayerByUUID(podOwner);
+            if (owner == null
+                    || owner.isDeadOrDying()
+                    || owner.getItemBySlot(EquipmentSlot.HEAD).getItem() != ModItems.GAZER_POD.get()) {
+
+                // force stop
+                currentState = GazerState.IDLE;
+                podOwner = null;
+
+                if (owner != null && !owner.level().isClientSide) {
+                    ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> owner),
+                            new GazerCameraPacketS2C(getId(), false));
+                }
+            }
         }
     }
 
@@ -107,50 +121,28 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     @Override
     public void remove(RemovalReason reason) {
         super.remove(reason);
-    }
 
+        if (podOwner == null) return;
+        Player player = this.level().getPlayerByUUID(podOwner);
+        if (player == null) return;
 
-    // ----- Behavior Handlers -----
-
-//    private void handleIdle() {
-//        // Float lazily near pod
-//
-//    }
-//
-//    private void handleFollowingPlayer() {
-//        if (podOwner == null) return;
-//        Player player = this.level().getPlayerByUUID(podOwner);
-//        if (player != null) {
-//            this.getNavigation().moveTo(player, 1.0D);
-//        }
-//    }
-//
-//    private void handleBeingControlled() {
-//    }
-
-    private void handleReturning() {
-        // Path back to pod block or pod item in player’s hand
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() instanceof GazerPodItem) {
+                if (GazerPodItem.getGazerId(stack) == this.getId()) {
+                    GazerPodItem.setGazerId(stack, -1);
+                }
+            }
+        }
     }
 
     // ----- State Transitions -----
 
     public void enterPod() {
-        this.currentState = GazerState.INSIDE_POD;
-        this.discard(); // remove from world
+        this.discard();
     }
 
-    public void exitPod(Player owner, boolean controlled) {
+    public void exitPod(Player player, boolean controlled) {
         this.currentState = controlled ? GazerState.BEING_CONTROLLED : GazerState.IDLE;
-        this.podOwner = owner.getUUID();
-    }
-
-    public void startFollowing(Player owner) {
-        this.currentState = GazerState.FOLLOWING_PLAYER;
-        this.podOwner = owner.getUUID();
-    }
-
-    public void startReturning() {
-        this.currentState = GazerState.RETURNING;
     }
 
 

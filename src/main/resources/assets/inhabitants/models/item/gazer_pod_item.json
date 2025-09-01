@@ -1,0 +1,14 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "inhabitants:item/gazer_pod_item"
+  },
+    "overrides": [
+      {
+        "predicate": {
+          "inhabitants:has_gazer": 1
+        },
+        "model": "inhabitants:item/gazer_pod_item_occupied"
+      }
+    ]
+}
