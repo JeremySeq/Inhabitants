@@ -3,29 +3,38 @@ package com.jeremyseq.inhabitants.items;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
+import com.jeremyseq.inhabitants.items.armor.GazerPodArmorRenderer;
 import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.network.NetworkDirection;
+import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class GazerPodItem extends Item {
+public class GazerPodItem extends ArmorItem implements GeoItem {
+    AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     public GazerPodItem(Properties properties) {
-        super(properties);
+        super(ArmorMaterials.LEATHER, Type.HELMET, properties);
     }
 
     // ===== NBT Helpers =====
@@ -83,14 +92,36 @@ public class GazerPodItem extends Item {
         return super.use(level, player, hand);
     }
 
+    @Override
+    public boolean onDroppedByPlayer(ItemStack item, Player player) {
+        return super.onDroppedByPlayer(item, player);
+    }
+
+//    @Override
+//    public void onInventoryTick(ItemStack stack, Level level, Player player, int slotIndex, int selectedIndex) {
+//        if (player.isDeadOrDying() && !hasGazer(stack)) {
+//            if (getGazerId(stack) != -1) {
+//                // Clear gazer ID if player dies and pod is empty
+//                setGazerId(stack, -1);
+//            } else {
+//                // If player dies and pod has a gazer, just ensure it's marked as empty
+//                GazerEntity gazer = (GazerEntity) level.getEntity(getGazerId(stack));
+//
+//                assert gazer != null;
+//                gazer.podOwner = null; // clear owner to prevent issues
+//                gazer.currentState = GazerEntity.GazerState.IDLE; // set to idle state
+//            }
+//        }
+//        super.onInventoryTick(stack, level, player, slotIndex, selectedIndex);
+//    }
+
     // ===== Right Click Entity =====
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
-        if (!player.level().isClientSide && target instanceof GazerEntity gazer) {
-            if (!hasGazer(stack)) {
-                // Capture gazer
-                setHasGazer(stack, true);
-//                gazer.enterPod(); // calls discard()
+        if (target instanceof GazerEntity gazer) {
+            if (!hasGazer(player.getItemInHand(hand))) {
+                setHasGazer(player.getItemInHand(hand), true);
+                gazer.enterPod(); // calls discard()
                 return InteractionResult.SUCCESS;
             }
         }
@@ -106,5 +137,31 @@ public class GazerPodItem extends Item {
             tooltip.add(net.minecraft.network.chat.Component.literal("Empty Pod"));
         }
         super.appendHoverText(stack, level, tooltip, flag);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            private GazerPodArmorRenderer renderer;
+
+            @Override
+            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity entity, ItemStack itemStack, EquipmentSlot armorSlot, HumanoidModel<?> _default) {
+                if (this.renderer == null) {
+                    this.renderer = new GazerPodArmorRenderer();
+                }
+                this.renderer.prepForRender(entity, itemStack, armorSlot, _default);
+                return this.renderer;
+            }
+        });
     }
 }
