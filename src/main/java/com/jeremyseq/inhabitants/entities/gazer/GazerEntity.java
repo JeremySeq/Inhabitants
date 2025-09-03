@@ -5,6 +5,9 @@ import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -25,13 +28,20 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class GazerEntity extends FlyingMob implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public GazerState currentState = GazerState.IDLE;
-    public UUID podOwner = null;
+    private static final EntityDataAccessor<String> STATE =
+            SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.STRING);
+
+    private static final EntityDataAccessor<Optional<UUID>> OWNER =
+            SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+
+    private static final EntityDataAccessor<Boolean> ENTERING_POD =
+            SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.BOOLEAN);
 
     // flag for animation of entering pod
     public boolean playingEnterPod = false;
@@ -96,16 +106,18 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public void tick() {
         super.tick();
 
+        if (this.level().isClientSide) return;
+
         // if being controlled, check owner validity
-        if (currentState == GazerState.BEING_CONTROLLED) {
-            ServerPlayer owner = (ServerPlayer) this.level().getPlayerByUUID(podOwner);
+        if (this.getGazerState() == GazerState.BEING_CONTROLLED) {
+            ServerPlayer owner = (ServerPlayer) this.level().getPlayerByUUID(this.getOwnerUUID());
             if (owner == null
                     || owner.isDeadOrDying()
                     || owner.getItemBySlot(EquipmentSlot.HEAD).getItem() != ModItems.GAZER_POD.get()) {
 
                 // force stop
-                currentState = GazerState.IDLE;
-                podOwner = null;
+                this.setGazerState(GazerState.IDLE);
+                this.setOwnerUUID(null);
 
                 if (owner != null && !owner.level().isClientSide) {
                     ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> owner),
@@ -129,8 +141,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public void remove(RemovalReason reason) {
         super.remove(reason);
 
-        if (podOwner == null) return;
-        Player player = this.level().getPlayerByUUID(podOwner);
+        if (this.getOwnerUUID() == null) return;
+        Player player = this.level().getPlayerByUUID(this.getOwnerUUID());
         if (player == null) return;
 
         for (ItemStack stack : player.getInventory().items) {
@@ -152,7 +164,35 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     }
 
     public void exitPod(boolean controlled) {
-        this.currentState = controlled ? GazerState.BEING_CONTROLLED : GazerState.IDLE;
+        this.setGazerState(controlled ? GazerState.BEING_CONTROLLED : GazerState.IDLE);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(OWNER, Optional.empty());
+        this.entityData.define(ENTERING_POD, false);
+        this.entityData.define(STATE, GazerState.IDLE.name());
+    }
+
+    // ----- Synced Data Getters/Setters -----
+    public GazerState getGazerState() {
+        return GazerState.valueOf(this.entityData.get(STATE));
+    }
+    public void setGazerState(GazerState state) {
+        this.entityData.set(STATE, state.name());
+    }
+    public UUID getOwnerUUID() {
+        return this.entityData.get(OWNER).orElse(null);
+    }
+    public void setOwnerUUID(UUID uuid) {
+        this.entityData.set(OWNER, Optional.ofNullable(uuid));
+    }
+    public boolean isEnteringPod() {
+        return this.entityData.get(ENTERING_POD);
+    }
+    public void setEnteringPod(boolean entering) {
+        this.entityData.set(ENTERING_POD, entering);
     }
 
     @Override
