@@ -11,21 +11,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class GazerStartControlC2S {
-    private final int gazerId;
+    private final UUID gazerId;
 
-    public GazerStartControlC2S(int gazerId) {
+    public GazerStartControlC2S(UUID gazerId) {
         this.gazerId = gazerId;
     }
 
     public static void encode(GazerStartControlC2S msg, FriendlyByteBuf buf) {
-        buf.writeInt(msg.gazerId);
+        buf.writeUUID(msg.gazerId);
     }
 
     public static GazerStartControlC2S decode(FriendlyByteBuf buf) {
-        int id = buf.readInt();
+        UUID id = buf.readUUID();
         return new GazerStartControlC2S(id);
     }
 
@@ -37,7 +38,7 @@ public class GazerStartControlC2S {
             ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
             if (!(helmet.getItem() instanceof GazerPodItem)) return;
 
-            GazerEntity gazer = player.level().getEntity(msg.gazerId) instanceof GazerEntity g ? g : null;
+            GazerEntity gazer = player.serverLevel().getEntity(msg.gazerId) instanceof GazerEntity g ? g : null;
             if (gazer == null) return;
 
             if (gazer.getGazerState() != GazerEntity.GazerState.IDLE) return;

@@ -26,6 +26,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class GazerPodItem extends ArmorItem implements GeoItem {
@@ -46,15 +47,24 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
         tag.putBoolean("HasGazer", hasGazer);
     }
 
-    public static int getGazerId(ItemStack stack) {
+    public static UUID getGazerId(ItemStack stack) {
         CompoundTag tag = stack.getTag();
-        if (tag == null) return -1;
-        return tag.getInt("GazerId") != 0 ? tag.getInt("GazerId") : -1;
+        if (tag == null || !tag.contains("GazerId")) {
+            return null;
+        }
+        return tag.getUUID("GazerId");
     }
 
-    public static void setGazerId(ItemStack stack, int gazerId) {
+    public static void setGazerId(ItemStack stack, UUID gazerId) {
         CompoundTag tag = stack.getOrCreateTag();
-        tag.putInt("GazerId", gazerId);
+        tag.putUUID("GazerId", gazerId);
+    }
+
+    public static void removeGazerId(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        if (tag != null) {
+            tag.remove("GazerId");
+        }
     }
 
     // ===== Right Click in Air =====
@@ -71,7 +81,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             gazerEntity.moveTo(player.getX(), player.getY() + 1, player.getZ(), player.getYRot(), player.getXRot());
             level.addFreshEntity(gazerEntity);
 
-            setGazerId(player.getItemInHand(hand), gazerEntity.getId());
+            setGazerId(player.getItemInHand(hand), gazerEntity.getUUID());
 
             gazerEntity.exitPod(false);
             gazerEntity.setOwnerUUID(player.getUUID());
@@ -89,7 +99,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
         if (target instanceof GazerEntity gazer) {
             if (!hasGazer(player.getItemInHand(hand))) {
                 setHasGazer(player.getItemInHand(hand), true);
-                setGazerId(player.getItemInHand(hand), -1);
+                setGazerId(player.getItemInHand(hand), gazer.getUUID());
 
                 gazer.enterPod();
                 return InteractionResult.SUCCESS;

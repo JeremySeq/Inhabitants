@@ -13,6 +13,7 @@ public class GazerWanderGoal extends FlyingWanderGoal {
     @Override
     public boolean canUse() {
         return (gazer.getGazerState() == GazerEntity.GazerState.IDLE)
+                && !gazer.isEnteringPod()
                 && super.canUse();
     }
 }
