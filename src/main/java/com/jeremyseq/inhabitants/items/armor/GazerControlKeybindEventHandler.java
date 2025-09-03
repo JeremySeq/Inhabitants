@@ -14,6 +14,8 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.UUID;
+
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID)
 public class GazerControlKeybindEventHandler {
     @SubscribeEvent
@@ -31,8 +33,8 @@ public class GazerControlKeybindEventHandler {
                 return;
             }
 
-            int gazerId = GazerPodItem.getGazerId(helmet);
-            if (gazerId == -1 || gazerId == 0) {
+            UUID gazerId = GazerPodItem.getGazerId(helmet);
+            if (gazerId == null) {
                 Inhabitants.LOGGER.warn("GazerPodItem has no valid gazer ID!");
                 return;
             }

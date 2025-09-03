@@ -12,11 +12,12 @@ public class FollowPodHolderGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return gazer.playingEnterPod;
+        return gazer.isEnteringPod();
     }
 
     @Override
     public void tick() {
+        if (gazer.getOwnerUUID() == null) return;
         Player player = gazer.level().getPlayerByUUID(gazer.getOwnerUUID());
         if (player != null) {
             gazer.getNavigation().moveTo(player, 1.0);
