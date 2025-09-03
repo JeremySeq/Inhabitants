@@ -43,9 +43,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     private static final EntityDataAccessor<Boolean> ENTERING_POD =
             SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.BOOLEAN);
 
-    // flag for animation of entering pod
-    public boolean playingEnterPod = false;
-
 
     public GazerEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -147,8 +144,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         for (ItemStack stack : player.getInventory().items) {
             if (stack.getItem() instanceof GazerPodItem) {
-                if (GazerPodItem.getGazerId(stack) == this.getId()) {
-                    GazerPodItem.setGazerId(stack, -1);
+                if (GazerPodItem.getGazerId(stack) == this.getUUID()) {
+                    GazerPodItem.removeGazerId(stack);
                 }
             }
         }
@@ -158,7 +155,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     public void enterPod() {
 
-        this.playingEnterPod = true;
+        this.setEnteringPod(true);
         // discard called in animation predicate when animation ends
 //        this.discard();
     }
@@ -203,7 +200,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
         AnimationController<?> controller = animationState.getController();
 
-        if (playingEnterPod) {
+        if (this.isEnteringPod()) {
             controller.setAnimation(RawAnimation.begin().then("landing into pod", Animation.LoopType.PLAY_ONCE));
             // when finished, discard the entity
             if (controller.hasAnimationFinished()) {
