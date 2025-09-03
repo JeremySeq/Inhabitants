@@ -73,7 +73,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
 
             setGazerId(player.getItemInHand(hand), gazerEntity.getId());
 
-            gazerEntity.exitPod(player, false);
+            gazerEntity.exitPod(false);
             gazerEntity.podOwner = player.getUUID();
 
             setHasGazer(player.getItemInHand(hand), false);

@@ -18,8 +18,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.UUID;
@@ -29,6 +32,10 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     public GazerState currentState = GazerState.IDLE;
     public UUID podOwner = null;
+
+    // flag for animation of entering pod
+    public boolean playingEnterPod = false;
+
 
     public GazerEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -71,7 +78,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     @Override
     protected void registerGoals() {
         // follow player holding pod item when IDLE
-//        this.goalSelector.addGoal(1, new FollowPodHolderGoal(this));
+        this.goalSelector.addGoal(1, new FollowPodHolderGoal(this));
 
         // Random floating movement when IDLE
         this.goalSelector.addGoal(2, new GazerWanderGoal(this, 5.0D));
@@ -138,17 +145,47 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     // ----- State Transitions -----
 
     public void enterPod() {
-        this.discard();
+        this.playingEnterPod = true;
+        // discard called in animation predicate when animation ends
+//        this.discard();
+
+        if (podOwner == null) return;
+
+        Player player = this.level().getPlayerByUUID(podOwner);
+        if (player == null) return;
+
+
     }
 
-    public void exitPod(Player player, boolean controlled) {
+    public void exitPod(boolean controlled) {
         this.currentState = controlled ? GazerState.BEING_CONTROLLED : GazerState.IDLE;
     }
 
-
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
 
+    private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
+        AnimationController<?> controller = animationState.getController();
+
+        if (playingEnterPod) {
+            controller.setAnimation(RawAnimation.begin().then("landing into pod", Animation.LoopType.PLAY_ONCE));
+            // when finished, discard the entity
+            if (controller.hasAnimationFinished()) {
+                this.discard(); // remove entity after anim ends
+            }
+            return PlayState.CONTINUE;
+        }
+
+        if (this.getDeltaMovement().lengthSqr() > 0.03) {
+            controller.setAnimation(RawAnimation.begin().then("floating_movement", Animation.LoopType.LOOP));
+            return PlayState.CONTINUE;
+        } else {
+            controller.setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.LOOP));
+        }
+
+        return PlayState.CONTINUE;
     }
 
     @Override
