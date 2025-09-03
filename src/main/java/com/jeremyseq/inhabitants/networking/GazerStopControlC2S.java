@@ -40,9 +40,9 @@ public class GazerStopControlC2S {
             if (gazer == null) return;
 
             // return if not the owner
-            if (!player.getUUID().equals(gazer.podOwner)) return;
+            if (!player.getUUID().equals(gazer.getOwnerUUID())) return;
 
-            gazer.currentState = GazerEntity.GazerState.IDLE;
+            gazer.setGazerState(GazerEntity.GazerState.IDLE);
 
             ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                     new GazerCameraPacketS2C(gazer.getId(), false));

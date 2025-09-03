@@ -12,6 +12,6 @@ public class GazerLookAroundGoal extends RandomLookAroundGoal {
 
     @Override
     public boolean canUse() {
-        return gazer.currentState == GazerEntity.GazerState.IDLE;
+        return gazer.getGazerState() == GazerEntity.GazerState.IDLE;
     }
 }
