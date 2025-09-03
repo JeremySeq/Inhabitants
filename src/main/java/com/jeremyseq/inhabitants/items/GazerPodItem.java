@@ -90,6 +90,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             if (!hasGazer(player.getItemInHand(hand))) {
                 setHasGazer(player.getItemInHand(hand), true);
                 setGazerId(player.getItemInHand(hand), -1);
+
                 gazer.enterPod();
                 return InteractionResult.SUCCESS;
             }
