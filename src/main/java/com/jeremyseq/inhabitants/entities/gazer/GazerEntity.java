@@ -145,16 +145,10 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     // ----- State Transitions -----
 
     public void enterPod() {
+
         this.playingEnterPod = true;
         // discard called in animation predicate when animation ends
 //        this.discard();
-
-        if (podOwner == null) return;
-
-        Player player = this.level().getPlayerByUUID(podOwner);
-        if (player == null) return;
-
-
     }
 
     public void exitPod(boolean controlled) {
