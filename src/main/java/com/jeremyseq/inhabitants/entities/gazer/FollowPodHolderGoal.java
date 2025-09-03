@@ -17,7 +17,7 @@ public class FollowPodHolderGoal extends Goal {
 
     @Override
     public void tick() {
-        Player player = gazer.level().getPlayerByUUID(gazer.podOwner);
+        Player player = gazer.level().getPlayerByUUID(gazer.getOwnerUUID());
         if (player != null) {
             gazer.getNavigation().moveTo(player, 1.0);
         }

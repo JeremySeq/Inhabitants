@@ -40,12 +40,12 @@ public class GazerStartControlC2S {
             GazerEntity gazer = player.level().getEntity(msg.gazerId) instanceof GazerEntity g ? g : null;
             if (gazer == null) return;
 
-            if (gazer.currentState != GazerEntity.GazerState.IDLE) return;
+            if (gazer.getGazerState() != GazerEntity.GazerState.IDLE) return;
 
-            if (gazer.podOwner != player.getUUID()) return;
+            if (gazer.getOwnerUUID() != player.getUUID()) return;
 
             // set controlled state and owner
-            gazer.currentState = GazerEntity.GazerState.BEING_CONTROLLED;
+            gazer.setGazerState(GazerEntity.GazerState.BEING_CONTROLLED);
 
             ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                     new GazerCameraPacketS2C(gazer.getId(), true));
