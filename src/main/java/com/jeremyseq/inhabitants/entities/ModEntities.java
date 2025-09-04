@@ -13,6 +13,8 @@ import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
+import com.jeremyseq.inhabitants.entities.wishfish.WishfishEntity;
+import com.jeremyseq.inhabitants.entities.wishfish.WishfishRenderer;
 import com.jeremyseq.inhabitants.entities.zinger.ZingerEntity;
 import com.jeremyseq.inhabitants.entities.zinger.ZingerRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -76,6 +78,12 @@ public class ModEntities {
                             .sized(3f, 2.5f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "zinger").toString()));
 
+    public static final RegistryObject<EntityType<WishfishEntity>> WISHFISH =
+            REGISTRY.register("wishfish", () -> EntityType.Builder
+                    .of(WishfishEntity::new, MobCategory.WATER_AMBIENT)
+                    .sized(0.6f, 2.2f)
+                    .build("wishfish"));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
@@ -83,6 +91,7 @@ public class ModEntities {
         event.put(ModEntities.ABYSSFISH.get(), AbyssfishEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
         event.put(ModEntities.ZINGER.get(), ZingerEntity.setAttributes());
+        event.put(ModEntities.WISHFISH.get(), WishfishEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -94,5 +103,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
         EntityRenderers.register(ModEntities.ZINGER.get(), ZingerRenderer::new);
+        EntityRenderers.register(ModEntities.WISHFISH.get(), WishfishRenderer::new);
     }
 }

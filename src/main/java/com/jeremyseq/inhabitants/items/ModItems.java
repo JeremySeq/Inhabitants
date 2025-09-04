@@ -60,6 +60,14 @@ public class ModItems {
     public static final RegistryObject<Item> ANCIENT_FLUTE = ITEMS.register("ancient_flute",
             () -> new AncientFluteItem(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> WISHFISH_BUCKET = ITEMS.register("wishfish_bucket", () ->
+            new MobBucketItem(
+                    ModEntities.WISHFISH,
+                    () -> Fluids.WATER,
+                    () -> SoundEvents.BUCKET_EMPTY_FISH,
+                    new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))
+    );
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
