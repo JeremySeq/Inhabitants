@@ -34,6 +34,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.ANCIENT_FLUTE.get());
                         pOutput.accept(ModItems.ANCIENT_FLUTE.get());
                         pOutput.accept(ModItems.WISHFISH_SPAWN_EGG.get());
+                        pOutput.accept(ModItems.WISHFISH.get());
                         pOutput.accept(ModItems.WISHFISH_BUCKET.get());
                     })
                     .build());

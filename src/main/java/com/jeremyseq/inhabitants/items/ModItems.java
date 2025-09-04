@@ -3,9 +3,11 @@ package com.jeremyseq.inhabitants.items;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MobBucketItem;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -60,6 +62,9 @@ public class ModItems {
     public static final RegistryObject<Item> ANCIENT_FLUTE = ITEMS.register("ancient_flute",
             () -> new AncientFluteItem(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> WISHFISH = ITEMS.register("wishfish",
+            () -> new Item((new Item.Properties()).rarity(Rarity.RARE).food(Foods.GOLDEN_APPLE)));
+
     public static final RegistryObject<Item> WISHFISH_SPAWN_EGG = ITEMS.register("wishfish_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.WISHFISH, 0xE9B115, 0xFDF55F, new Item.Properties()));
 
@@ -68,7 +73,7 @@ public class ModItems {
                     ModEntities.WISHFISH,
                     () -> Fluids.WATER,
                     () -> SoundEvents.BUCKET_EMPTY_FISH,
-                    new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))
+                    new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET).rarity(Rarity.EPIC))
     );
 
     public static void register(IEventBus eventBus) {
