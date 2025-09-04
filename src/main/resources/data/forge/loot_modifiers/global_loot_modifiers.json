@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-    "inhabitants:abyssfish_fishing"
+    "inhabitants:abyssfish_fishing",
+    "inhabitants:wishfish_fishing"
   ]
 }
