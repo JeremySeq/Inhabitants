@@ -5,7 +5,6 @@ import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.items.GazerPodItem;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
@@ -50,7 +49,7 @@ public class GazerStartControlC2S {
 
             ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                     new GazerCameraPacketS2C(gazer.getId(), true));
-            Inhabitants.LOGGER.debug("Player {} started controlling Gazer {}", player.getName().getString(), gazer.getId());
+            Inhabitants.LOGGER.debug("Player {} started controlling Gazer {}", player.getName().getString(), gazer.getUUID());
         });
         ctx.get().setPacketHandled(true);
     }
