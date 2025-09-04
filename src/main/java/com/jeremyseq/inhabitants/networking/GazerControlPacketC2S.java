@@ -6,10 +6,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class GazerControlPacketC2S {
-    private final int gazerId;
+    private final UUID gazerId;
     private final boolean forward;
     private final boolean back;
     private final boolean left;
@@ -19,7 +20,7 @@ public class GazerControlPacketC2S {
     private final float yaw;
     private final float pitch;
 
-    public GazerControlPacketC2S(int gazerId, boolean forward, boolean back, boolean left, boolean right, boolean jump, boolean sneak, float yaw, float pitch) {
+    public GazerControlPacketC2S(UUID gazerId, boolean forward, boolean back, boolean left, boolean right, boolean jump, boolean sneak, float yaw, float pitch) {
         this.gazerId = gazerId;
         this.forward = forward;
         this.back = back;
@@ -32,7 +33,7 @@ public class GazerControlPacketC2S {
     }
 
     public static void encode(GazerControlPacketC2S msg, FriendlyByteBuf buf) {
-        buf.writeInt(msg.gazerId);
+        buf.writeUUID(msg.gazerId);
         buf.writeBoolean(msg.forward);
         buf.writeBoolean(msg.back);
         buf.writeBoolean(msg.left);
@@ -44,7 +45,7 @@ public class GazerControlPacketC2S {
     }
 
     public static GazerControlPacketC2S decode(FriendlyByteBuf buf) {
-        int id = buf.readInt();
+        UUID id = buf.readUUID();
         boolean forward = buf.readBoolean();
         boolean back = buf.readBoolean();
         boolean left = buf.readBoolean();
@@ -64,7 +65,7 @@ public class GazerControlPacketC2S {
             if (player == null) return; // sanity check
 
             // Lookup gazer by ID in the player's world
-            Entity e = player.level().getEntity(msg.gazerId);
+            Entity e = player.serverLevel().getEntity(msg.gazerId);
             if (!(e instanceof GazerEntity gazer)) return;
 
             double speed = 0.3;

@@ -47,6 +47,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
         tag.putBoolean("HasGazer", hasGazer);
     }
 
+    @Nullable
     public static UUID getGazerId(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         if (tag == null || !tag.contains("GazerId")) {
@@ -88,7 +89,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
 
             setHasGazer(player.getItemInHand(hand), false);
 
-            Inhabitants.LOGGER.debug("Releasing gazer with ID {}", gazerEntity.getId());
+            Inhabitants.LOGGER.debug("Releasing gazer with ID {}", gazerEntity.getUUID());
         }
         return InteractionResultHolder.success(stack);
     }
@@ -99,6 +100,8 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
         if (target instanceof GazerEntity gazer) {
             if (!hasGazer(player.getItemInHand(hand))) {
                 setHasGazer(player.getItemInHand(hand), true);
+                Inhabitants.LOGGER.debug("Capturing gazer with ID {}", gazer.getUUID());
+
                 setGazerId(player.getItemInHand(hand), gazer.getUUID());
 
                 gazer.enterPod();
@@ -123,6 +126,10 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             tooltip.add(Component.literal("Contains a Gazer"));
         } else {
             tooltip.add(Component.literal("Empty Pod"));
+        }
+
+        if (getGazerId(stack) != null) {
+            tooltip.add(Component.literal("Gazer ID: " + getGazerId(stack).toString()));
         }
 
         super.appendHoverText(stack, level, tooltip, flag);
