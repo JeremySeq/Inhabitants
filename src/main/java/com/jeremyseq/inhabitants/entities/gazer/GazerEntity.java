@@ -1,10 +1,12 @@
 package com.jeremyseq.inhabitants.entities.gazer;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.items.GazerPodItem;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -118,7 +120,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
                 if (owner != null && !owner.level().isClientSide) {
                     ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> owner),
-                            new GazerCameraPacketS2C(getId(), false));
+                            new GazerCameraPacketS2C(this.getId(), false));
                 }
             }
         }
@@ -172,6 +174,35 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         this.entityData.define(STATE, GazerState.IDLE.name());
     }
 
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+
+        // Save custom data
+        if (this.getOwnerUUID() != null) {
+            tag.putUUID("Owner", this.getOwnerUUID());
+        }
+        tag.putString("GazerState", this.getGazerState().name());
+        tag.putBoolean("EnteringPod", this.isEnteringPod());
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+
+        // Load custom data
+        if (tag.hasUUID("Owner")) {
+            this.setOwnerUUID(tag.getUUID("Owner"));
+        } else {
+            this.setOwnerUUID(null);
+        }
+        if (tag.contains("GazerState")) {
+            this.setGazerState(GazerState.valueOf(tag.getString("GazerState")));
+        }
+        this.setEnteringPod(tag.getBoolean("EnteringPod"));
+    }
+
+
     // ----- Synced Data Getters/Setters -----
     public GazerState getGazerState() {
         return GazerState.valueOf(this.entityData.get(STATE));
@@ -204,7 +235,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             controller.setAnimation(RawAnimation.begin().then("landing into pod", Animation.LoopType.PLAY_ONCE));
             // when finished, discard the entity
             if (controller.hasAnimationFinished()) {
-                this.discard(); // remove entity after anim ends
+                Inhabitants.LOGGER.debug("GazerEntity entering pod animation finished, removing entity");
+                this.remove(RemovalReason.DISCARDED); // remove entity after anim ends
             }
             return PlayState.CONTINUE;
         }

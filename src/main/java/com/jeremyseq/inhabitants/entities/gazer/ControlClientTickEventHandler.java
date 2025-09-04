@@ -12,6 +12,8 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.UUID;
+
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID)
 public class ControlClientTickEventHandler {
     @SubscribeEvent
@@ -30,7 +32,7 @@ public class ControlClientTickEventHandler {
             boolean jump = mc.options.keyJump.isDown();
             boolean sneak = mc.options.keyShift.isDown();
 
-            int gazerId = gazer.getId();
+            UUID gazerId = gazer.getUUID();
 
             float yaw = mc.player.getYHeadRot() % 360F;
             float pitch = mc.player.getXRot();
