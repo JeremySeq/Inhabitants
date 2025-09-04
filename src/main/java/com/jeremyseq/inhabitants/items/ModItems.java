@@ -60,6 +60,9 @@ public class ModItems {
     public static final RegistryObject<Item> ANCIENT_FLUTE = ITEMS.register("ancient_flute",
             () -> new AncientFluteItem(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> WISHFISH_SPAWN_EGG = ITEMS.register("wishfish_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.WISHFISH, 0xE9B115, 0xFDF55F, new Item.Properties()));
+
     public static final RegistryObject<Item> WISHFISH_BUCKET = ITEMS.register("wishfish_bucket", () ->
             new MobBucketItem(
                     ModEntities.WISHFISH,
