@@ -81,7 +81,12 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     @Override
     protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
-        // do nothing, bat doesn’t take fall damage
+        // no fall damage
+    }
+
+    @Override
+    public boolean canAttack(LivingEntity target) {
+        return false;
     }
 
     @Override
@@ -236,7 +241,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             // when finished, discard the entity
             if (controller.hasAnimationFinished()) {
                 Inhabitants.LOGGER.debug("GazerEntity entering pod animation finished, removing entity");
-                this.remove(RemovalReason.DISCARDED); // remove entity after anim ends
+                this.discard(); // remove entity after anim ends
             }
             return PlayState.CONTINUE;
         }
