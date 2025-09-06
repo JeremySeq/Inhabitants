@@ -90,8 +90,12 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             setHasGazer(player.getItemInHand(hand), false);
 
             Inhabitants.LOGGER.debug("Releasing gazer with ID {}", gazerEntity.getUUID());
+            return InteractionResultHolder.success(stack);
         }
-        return InteractionResultHolder.success(stack);
+        if (level.isClientSide && hasGazer(stack)) {
+            return InteractionResultHolder.success(stack);
+        }
+        return InteractionResultHolder.pass(stack);
     }
 
     // ===== Right Click Entity =====
