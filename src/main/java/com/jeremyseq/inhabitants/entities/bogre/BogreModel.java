@@ -17,11 +17,7 @@ public class BogreModel extends GeoModel<BogreEntity> {
 
     @Override
     public ResourceLocation getTextureResource(BogreEntity animatable) {
-        if (animatable.getTextureType() == 0) {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre.png");
-        } else {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre2.png");
-        }
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre.png");
     }
 
     @Override

@@ -32,11 +32,7 @@ public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull BogreEntity animatable) {
-        if (animatable.getTextureType() == 0) {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre.png");
-        } else {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre2.png");
-        }
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre.png");
     }
 
     private static class HeldItemLayer extends BlockAndItemGeoLayer<BogreEntity> {

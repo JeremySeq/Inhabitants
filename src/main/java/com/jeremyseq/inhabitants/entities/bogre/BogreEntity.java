@@ -19,7 +19,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -32,8 +31,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -63,8 +60,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     boolean pathSet = false;
 
     public State state = State.CAUTIOUS;
-    // used for different textures, 0 or 1
-    public static final EntityDataAccessor<Integer> TEXTURE_TYPE = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT);
 
     /**
      * On client side, this is used to start the roar animation and is set to false immediately after starting.
@@ -649,27 +644,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(COOKING_TICKS, 0);
         entityData.define(CARVING_ANIM, false);
         entityData.define(ITEM_HELD, ItemStack.EMPTY);
-        entityData.define(TEXTURE_TYPE, getBiomeTextureType());
-    }
-
-    private int getBiomeTextureType() {
-        if (this.level().getBiome(this.blockPosition()).is(Biomes.MANGROVE_SWAMP)) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public @org.jetbrains.annotations.Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor pLevel,
-                                                                            @NotNull DifficultyInstance pDifficulty,
-                                                                            @NotNull MobSpawnType pReason,
-                                                                            @org.jetbrains.annotations.Nullable SpawnGroupData pSpawnData,
-                                                                            @org.jetbrains.annotations.Nullable CompoundTag pDataTag) {
-        if (pSpawnData == null) {
-            this.entityData.set(TEXTURE_TYPE, getBiomeTextureType());
-        }
-        return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
     public boolean isTamedBy(Player player) {
@@ -736,15 +710,9 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.spawnAtLocation(new ItemStack(ModItems.BRACER_OF_MIGHT.get()));
     }
 
-    public int getTextureType() {
-        return entityData.get(TEXTURE_TYPE);
-    }
-
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-
-        tag.putInt("textureType", entityData.get(TEXTURE_TYPE));
 
         ListTag list = new ListTag();
         for (UUID id : tamedPlayers) {
@@ -762,12 +730,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-
-        if (tag.contains("textureType")) {
-            entityData.set(TEXTURE_TYPE, tag.getInt("textureType"));
-        } else {
-            entityData.set(TEXTURE_TYPE, getBiomeTextureType());
-        }
 
         tamedPlayers.clear();
 
