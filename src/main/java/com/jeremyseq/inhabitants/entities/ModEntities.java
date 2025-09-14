@@ -3,6 +3,8 @@ package com.jeremyseq.inhabitants.entities;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishEntity;
 import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishRenderer;
+import com.jeremyseq.inhabitants.entities.apex.ApexEntity;
+import com.jeremyseq.inhabitants.entities.apex.ApexRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
@@ -94,6 +96,12 @@ public class ModEntities {
                     .sized(0.6f, 2.2f)
                     .build("wishfish"));
 
+    public static final RegistryObject<EntityType<ApexEntity>> APEX =
+            REGISTRY.register("apex",
+                    () -> EntityType.Builder.of(ApexEntity::new, MobCategory.MONSTER)
+                            .sized(2.25f, 2.3f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "apex").toString()));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
@@ -103,6 +111,7 @@ public class ModEntities {
         event.put(ModEntities.ZINGER.get(), ZingerEntity.setAttributes());
         event.put(ModEntities.GAZER.get(), GazerEntity.setAttributes());
         event.put(ModEntities.WISHFISH.get(), WishfishEntity.setAttributes());
+        event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -116,5 +125,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.ZINGER.get(), ZingerRenderer::new);
         EntityRenderers.register(ModEntities.GAZER.get(), GazerRenderer::new);
         EntityRenderers.register(ModEntities.WISHFISH.get(), WishfishRenderer::new);
+        EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
     }
 }
