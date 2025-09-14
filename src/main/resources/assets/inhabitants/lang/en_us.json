@@ -26,6 +26,9 @@
   "item.inhabitants.wishfish_bucket": "Bucket of Wishfish",
   "item.inhabitants.wishfish": "Wishfish",
 
+  "block.inhabitants.chiseled_ice": "Chiseled Ice",
+  "block.inhabitants.ice_bricks": "Ice Bricks",
+
   "item.minecraft.potion.effect.adaptation": "Potion of Adaptation",
   "item.minecraft.potion.effect.long_adaptation": "Potion of Adaptation",
   "effect.inhabitants.adaptation": "Adaptation",

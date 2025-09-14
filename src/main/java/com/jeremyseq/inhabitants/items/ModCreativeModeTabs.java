@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -40,6 +41,8 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.WISHFISH.get());
                         pOutput.accept(ModItems.WISHFISH_BUCKET.get());
                         pOutput.accept(gazer_pod);
+                        pOutput.accept(ModBlocks.CHISELED_ICE_ITEM.get());
+                        pOutput.accept(ModBlocks.ICE_BRICKS_ITEM.get());
                     })
                     .build());
 

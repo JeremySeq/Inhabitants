@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "inhabitants:block/chiseled_ice",
+    "top": "inhabitants:block/chiseled_ice_top",
+    "bottom": "inhabitants:block/chiseled_ice_bottom"
+  }
+}
