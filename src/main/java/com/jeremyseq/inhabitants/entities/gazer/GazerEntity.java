@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.gazer;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.entities.gazer_pod.GazerPodEntity;
 import com.jeremyseq.inhabitants.items.GazerPodItem;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
@@ -62,6 +63,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public enum GazerState {
         IDLE,               // Floating near the pod
         BEING_CONTROLLED,   // Player is “possessing” the gazer
+        RETURNING_TO_POD    // Returning to pod after being controlled
     }
 
     @Override
@@ -127,6 +129,34 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
                     ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> owner),
                             new GazerCameraPacketS2C(this.getId(), false));
                 }
+            }
+        }
+
+        if (this.getGazerState() == GazerState.IDLE) {
+            // find closest GazerPodEntity without a gazer
+            GazerPodEntity closestPod = null;
+            double closestDistance = Double.MAX_VALUE;
+            for (Entity entity : this.level().getEntities(this, this.getBoundingBox().inflate(50))) {
+                if (entity instanceof GazerPodEntity pod && !pod.hasGazer()) {
+                    double distance = this.distanceToSqr(pod);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestPod = pod;
+                    }
+                }
+            }
+            if (closestPod != null) {
+                // navigate to pod
+                this.getNavigation().moveTo(closestPod, 1.0);
+
+                // if close enough, enter pod
+                if (this.distanceTo(closestPod) < 2.0) {
+                    this.enterPod();
+                    closestPod.setHasGazer(true);
+                }
+            } else {
+                // no pod found, just idle
+                this.setGazerState(GazerState.IDLE);
             }
         }
     }
