@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.entities.gazer_pod;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -22,7 +23,7 @@ public class GazerPodEntity extends Mob implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private final Random random = new Random();
 
-    public static final EntityDataAccessor<Boolean> HAS_GAZER = SynchedEntityData.defineId(GazerPodEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> HAS_GAZER = SynchedEntityData.defineId(GazerPodEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static AttributeSupplier setAttributes() {
         return Mob.createMobAttributes()
@@ -83,15 +84,17 @@ public class GazerPodEntity extends Mob implements GeoEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+    public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putBoolean("HasGazer", hasGazer());
     }
 
     @Override
-    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+    public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        setHasGazer(tag.getBoolean("HasGazer"));
+        if (tag.contains("HasGazer")) {
+            setHasGazer(tag.getBoolean("HasGazer"));
+        }
     }
 
     @Override
