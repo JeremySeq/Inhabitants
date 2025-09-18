@@ -31,6 +31,7 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -112,10 +113,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public void tick() {
         super.tick();
 
-        if (this.level().isClientSide) return;
-
         // if being controlled, check owner validity
-        if (this.getGazerState() == GazerState.BEING_CONTROLLED) {
+        if (this.getGazerState() == GazerState.BEING_CONTROLLED && !level().isClientSide) {
             ServerPlayer owner = (ServerPlayer) this.level().getPlayerByUUID(this.getOwnerUUID());
             if (owner == null
                     || owner.isDeadOrDying()
@@ -194,7 +193,21 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         this.setEnteringPod(true);
         // discard called in animation predicate when animation ends
-//        this.discard();
+
+        if (level().isClientSide) {
+            return;
+        }
+
+        // wait 2 seconds then discard
+        Objects.requireNonNull(this.level().getServer()).execute(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            this.discard();
+        });
+
     }
 
     public void exitPod(boolean controlled) {
@@ -268,10 +281,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         if (this.isEnteringPod()) {
             controller.setAnimation(RawAnimation.begin().then("landing into pod", Animation.LoopType.PLAY_ONCE));
-            // when finished, discard the entity
             if (controller.hasAnimationFinished()) {
                 Inhabitants.LOGGER.debug("GazerEntity entering pod animation finished, removing entity");
-                this.discard(); // remove entity after anim ends
             }
             return PlayState.CONTINUE;
         }
