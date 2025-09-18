@@ -16,7 +16,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -94,18 +93,18 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-        // follow player holding pod item when IDLE
+        // move to player holding pod item when entering pod
         this.goalSelector.addGoal(1, new FollowPodHolderGoal(this));
 
         // Random floating movement when IDLE
-        this.goalSelector.addGoal(2, new GazerWanderGoal(this, 5.0D));
+        this.goalSelector.addGoal(2, new GazerWanderGoal(this, 2.0D));
 
         // Look around when IDLE
-        this.goalSelector.addGoal(3, new GazerLookAroundGoal(this));
+        this.goalSelector.addGoal(2, new GazerLookAroundGoal(this));
     }
 
     @Override
-    protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
+    protected @NotNull FlyingPathNavigation createNavigation(@NotNull Level pLevel) {
         return new FlyingPathNavigation(this, pLevel);
     }
 
