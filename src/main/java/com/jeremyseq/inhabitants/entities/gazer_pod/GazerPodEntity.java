@@ -3,7 +3,6 @@ package com.jeremyseq.inhabitants.entities.gazer_pod;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
-import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -21,7 +20,6 @@ import java.util.Random;
 
 public class GazerPodEntity extends Mob implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
-    private GazerEntity spawnedGazer = null;
     private final Random random = new Random();
 
     public static final EntityDataAccessor<Boolean> HAS_GAZER = SynchedEntityData.defineId(GazerPodEntity.class, EntityDataSerializers.BOOLEAN);
@@ -45,8 +43,8 @@ public class GazerPodEntity extends Mob implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide) {
-            if (hasGazer() && random.nextInt(50) == 0) {
+//        if (!level().isClientSide) {
+            if (this.hasGazer() && random.nextInt(50) == 0) {
                 // Spawn gazer
                 GazerEntity gazerEntity = ModEntities.GAZER.get().create(level());
 
@@ -58,18 +56,16 @@ public class GazerPodEntity extends Mob implements GeoEntity {
 
                 Inhabitants.LOGGER.debug("Spawning gazer from pod at " + getX() + ", " + (getY() + 1) + ", " + getZ());
 
-                setHasGazer(false);
+                this.setHasGazer(false);
                 gazerEntity.setGazerState(GazerEntity.GazerState.IDLE);
-
-                this.spawnedGazer = gazerEntity;
             }
 //            else if (!hasGazer() && random.nextInt(100) == 0) {
 //                // Despawn gazer
 //                spawnedGazer.discard();
 //                spawnedGazer = null;
 //            }
-        }
-        Inhabitants.LOGGER.debug("GazerPod hasGazer: " + hasGazer() + " spawnedGazer: " + (spawnedGazer != null) + " tick: " + this.tickCount);
+//        }
+        Inhabitants.LOGGER.debug("GazerPod hasGazer: " + hasGazer() + " tick: " + this.tickCount);
     }
 
 
