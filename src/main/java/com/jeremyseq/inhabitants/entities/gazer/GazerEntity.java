@@ -30,12 +30,13 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 public class GazerEntity extends FlyingMob implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final Random random = new Random();
 
     private static final EntityDataAccessor<String> STATE =
             SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.STRING);
@@ -130,7 +131,14 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             }
         }
 
-        if (this.getGazerState() == GazerState.IDLE) {
+        // trigger RETURNING TO POD state
+        if (this.getGazerState() == GazerState.IDLE && random.nextInt(50) == 0) {
+            // find closest GazerPodEntity without a gazer
+            this.setGazerState(GazerState.RETURNING_TO_POD);
+        }
+
+        // handle RETURNING TO POD state
+        if (this.getGazerState() == GazerState.RETURNING_TO_POD) {
             // find closest GazerPodEntity without a gazer
             GazerPodEntity closestPod = null;
             double closestDistance = Double.MAX_VALUE;
@@ -191,14 +199,11 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public void enterPod() {
 
         this.setEnteringPod(true);
-        // discard called in animation predicate when animation ends
 
-        if (level().isClientSide) {
-            return;
-        }
+        if (level().isClientSide) return;
 
-        // wait 2 seconds then discard
-        Objects.requireNonNull(this.level().getServer()).execute(() -> {
+        // remove entity after animation for client side
+        level().getServer().execute(() -> {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -206,7 +211,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             }
             this.discard();
         });
-
     }
 
     public void exitPod(boolean controlled) {
@@ -282,6 +286,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             controller.setAnimation(RawAnimation.begin().then("landing into pod", Animation.LoopType.PLAY_ONCE));
             if (controller.hasAnimationFinished()) {
                 Inhabitants.LOGGER.debug("GazerEntity entering pod animation finished, removing entity");
+                this.discard(); // remove entity after animation for client side
             }
             return PlayState.CONTINUE;
         }
