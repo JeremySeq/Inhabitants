@@ -38,6 +38,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final Random random = new Random();
 
+    private int podEntryTick = -1;
+
     private static final EntityDataAccessor<String> STATE =
             SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.STRING);
 
@@ -165,6 +167,11 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
                 this.setGazerState(GazerState.IDLE);
             }
         }
+
+        // handle pod entry discard timing
+        if (!level().isClientSide && isEnteringPod() && podEntryTick > 0 && this.tickCount - podEntryTick > 40) {
+            this.discard();
+        }
     }
 
     @Override
@@ -200,17 +207,9 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         this.setEnteringPod(true);
 
-        if (level().isClientSide) return;
-
-        // remove entity after animation for client side
-        level().getServer().execute(() -> {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            this.discard();
-        });
+        if (!level().isClientSide) {
+            podEntryTick = this.tickCount;
+        }
     }
 
     public void exitPod(boolean controlled) {
