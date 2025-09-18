@@ -45,7 +45,7 @@ public class GazerPodEntity extends Mob implements GeoEntity {
     public void tick() {
         super.tick();
 //        if (!level().isClientSide) {
-            if (this.hasGazer() && random.nextInt(50) == 0) {
+            if (this.hasGazer() && random.nextInt(100) == 0) {
                 // Spawn gazer
                 GazerEntity gazerEntity = ModEntities.GAZER.get().create(level());
 
