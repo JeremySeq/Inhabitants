@@ -45,7 +45,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     private int podEntryTick = -1;
 
     private GazerPodEntity returningPod = null;
-    private Path returningPath = null;
 
     private static final EntityDataAccessor<String> STATE =
             SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.STRING);
@@ -155,6 +154,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         // handle RETURNING TO POD state
         if (this.getGazerState() == GazerState.RETURNING_TO_POD) {
+            Path returningPath;
             if (returningPod == null || !returningPod.isAlive() || returningPod.hasGazer()) {
                 // Find closest pod
                 double closestDistance = Double.MAX_VALUE;
@@ -179,15 +179,16 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             } else {
                 // Only recalculate if navigation is done
                 if (this.getNavigation().isDone() && this.distanceTo(returningPod) >= 2.0) {
-                    this.getNavigation().moveTo(returningPod, 1.0);
+                    this.getNavigation().moveTo(this.getNavigation().createPath(returningPod, 0), 1.0);
                     Inhabitants.LOGGER.debug("GazerEntity {} recalculating path to pod {}", this.getUUID(), returningPod.getUUID());
                 }
                 // If close enough, enter pod
                 if (this.distanceTo(returningPod) < 2.0) {
+                    Inhabitants.LOGGER.debug("GazerEntity {} entering pod {}", this.getUUID(), returningPod.getUUID());
+                    this.setDeltaMovement(0, 0, 0);
                     this.enterPod();
                     returningPod.setHasGazer(true);
                     returningPod = null;
-                    returningPath = null;
                 }
             }
         }

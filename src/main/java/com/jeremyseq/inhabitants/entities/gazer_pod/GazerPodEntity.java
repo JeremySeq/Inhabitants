@@ -59,7 +59,7 @@ public class GazerPodEntity extends Mob implements GeoEntity {
                 this.setHasGazer(false);
                 gazerEntity.setGazerState(GazerEntity.GazerState.IDLE);
             }
-        Inhabitants.LOGGER.debug("GazerPod hasGazer: " + hasGazer() + " tick: " + this.tickCount);
+//        Inhabitants.LOGGER.debug("GazerPod hasGazer: " + hasGazer() + " tick: " + this.tickCount);
     }
 
 
