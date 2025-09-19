@@ -15,12 +15,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +59,10 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     public GazerEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        this.setNoGravity(true);
+        this.moveControl = new FlyingMoveControl(this, 20, true);
+        this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
+        this.setPathfindingMalus(BlockPathTypes.LAVA, -1.0F);
+        this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
     }
 
     public static AttributeSupplier setAttributes() {
@@ -113,12 +118,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     @Override
     protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
-        FlyingPathNavigation flyingpathnavigation = new FlyingPathNavigation(this, pLevel) {
-//            @Override
-//            public boolean isStableDestination(BlockPos blockPos) {
-//                return !this.level.getBlockState(blockPos.below()).isAir();
-//            }
-        };
+        FlyingPathNavigation flyingpathnavigation = new FlyingPathNavigation(this, pLevel);
         flyingpathnavigation.setCanOpenDoors(false);
         flyingpathnavigation.setCanFloat(false);
         flyingpathnavigation.setCanPassDoors(true);
@@ -179,10 +179,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             } else {
                 // Only recalculate if navigation is done
                 if (this.getNavigation().isDone() && this.distanceTo(returningPod) >= 2.0) {
-                    returningPath = this.getNavigation().createPath(returningPod, 0);
-                    if (returningPath != null) {
-                        this.getNavigation().moveTo(returningPath, 1.0);
-                    }
+                    this.getNavigation().moveTo(returningPod, 1.0);
+                    Inhabitants.LOGGER.debug("GazerEntity {} recalculating path to pod {}", this.getUUID(), returningPod.getUUID());
                 }
                 // If close enough, enter pod
                 if (this.distanceTo(returningPod) < 2.0) {
