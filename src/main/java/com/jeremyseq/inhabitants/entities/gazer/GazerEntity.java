@@ -16,10 +16,12 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.Path;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -39,6 +41,9 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     private final Random random = new Random();
 
     private int podEntryTick = -1;
+
+    private GazerPodEntity returningPod = null;
+    private Path returningPath = null;
 
     private static final EntityDataAccessor<String> STATE =
             SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.STRING);
@@ -100,15 +105,24 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         this.goalSelector.addGoal(1, new FollowPodHolderGoal(this));
 
         // Random floating movement when IDLE
-        this.goalSelector.addGoal(2, new GazerWanderGoal(this, 2.0D));
+        this.goalSelector.addGoal(2, new GazerWanderGoal(this));
 
         // Look around when IDLE
         this.goalSelector.addGoal(2, new GazerLookAroundGoal(this));
     }
 
     @Override
-    protected @NotNull FlyingPathNavigation createNavigation(@NotNull Level pLevel) {
-        return new FlyingPathNavigation(this, pLevel);
+    protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
+        FlyingPathNavigation flyingpathnavigation = new FlyingPathNavigation(this, pLevel) {
+//            @Override
+//            public boolean isStableDestination(BlockPos blockPos) {
+//                return !this.level.getBlockState(blockPos.below()).isAir();
+//            }
+        };
+        flyingpathnavigation.setCanOpenDoors(false);
+        flyingpathnavigation.setCanFloat(false);
+        flyingpathnavigation.setCanPassDoors(true);
+        return flyingpathnavigation;
     }
 
     @Override
@@ -141,30 +155,42 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         // handle RETURNING TO POD state
         if (this.getGazerState() == GazerState.RETURNING_TO_POD) {
-            // find closest GazerPodEntity without a gazer
-            GazerPodEntity closestPod = null;
-            double closestDistance = Double.MAX_VALUE;
-            for (Entity entity : this.level().getEntities(this, this.getBoundingBox().inflate(50))) {
-                if (entity instanceof GazerPodEntity pod && !pod.hasGazer()) {
-                    double distance = this.distanceToSqr(pod);
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestPod = pod;
+            if (returningPod == null || !returningPod.isAlive() || returningPod.hasGazer()) {
+                // Find closest pod
+                double closestDistance = Double.MAX_VALUE;
+                for (Entity entity : this.level().getEntities(this, this.getBoundingBox().inflate(50))) {
+                    if (entity instanceof GazerPodEntity pod && !pod.hasGazer()) {
+                        double distance = this.distanceToSqr(pod);
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            returningPod = pod;
+                        }
                     }
                 }
-            }
-            if (closestPod != null) {
-                // navigate to pod
-                this.getNavigation().moveTo(closestPod, 1.0);
-
-                // if close enough, enter pod
-                if (this.distanceTo(closestPod) < 2.0) {
-                    this.enterPod();
-                    closestPod.setHasGazer(true);
+                if (returningPod != null) {
+                    returningPath = this.getNavigation().createPath(returningPod, 0);
+                    if (returningPath != null) {
+                        this.getNavigation().moveTo(returningPath, 1.0);
+                        Inhabitants.LOGGER.debug("GazerEntity {} returning to pod {}", this.getUUID(), returningPod.getUUID());
+                    }
+                } else {
+                    this.setGazerState(GazerState.IDLE);
                 }
             } else {
-                // no pod found, just idle
-                this.setGazerState(GazerState.IDLE);
+                // Only recalculate if navigation is done
+                if (this.getNavigation().isDone() && this.distanceTo(returningPod) >= 2.0) {
+                    returningPath = this.getNavigation().createPath(returningPod, 0);
+                    if (returningPath != null) {
+                        this.getNavigation().moveTo(returningPath, 1.0);
+                    }
+                }
+                // If close enough, enter pod
+                if (this.distanceTo(returningPod) < 2.0) {
+                    this.enterPod();
+                    returningPod.setHasGazer(true);
+                    returningPod = null;
+                    returningPath = null;
+                }
             }
         }
 
