@@ -44,7 +44,6 @@ public class GazerPodEntity extends Mob implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
-//        if (!level().isClientSide) {
             if (this.hasGazer() && random.nextInt(100) == 0) {
                 // Spawn gazer
                 GazerEntity gazerEntity = ModEntities.GAZER.get().create(level());
@@ -60,12 +59,6 @@ public class GazerPodEntity extends Mob implements GeoEntity {
                 this.setHasGazer(false);
                 gazerEntity.setGazerState(GazerEntity.GazerState.IDLE);
             }
-//            else if (!hasGazer() && random.nextInt(100) == 0) {
-//                // Despawn gazer
-//                spawnedGazer.discard();
-//                spawnedGazer = null;
-//            }
-//        }
         Inhabitants.LOGGER.debug("GazerPod hasGazer: " + hasGazer() + " tick: " + this.tickCount);
     }
 
@@ -80,7 +73,7 @@ public class GazerPodEntity extends Mob implements GeoEntity {
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define(HAS_GAZER, false);
+        this.entityData.define(HAS_GAZER, false);
     }
 
     @Override
