@@ -42,6 +42,7 @@ public class FollowPodHolderGoal extends Goal {
     @Override
     public void stop() {
         gazer.getNavigation().stop();
+        gazer.setDeltaMovement(0, 0, 0);
         targetPlayer = null;
         path = null;
     }
