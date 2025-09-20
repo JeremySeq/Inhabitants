@@ -103,12 +103,11 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
         if (target instanceof GazerEntity gazer) {
             if (!hasGazer(player.getItemInHand(hand))) {
-                setHasGazer(player.getItemInHand(hand), true);
                 Inhabitants.LOGGER.debug("Capturing gazer with ID {}", gazer.getUUID());
 
-                setGazerId(player.getItemInHand(hand), gazer.getUUID());
+                gazer.returningPod = null;
 
-                gazer.enterPod();
+                gazer.enterPodWithItem(player.getItemInHand(hand));
                 return InteractionResult.SUCCESS;
             }
         }

@@ -44,7 +44,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     private int podEntryTick = -1;
 
-    private GazerPodEntity returningPod = null;
+    public GazerPodEntity returningPod = null;
+    public ItemStack returningPodItem = ItemStack.EMPTY;
 
     private static final EntityDataAccessor<String> STATE =
             SynchedEntityData.defineId(GazerEntity.class, EntityDataSerializers.STRING);
@@ -147,7 +148,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         }
 
         // trigger RETURNING TO POD state
-        if (this.getGazerState() == GazerState.IDLE && random.nextInt(50) == 0) {
+        if (this.getGazerState() == GazerState.IDLE && random.nextInt(100) == 0) {
             // find closest GazerPodEntity without a gazer
             this.setGazerState(GazerState.RETURNING_TO_POD);
         }
@@ -179,24 +180,35 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             } else {
                 // Only recalculate if navigation is done
                 if (this.getNavigation().isDone() && this.distanceTo(returningPod) >= 2.0) {
-                    this.getNavigation().moveTo(this.getNavigation().createPath(returningPod, 0), 1.0);
+                    this.getNavigation().moveTo(returningPod, 1.0);
                     Inhabitants.LOGGER.debug("GazerEntity {} recalculating path to pod {}", this.getUUID(), returningPod.getUUID());
                 }
                 // If close enough, enter pod
-                if (this.distanceTo(returningPod) < 2.0) {
+                if (this.distanceTo(returningPod) < 2.0 && !this.isEnteringPod()) {
                     Inhabitants.LOGGER.debug("GazerEntity {} entering pod {}", this.getUUID(), returningPod.getUUID());
                     this.setDeltaMovement(0, 0, 0);
-                    this.enterPod();
-                    returningPod.setHasGazer(true);
-                    returningPod = null;
+                    this.enterPodWithBlock();
+//                    returningPod.setHasGazer(true);
                 }
             }
         }
 
         // handle pod entry discard timing
-        if (!level().isClientSide && isEnteringPod() && podEntryTick > 0 && this.tickCount - podEntryTick > 40) {
+        if (!level().isClientSide && podEntryTick > 0 && this.tickCount - podEntryTick > 40) {
+            if (returningPod != null && returningPod.isAlive() && !returningPod.hasGazer()) {
+                Inhabitants.LOGGER.debug("GazerEntity {} entered pod entity {}", this.getUUID(), returningPod.getUUID());
+                returningPod.setHasGazer(true);
+            } else if (returningPodItem != null && returningPodItem.getItem() == ModItems.GAZER_POD.get() && !returningPodItem.isEmpty()) {
+                // drop pod item if no pod entity to return to
+                Inhabitants.LOGGER.debug("GazerEntity {} returning to pod item in inventory", this.getUUID());
+                GazerPodItem.setGazerId(returningPodItem, this.getUUID());
+                GazerPodItem.setHasGazer(returningPodItem, true);
+            }
+            Inhabitants.LOGGER.debug("GazerEntity discarded");
             this.discard();
         }
+
+        Inhabitants.LOGGER.debug("tickCount: {} podEntryTick: {} isEnteringPod: {}", this.tickCount, podEntryTick, this.isEnteringPod());
     }
 
     @Override
@@ -228,12 +240,21 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     // ----- State Transitions -----
 
-    public void enterPod() {
+    public void enterPodWithBlock() {
 
         this.setEnteringPod(true);
 
-        if (!level().isClientSide) {
-            podEntryTick = this.tickCount;
+        podEntryTick = this.tickCount;
+    }
+
+    public void enterPodWithItem(ItemStack podItem) {
+
+        this.setEnteringPod(true);
+
+        podEntryTick = this.tickCount;
+
+        if (podItem.getItem() instanceof GazerPodItem) {
+            this.returningPodItem = podItem;
         }
     }
 
