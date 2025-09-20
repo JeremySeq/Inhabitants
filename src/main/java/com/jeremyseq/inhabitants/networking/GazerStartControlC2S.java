@@ -40,7 +40,7 @@ public class GazerStartControlC2S {
             GazerEntity gazer = player.serverLevel().getEntity(msg.gazerId) instanceof GazerEntity g ? g : null;
             if (gazer == null) return;
 
-            if (gazer.getGazerState() != GazerEntity.GazerState.IDLE) return;
+            if (gazer.isEnteringPod()) return;
 
             if (gazer.getOwnerUUID() != player.getUUID()) return;
 

@@ -56,8 +56,8 @@ public class GazerPodEntity extends Mob implements GeoEntity {
 
                 Inhabitants.LOGGER.debug("Spawning gazer from pod at " + getX() + ", " + (getY() + 1) + ", " + getZ());
 
+                gazerEntity.exitPod(false);
                 this.setHasGazer(false);
-                gazerEntity.setGazerState(GazerEntity.GazerState.IDLE);
             }
 //        Inhabitants.LOGGER.debug("GazerPod hasGazer: " + hasGazer() + " tick: " + this.tickCount);
     }
