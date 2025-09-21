@@ -1,6 +1,9 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -20,6 +23,8 @@ import software.bernie.geckolib.core.object.PlayState;
 
 public class ApexEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+
+    public static final EntityDataAccessor<Boolean> SLEEPING = SynchedEntityData.defineId(ApexEntity.class, EntityDataSerializers.BOOLEAN);
 
     public ApexEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -41,9 +46,11 @@ public class ApexEntity extends Monster implements GeoEntity {
     }
 
     protected void addBehaviourGoals() {
+        this.goalSelector.addGoal(1, new ApexSleepGoal(this));
         this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 2));
         this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, false));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
@@ -52,10 +59,15 @@ public class ApexEntity extends Monster implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "defaults_controller", 0, this::defaults));
+        controllers.add(new AnimationController<>(this, "sleep_states", 0, state -> PlayState.STOP)
+                .triggerableAnim("sleep", RawAnimation.begin().then("sleeping", Animation.LoopType.PLAY_ONCE))
+                .triggerableAnim("wake", RawAnimation.begin().then("wake up", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState defaults(AnimationState<T> animationState) {
-        if (animationState.isMoving()) {
+        if (this.entityData.get(SLEEPING)) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("sleeping", Animation.LoopType.LOOP));
+        } else if (animationState.isMoving()) {
             if (this.isSprinting()) {
                 animationState.getController().setAnimation(RawAnimation.begin().then("running", Animation.LoopType.LOOP));
             } else {
@@ -65,6 +77,12 @@ public class ApexEntity extends Monster implements GeoEntity {
             animationState.getController().setAnimation(RawAnimation.begin().then("Idle", Animation.LoopType.LOOP));
         }
         return PlayState.CONTINUE;
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(SLEEPING, true);
     }
 
     @Override
