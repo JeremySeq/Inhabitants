@@ -41,6 +41,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.WISHFISH.get());
                         pOutput.accept(ModItems.WISHFISH_BUCKET.get());
                         pOutput.accept(gazer_pod);
+                        pOutput.accept(ModItems.APEX_SPAWN_EGG.get());
                         pOutput.accept(ModBlocks.CHISELED_ICE_ITEM.get());
                         pOutput.accept(ModBlocks.ICE_BRICKS_ITEM.get());
                     })

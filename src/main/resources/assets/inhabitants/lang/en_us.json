@@ -6,6 +6,7 @@
   "entity.inhabitants.impaler": "Impaler",
   "entity.inhabitants.zinger": "Zinger",
   "entity.inhabitants.wishfish": "Wishfish",
+  "entity.inhabitants.apex": "Apex",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -25,6 +26,7 @@
   "item.inhabitants.wishfish_spawn_egg": "Wishfish Spawn Egg",
   "item.inhabitants.wishfish_bucket": "Bucket of Wishfish",
   "item.inhabitants.wishfish": "Wishfish",
+  "item.inhabitants.apex_spawn_egg": "Apex Spawn Egg",
 
   "block.inhabitants.chiseled_ice": "Chiseled Ice",
   "block.inhabitants.ice_bricks": "Ice Bricks",
