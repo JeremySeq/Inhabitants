@@ -23,7 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
-import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
@@ -157,26 +156,10 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         // handle RETURNING TO POD state
         if (this.getGazerState() == GazerState.RETURNING_TO_POD) {
             if (returningPod == null || returningPod.isRemoved() || returningPod.hasGazer()) {
-                // Find closest pod
-//                double closestDistance = Double.MAX_VALUE;
-//                for (Entity entity : this.level().getEntities(this, this.getBoundingBox().inflate(50))) {
-//                    if (entity instanceof GazerPodEntity pod && !pod.hasGazer()) {
-//                        double distance = this.distanceToSqr(pod);
-//                        if (distance < closestDistance) {
-//                            closestDistance = distance;
-//                            returningPod = pod;
-//                        }
-//                    }
-//                }
-
+                // find closest GazerPodEntity without a gazer
                 this.returningPod = findNearestAvailablePod(50);
 
                 if (returningPod != null) {
-//                    returningPath = this.getNavigation().createPath(returningPod, 0);
-//                    if (returningPath != null) {
-//                        this.getNavigation().moveTo(returningPath, 1.0);
-////                        Inhabitants.LOGGER.debug("GazerEntity {} returning to pod {}", this.getUUID(), returningPod.getUUID());
-//                    }
                     Vec3 center = returningPod.getBlockPos().getCenter();
                     this.getNavigation().moveTo(center.x, center.y, center.z, 1.0);
                 } else {
@@ -195,7 +178,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 //                    Inhabitants.LOGGER.debug("GazerEntity {} entering pod {}", this.getUUID(), returningPod.getUUID());
                     this.setDeltaMovement(0, 0, 0);
                     this.enterPodWithBlock();
-//                    returningPod.setHasGazer(true);
                 }
             }
         }
