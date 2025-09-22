@@ -5,6 +5,7 @@ import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -19,6 +20,10 @@ public class ModBlocks
     public static final RegistryObject<Block> INVISIBLE_CAULDRON_BLOCK = registerBlock(
             "invisible_cauldron_block",
             () -> new InvisibleCauldronBlock(Block.Properties.of().noLootTable().strength(-1.0F, 3600000.0F).noOcclusion())
+    );
+    public static final RegistryObject<Block> GAZER_POD_BLOCK = registerBlock(
+            "gazer_pod_block",
+            () -> new GazerPodBlock(Block.Properties.copy(Blocks.NETHERRACK).dynamicShape().noOcclusion())
     );
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
