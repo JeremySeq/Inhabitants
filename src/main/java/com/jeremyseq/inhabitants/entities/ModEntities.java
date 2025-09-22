@@ -11,8 +11,6 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.entities.gazer.GazerRenderer;
-import com.jeremyseq.inhabitants.entities.gazer_pod.GazerPodEntity;
-import com.jeremyseq.inhabitants.entities.gazer_pod.GazerPodRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
@@ -104,12 +102,6 @@ public class ModEntities {
                             .sized(2.25f, 2.3f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "apex").toString()));
 
-    public static final RegistryObject<EntityType<GazerPodEntity>> GAZER_POD =
-            REGISTRY.register("gazer_pod",
-                    () -> EntityType.Builder.of(GazerPodEntity::new, MobCategory.CREATURE)
-                            .sized(.5f, .5f)
-                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "gazer_pod").toString()));
-
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
@@ -120,7 +112,6 @@ public class ModEntities {
         event.put(ModEntities.GAZER.get(), GazerEntity.setAttributes());
         event.put(ModEntities.WISHFISH.get(), WishfishEntity.setAttributes());
         event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
-        event.put(ModEntities.GAZER_POD.get(), GazerPodEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -135,6 +126,5 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.GAZER.get(), GazerRenderer::new);
         EntityRenderers.register(ModEntities.WISHFISH.get(), WishfishRenderer::new);
         EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
-        EntityRenderers.register(ModEntities.GAZER_POD.get(), GazerPodRenderer::new);
     }
 }

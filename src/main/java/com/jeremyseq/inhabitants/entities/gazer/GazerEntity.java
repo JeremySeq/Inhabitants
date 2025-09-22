@@ -1,7 +1,7 @@
 package com.jeremyseq.inhabitants.entities.gazer;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import com.jeremyseq.inhabitants.entities.gazer_pod.GazerPodEntity;
+import com.jeremyseq.inhabitants.blocks.entity.GazerPodBlockEntity;
 import com.jeremyseq.inhabitants.items.GazerPodItem;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
@@ -24,6 +24,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -44,7 +45,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     private int podEntryTick = -1;
 
-    public GazerPodEntity returningPod = null;
+    public GazerPodBlockEntity returningPod = null;
     public ItemStack returningPodItem = ItemStack.EMPTY;
 
     private static final EntityDataAccessor<String> STATE =
@@ -155,37 +156,43 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         // handle RETURNING TO POD state
         if (this.getGazerState() == GazerState.RETURNING_TO_POD) {
-            Path returningPath;
-            if (returningPod == null || !returningPod.isAlive() || returningPod.hasGazer()) {
+            if (returningPod == null || returningPod.isRemoved() || returningPod.hasGazer()) {
                 // Find closest pod
-                double closestDistance = Double.MAX_VALUE;
-                for (Entity entity : this.level().getEntities(this, this.getBoundingBox().inflate(50))) {
-                    if (entity instanceof GazerPodEntity pod && !pod.hasGazer()) {
-                        double distance = this.distanceToSqr(pod);
-                        if (distance < closestDistance) {
-                            closestDistance = distance;
-                            returningPod = pod;
-                        }
-                    }
-                }
+//                double closestDistance = Double.MAX_VALUE;
+//                for (Entity entity : this.level().getEntities(this, this.getBoundingBox().inflate(50))) {
+//                    if (entity instanceof GazerPodEntity pod && !pod.hasGazer()) {
+//                        double distance = this.distanceToSqr(pod);
+//                        if (distance < closestDistance) {
+//                            closestDistance = distance;
+//                            returningPod = pod;
+//                        }
+//                    }
+//                }
+
+                this.returningPod = findNearestAvailablePod(50);
+
                 if (returningPod != null) {
-                    returningPath = this.getNavigation().createPath(returningPod, 0);
-                    if (returningPath != null) {
-                        this.getNavigation().moveTo(returningPath, 1.0);
-                        Inhabitants.LOGGER.debug("GazerEntity {} returning to pod {}", this.getUUID(), returningPod.getUUID());
-                    }
+//                    returningPath = this.getNavigation().createPath(returningPod, 0);
+//                    if (returningPath != null) {
+//                        this.getNavigation().moveTo(returningPath, 1.0);
+////                        Inhabitants.LOGGER.debug("GazerEntity {} returning to pod {}", this.getUUID(), returningPod.getUUID());
+//                    }
+                    Vec3 center = returningPod.getBlockPos().getCenter();
+                    this.getNavigation().moveTo(center.x, center.y, center.z, 1.0);
                 } else {
                     this.setGazerState(GazerState.IDLE);
                 }
             } else {
                 // Only recalculate if navigation is done
-                if (this.getNavigation().isDone() && this.distanceTo(returningPod) >= 2.0) {
-                    this.getNavigation().moveTo(returningPod, 1.0);
-                    Inhabitants.LOGGER.debug("GazerEntity {} recalculating path to pod {}", this.getUUID(), returningPod.getUUID());
+                Vec3 center = returningPod.getBlockPos().getCenter();
+
+                if (this.getNavigation().isDone() && this.distanceToSqr(returningPod.getBlockPos().getCenter()) >= 4.0) {
+                    this.getNavigation().moveTo(center.x, center.y, center.z, 1.0);
+//                    Inhabitants.LOGGER.debug("GazerEntity {} recalculating path to pod {}", this.getUUID(), returningPod.getUUID());
                 }
                 // If close enough, enter pod
-                if (this.distanceTo(returningPod) < 2.0 && !this.isEnteringPod()) {
-                    Inhabitants.LOGGER.debug("GazerEntity {} entering pod {}", this.getUUID(), returningPod.getUUID());
+                if (this.distanceToSqr(center) < 4.0 && !this.isEnteringPod()) {
+//                    Inhabitants.LOGGER.debug("GazerEntity {} entering pod {}", this.getUUID(), returningPod.getUUID());
                     this.setDeltaMovement(0, 0, 0);
                     this.enterPodWithBlock();
 //                    returningPod.setHasGazer(true);
@@ -195,8 +202,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         // handle pod entry discard timing
         if (!level().isClientSide && podEntryTick > 0 && this.tickCount - podEntryTick > 40) {
-            if (returningPod != null && returningPod.isAlive() && !returningPod.hasGazer()) {
-                Inhabitants.LOGGER.debug("GazerEntity {} entered pod entity {}", this.getUUID(), returningPod.getUUID());
+            if (returningPod != null && !returningPod.isRemoved() && !returningPod.hasGazer()) {
+//                Inhabitants.LOGGER.debug("GazerEntity {} entered pod entity {}", this.getUUID(), returningPod.getUUID());
                 returningPod.setHasGazer(true);
             } else if (returningPodItem != null && returningPodItem.getItem() == ModItems.GAZER_POD.get() && !returningPodItem.isEmpty()) {
                 // drop pod item if no pod entity to return to
@@ -209,6 +216,28 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         }
 
         Inhabitants.LOGGER.debug("tickCount: {} podEntryTick: {} isEnteringPod: {}", this.tickCount, podEntryTick, this.isEnteringPod());
+    }
+
+    private GazerPodBlockEntity findNearestAvailablePod(double radius) {
+        BlockPos center = this.blockPosition();
+        GazerPodBlockEntity closestPod = null;
+        double closestDistance = Double.MAX_VALUE;
+
+        // Only check loaded chunks in a cube around the entity
+        int intRadius = (int)Math.ceil(radius);
+        for (BlockPos pos : BlockPos.betweenClosed(center.offset(-intRadius, -intRadius, -intRadius), center.offset(intRadius, intRadius, intRadius))) {
+            if (level().isLoaded(pos)) {
+                var be = level().getBlockEntity(pos);
+                if (be instanceof GazerPodBlockEntity pod && !pod.hasGazer()) {
+                    double distance = this.position().distanceTo(Vec3.atCenterOf(pos));
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestPod = pod;
+                    }
+                }
+            }
+        }
+        return closestPod;
     }
 
     @Override
