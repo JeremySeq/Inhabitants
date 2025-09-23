@@ -23,7 +23,7 @@ public class ModBlocks
     );
     public static final RegistryObject<Block> GAZER_POD_BLOCK = registerBlock(
             "gazer_pod_block",
-            () -> new GazerPodBlock(Block.Properties.copy(Blocks.NETHERRACK).dynamicShape().noOcclusion())
+            () -> new GazerPodBlock(Block.Properties.copy(Blocks.NETHERRACK).requiresCorrectToolForDrops().noOcclusion())
     );
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
