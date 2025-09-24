@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.blocks;
 import com.jeremyseq.inhabitants.blocks.entity.GazerPodBlockEntity;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -74,6 +75,20 @@ public class GazerPodBlock extends BaseEntityBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return Block.box(3, 0, 3, 13, 10, 13);
+    }
+
+    @Override
+    protected void spawnDestroyParticles(Level pLevel, Player pPlayer, BlockPos pPos, BlockState pState) {
+        for (int i = 0; i < 20; i++) {
+            double x = pPos.getX() + 0.5 + (pLevel.random.nextDouble() - 0.5);
+            double y = pPos.getY() + 0.5 + (pLevel.random.nextDouble() - 0.5);
+            double z = pPos.getZ() + 0.5 + (pLevel.random.nextDouble() - 0.5);
+            pLevel.addParticle(
+                    ParticleTypes.CRIMSON_SPORE,
+                    x, y, z,
+                    0, 0.05, 0
+            );
+        }
     }
 
     @Override
