@@ -8,11 +8,9 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
 
 public class GazerPodBlockModel extends GeoModel<GazerPodBlockEntity> {
-    private GazerPodBlockEntity modelEntity;
 
     @Override
     public ResourceLocation getModelResource(GazerPodBlockEntity gazerPodBlockEntity) {
-        this.modelEntity = gazerPodBlockEntity;
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/gazer_pod_block.geo.json");
     }
 
