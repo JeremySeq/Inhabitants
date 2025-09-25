@@ -44,10 +44,14 @@ public class WishfishEntity extends AbstractSchoolingFish implements GeoEntity {
         super(pEntityType, pLevel);
     }
 
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new WishfishFleeGoal(this, 5d));
+    }
+
     public static AttributeSupplier setAttributes() {
         return AbstractFish.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 3f)
-                .add(Attributes.MOVEMENT_SPEED, 1.0D).build();
+                .add(Attributes.MOVEMENT_SPEED, 2f).build();
     }
 
     @Override
@@ -98,7 +102,11 @@ public class WishfishEntity extends AbstractSchoolingFish implements GeoEntity {
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
-        animationState.setAnimation(RawAnimation.begin().thenLoop("swimming"));
+        if (this.isSprinting()) {
+            animationState.setAnimation(RawAnimation.begin().thenLoop("fleeing"));
+        } else {
+            animationState.setAnimation(RawAnimation.begin().thenLoop("swimming"));
+        }
         return PlayState.CONTINUE;
     }
 
