@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "inhabitants:block/glacierpine_log_top",
+    "side": "inhabitants:block/glacierpine_log"
+  }
+}

@@ -5,7 +5,9 @@ import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -44,10 +46,44 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.APEX_SPAWN_EGG.get());
                         pOutput.accept(ModBlocks.CHISELED_ICE_ITEM.get());
                         pOutput.accept(ModBlocks.ICE_BRICKS_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_LOG_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_WOOD_ITEM.get());
+                        pOutput.accept(ModBlocks.STRIPPED_GLACIERPINE_LOG_ITEM.get());
+                        pOutput.accept(ModBlocks.STRIPPED_GLACIERPINE_WOOD_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_PLANKS_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_STAIRS_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_SLAB_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_FENCE_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_FENCE_GATE_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_PRESSURE_PLATE_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_BUTTON_ITEM.get());
                     })
                     .build());
 
+    public static void addItemsToCreativeModeTabs(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModBlocks.GLACIERPINE_LOG_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_WOOD_ITEM.get());
+            event.accept(ModBlocks.STRIPPED_GLACIERPINE_LOG_ITEM.get());
+            event.accept(ModBlocks.STRIPPED_GLACIERPINE_WOOD_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_PLANKS_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_STAIRS_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_SLAB_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_FENCE_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_FENCE_GATE_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_PRESSURE_PLATE_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_BUTTON_ITEM.get());
+        } else if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
+            event.accept(ModBlocks.GLACIERPINE_FENCE_GATE_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_PRESSURE_PLATE_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_BUTTON_ITEM.get());
+        } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
+            event.accept(ModBlocks.GLACIERPINE_LOG_ITEM.get());
+        }
+    }
+
     public static void register(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);
+        eventBus.addListener(ModCreativeModeTabs::addItemsToCreativeModeTabs);
     }
 }

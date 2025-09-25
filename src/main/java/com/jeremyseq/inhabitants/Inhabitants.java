@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants;
 
+import com.google.common.collect.ImmutableMap;
 import com.jeremyseq.inhabitants.gui.ModMenuTypes;
 import com.jeremyseq.inhabitants.gui.client.ZingerChestScreen;
 import com.jeremyseq.inhabitants.effects.ModEffects;
@@ -15,8 +16,10 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -63,7 +66,12 @@ public class Inhabitants
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-
+        // add wood strippables
+        AxeItem.STRIPPABLES = new ImmutableMap.Builder<Block, Block>()
+                .putAll(AxeItem.STRIPPABLES)
+                .put(ModBlocks.GLACIERPINE_LOG.get(), ModBlocks.STRIPPED_GLACIERPINE_LOG.get())
+                .put(ModBlocks.GLACIERPINE_WOOD.get(), ModBlocks.STRIPPED_GLACIERPINE_WOOD.get())
+                .build();
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event)

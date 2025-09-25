@@ -30,6 +30,17 @@
 
   "block.inhabitants.chiseled_ice": "Chiseled Ice",
   "block.inhabitants.ice_bricks": "Ice Bricks",
+  "block.inhabitants.glacierpine_log": "Glacierpine Log",
+  "block.inhabitants.glacierpine_wood": "Glacierpine Wood",
+  "block.inhabitants.stripped_glacierpine_log": "Stripped Glacierpine Log",
+  "block.inhabitants.stripped_glacierpine_wood": "Stripped Glacierpine Wood",
+  "block.inhabitants.glacierpine_planks": "Glacierpine Planks",
+  "block.inhabitants.glacierpine_stairs": "Glacierpine Stairs",
+  "block.inhabitants.glacierpine_slab": "Glacierpine Slab",
+  "block.inhabitants.glacierpine_fence": "Glacierpine Fence",
+  "block.inhabitants.glacierpine_fence_gate": "Glacierpine Gate",
+  "block.inhabitants.glacierpine_button": "Glacierpine Button",
+  "block.inhabitants.glacierpine_pressure_plate": "Glacierpine Pressure Plate",
 
   "item.minecraft.potion.effect.adaptation": "Potion of Adaptation",
   "item.minecraft.potion.effect.long_adaptation": "Potion of Adaptation",
