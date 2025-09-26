@@ -340,10 +340,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         if (this.isEnteringPod()) {
             controller.setAnimation(RawAnimation.begin().then("landing into pod", Animation.LoopType.PLAY_ONCE));
-            if (controller.hasAnimationFinished()) {
-                Inhabitants.LOGGER.debug("GazerEntity entering pod animation finished, removing entity");
-                this.discard(); // remove entity after animation for client side
-            }
             return PlayState.CONTINUE;
         }
 

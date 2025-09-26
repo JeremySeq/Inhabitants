@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -99,15 +100,16 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     public void tick() {
-        if (this.hasGazer() && random.nextInt(100) == 0) {
+        Inhabitants.LOGGER.debug("Gazer pod ticking at " + this.getBlockPos() + ", hasGazer: " + this.hasGazer());
+        if (level instanceof ServerLevel serverLevel && this.hasGazer() && random.nextInt(100) == 0) {
             // Spawn gazer
-            GazerEntity gazerEntity = ModEntities.GAZER.get().create(level);
+            GazerEntity gazerEntity = ModEntities.GAZER.get().create(serverLevel);
 
             assert gazerEntity != null;
 
             gazerEntity.moveTo(this.getBlockPos().above(1), 0, 0);
 
-            level.addFreshEntity(gazerEntity);
+            serverLevel.addFreshEntity(gazerEntity);
 
             Inhabitants.LOGGER.debug("Spawning gazer from pod at " + this.getBlockPos());
 
