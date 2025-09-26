@@ -1,0 +1,11 @@
+{
+  "feature": "inhabitants:gazer_pod",
+  "placement": [
+    {
+      "type": "minecraft:count_on_every_layer",
+      "count": 1
+    },
+    { "type":  "rarity_filter", "chance": 50 },
+    { "type": "minecraft:biome" }
+  ]
+}

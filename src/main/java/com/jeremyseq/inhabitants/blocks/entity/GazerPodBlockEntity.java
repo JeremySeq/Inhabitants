@@ -24,7 +24,7 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     private final Random random = new Random();
 
-    private boolean hasGazer = false;
+    private boolean hasGazer = true;
 
     public GazerPodBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GAZER_POD_BLOCK_ENTITY.get(), pPos, pBlockState);
