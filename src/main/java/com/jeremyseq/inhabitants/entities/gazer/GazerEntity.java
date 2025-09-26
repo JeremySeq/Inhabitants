@@ -156,7 +156,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         }
 
         // handle RETURNING TO POD state
-        if (this.getGazerState() == GazerState.RETURNING_TO_POD) {
+        if (this.getGazerState() == GazerState.RETURNING_TO_POD && !this.isEnteringPod()) {
             if (returningPod == null || returningPod.isRemoved() || returningPod.hasGazer()) {
                 // find closest GazerPodEntity without a gazer
                 this.returningPod = findNearestAvailablePod(50);
@@ -187,14 +187,10 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         // handle pod entry discard timing
         if (!level().isClientSide && podEntryTick > 0 && this.tickCount - podEntryTick > 40) {
 
-            // TODO: problem when player tries to get gazer using pod item while gazer is pathfinding to pod block
-            // solution: set returningPod to null when right clicked with pod item
-
             if (returningPod != null && !returningPod.isRemoved() && !returningPod.hasGazer()) {
-//                Inhabitants.LOGGER.debug("GazerEntity {} entered pod entity {}", this.getUUID(), returningPod.getUUID());
+                Inhabitants.LOGGER.debug("GazerEntity {} entered pod block", this.getUUID());
                 returningPod.setHasGazer(true);
             } else if (returningPodItem != null && returningPodItem.getItem() == ModItems.GAZER_POD.get() && !returningPodItem.isEmpty()) {
-                // drop pod item if no pod entity to return to
                 Inhabitants.LOGGER.debug("GazerEntity {} returning to pod item in inventory", this.getUUID());
                 GazerPodItem.setGazerId(returningPodItem, this.getUUID());
                 GazerPodItem.setHasGazer(returningPodItem, true);
