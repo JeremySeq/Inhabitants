@@ -4,14 +4,13 @@ import com.jeremyseq.inhabitants.blocks.entity.GazerPodBlockEntity;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -96,5 +95,10 @@ public class GazerPodBlock extends BaseEntityBlock {
         return (lvl, pos, st, be) -> {
             if (be instanceof GazerPodBlockEntity pod) pod.tick();
         };
+    }
+
+    @Override
+    public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity) {
+        return Blocks.CRIMSON_NYLIUM.getSoundType(state, level, pos, entity);
     }
 }

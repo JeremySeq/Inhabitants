@@ -12,6 +12,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -184,6 +186,10 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
         // handle pod entry discard timing
         if (!level().isClientSide && podEntryTick > 0 && this.tickCount - podEntryTick > 40) {
+
+            // TODO: problem when player tries to get gazer using pod item while gazer is pathfinding to pod block
+            // solution: set returningPod to null when right clicked with pod item
+
             if (returningPod != null && !returningPod.isRemoved() && !returningPod.hasGazer()) {
 //                Inhabitants.LOGGER.debug("GazerEntity {} entered pod entity {}", this.getUUID(), returningPod.getUUID());
                 returningPod.setHasGazer(true);
@@ -194,7 +200,18 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
                 GazerPodItem.setHasGazer(returningPodItem, true);
             }
             Inhabitants.LOGGER.debug("GazerEntity discarded");
+
+            level().playSound(
+                    null,
+                    this.blockPosition(),
+                    SoundEvents.BEEHIVE_ENTER,
+                    SoundSource.BLOCKS,
+                    1.0F, 1.0F
+            );
+
             this.discard();
+
+
         }
 
         Inhabitants.LOGGER.debug("tickCount: {} podEntryTick: {} isEnteringPod: {}", this.tickCount, podEntryTick, this.isEnteringPod());

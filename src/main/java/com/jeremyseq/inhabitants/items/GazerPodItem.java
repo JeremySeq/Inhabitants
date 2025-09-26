@@ -8,6 +8,8 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -79,15 +81,23 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             GazerEntity gazerEntity = ModEntities.GAZER.get().create(level);
 
             assert gazerEntity != null;
-            gazerEntity.moveTo(player.getX(), player.getY() + 1, player.getZ(), player.getYRot(), player.getXRot());
+            gazerEntity.moveTo(serverPlayer.getX(), serverPlayer.getY() + 1, serverPlayer.getZ(), serverPlayer.getYRot(), serverPlayer.getXRot());
             level.addFreshEntity(gazerEntity);
 
-            setGazerId(player.getItemInHand(hand), gazerEntity.getUUID());
+            setGazerId(serverPlayer.getItemInHand(hand), gazerEntity.getUUID());
 
             gazerEntity.exitPod(false);
-            gazerEntity.setOwnerUUID(player.getUUID());
+            gazerEntity.setOwnerUUID(serverPlayer.getUUID());
 
-            setHasGazer(player.getItemInHand(hand), false);
+            setHasGazer(serverPlayer.getItemInHand(hand), false);
+
+            level.playSound(
+                    null,
+                    serverPlayer.blockPosition(),
+                    SoundEvents.BEEHIVE_EXIT,
+                    SoundSource.BLOCKS,
+                    1.0F, 1.0F
+            );
 
             Inhabitants.LOGGER.debug("Releasing gazer with ID {}", gazerEntity.getUUID());
             return InteractionResultHolder.success(stack);
@@ -108,6 +118,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
                 gazer.returningPod = null;
 
                 gazer.enterPodWithItem(player.getItemInHand(hand));
+
                 return InteractionResult.SUCCESS;
             }
         }
@@ -129,10 +140,6 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             tooltip.add(Component.literal("Contains a Gazer"));
         } else {
             tooltip.add(Component.literal("Empty Pod"));
-        }
-
-        if (getGazerId(stack) != null) {
-            tooltip.add(Component.literal("Gazer ID: " + getGazerId(stack).toString()));
         }
 
         super.appendHoverText(stack, level, tooltip, flag);

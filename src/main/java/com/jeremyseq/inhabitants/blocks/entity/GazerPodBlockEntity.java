@@ -9,6 +9,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -115,6 +117,14 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
 
             gazerEntity.exitPod(false);
             this.setHasGazer(false);
+
+            serverLevel.playSound(
+                    null,
+                    this.getBlockPos(),
+                    SoundEvents.BEEHIVE_EXIT,
+                    SoundSource.BLOCKS,
+                    1.0F, 1.0F
+            );
         }
     }
 }
