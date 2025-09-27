@@ -1,13 +1,17 @@
 package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.blocks.ModBlocks;
+import com.jeremyseq.inhabitants.blocks.entity.GazerPodBlockEntity;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.items.armor.GazerPodArmorRenderer;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -18,6 +22,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
@@ -107,6 +112,39 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
         }
         return InteractionResultHolder.pass(stack);
     }
+
+    @Override
+    public SoundEvent getEquipSound() {
+        return SoundEvents.ARMOR_EQUIP_GENERIC;
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos().relative(context.getClickedFace());
+        Player player = context.getPlayer();
+        ItemStack stack = context.getItemInHand();
+
+        // Replace `ModBlocks.GAZER_POD_BLOCK` with your actual block instance
+        if (!level.isClientSide && level.getBlockState(pos).canBeReplaced()) {
+            level.setBlock(pos, ModBlocks.GAZER_POD_BLOCK.get().defaultBlockState(), 3);
+
+            // Transfer NBT to block entity
+            if (level.getBlockEntity(pos) instanceof GazerPodBlockEntity podEntity) {
+                CompoundTag tag = stack.getTag();
+                if (tag != null) {
+                    podEntity.setHasGazer(tag.getBoolean("HasGazer"));
+                }
+            }
+
+            if (player != null && !player.isCreative()) {
+                stack.shrink(1);
+            }
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.FAIL;
+    }
+
 
     // ===== Right Click Entity =====
     @Override
