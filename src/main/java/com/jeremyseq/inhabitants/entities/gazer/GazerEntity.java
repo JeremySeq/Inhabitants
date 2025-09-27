@@ -68,7 +68,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
     public static AttributeSupplier setAttributes() {
         return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 600f)
+                .add(Attributes.MAX_HEALTH, 10f)
                 .add(Attributes.FLYING_SPEED, 2f)
                 .add(Attributes.FOLLOW_RANGE, 16.0D)
                 .build();
