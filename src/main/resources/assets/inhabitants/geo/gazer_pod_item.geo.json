@@ -18,12 +18,14 @@
 				{
 					"name": "armorHead",
 					"parent": "bipedHead",
-					"pivot": [0, 24, 0]
+					"pivot": [0, 24, 0],
+					"rotation": [180, 0, -180]
 				},
 				{
 					"name": "gazer",
 					"parent": "armorHead",
-					"pivot": [1, 48, 22],
+					"pivot": [0, 29, 0],
+					"rotation": [180, 0, 0],
 					"cubes": [
 						{
 							"origin": [-15, 34, -6],
