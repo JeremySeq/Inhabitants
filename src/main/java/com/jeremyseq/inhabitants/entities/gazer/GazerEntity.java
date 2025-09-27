@@ -139,8 +139,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
                 // force stop
                 this.setGazerState(GazerState.IDLE);
-                this.setOwnerUUID(null);
-
                 if (owner != null && !owner.level().isClientSide) {
                     ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> owner),
                             new GazerCameraPacketS2C(this.getId(), false));

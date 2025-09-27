@@ -42,7 +42,10 @@ public class GazerStartControlC2S {
 
             if (gazer.isEnteringPod()) return;
 
-            if (gazer.getOwnerUUID() != player.getUUID()) return;
+            if (gazer.getOwnerUUID() != player.getUUID()) {
+                gazer.setOwnerUUID(player.getUUID());
+                Inhabitants.LOGGER.debug("Set owner of Gazer {} to player {}", gazer.getUUID(), player.getName().getString());
+            }
 
             // set controlled state and owner
             gazer.setGazerState(GazerEntity.GazerState.BEING_CONTROLLED);
