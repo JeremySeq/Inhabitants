@@ -7,6 +7,7 @@ import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -36,9 +37,7 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class GazerEntity extends FlyingMob implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -78,7 +77,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public enum GazerState {
         IDLE,               // Floating near the pod
         BEING_CONTROLLED,   // Player is “possessing” the gazer
-        RETURNING_TO_POD    // Returning to pod after being controlled
+        RETURNING_TO_POD    // Returning to pod block to enter
     }
 
     @Override
@@ -214,25 +213,32 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     }
 
     private GazerPodBlockEntity findNearestAvailablePod(double radius) {
-        BlockPos center = this.blockPosition();
-        GazerPodBlockEntity closestPod = null;
-        double closestDistance = Double.MAX_VALUE;
+        BlockPos start = this.blockPosition();
+        int intRadius = (int) Math.ceil(radius);
+        Set<BlockPos> visited = new HashSet<>();
+        Queue<BlockPos> queue = new ArrayDeque<>();
+        queue.add(start);
+        visited.add(start);
 
-        // Only check loaded chunks in a cube around the entity
-        int intRadius = (int)Math.ceil(radius);
-        for (BlockPos pos : BlockPos.betweenClosed(center.offset(-intRadius, -intRadius, -intRadius), center.offset(intRadius, intRadius, intRadius))) {
+        while (!queue.isEmpty()) {
+            BlockPos pos = queue.poll();
+
             if (level().isLoaded(pos)) {
                 var be = level().getBlockEntity(pos);
                 if (be instanceof GazerPodBlockEntity pod && !pod.hasGazer()) {
-                    double distance = this.position().distanceTo(Vec3.atCenterOf(pos));
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestPod = pod;
-                    }
+                    return pod;
+                }
+            }
+
+            for (Direction dir : Direction.values()) {
+                BlockPos next = pos.relative(dir);
+                if (!visited.contains(next) && start.distManhattan(next) <= intRadius) {
+                    visited.add(next);
+                    queue.add(next);
                 }
             }
         }
-        return closestPod;
+        return null;
     }
 
     @Override
