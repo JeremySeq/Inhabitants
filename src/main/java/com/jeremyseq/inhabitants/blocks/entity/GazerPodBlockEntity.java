@@ -24,6 +24,7 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     private boolean hasGazer = true;
+    private int tickCounter = 0;
 
     public GazerPodBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GAZER_POD_BLOCK_ENTITY.get(), pPos, pBlockState);
@@ -98,7 +99,10 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     public void tick() {
-        if (level instanceof ServerLevel serverLevel && this.hasGazer() && getTick(this) % 200 == 0) {
+        tickCounter++;
+        if (level instanceof ServerLevel serverLevel && this.hasGazer() && tickCounter % 200 == 0) {
+            Inhabitants.LOGGER.debug("Spawning gazer from pod at {}", this.getBlockPos());
+
             // Spawn gazer
             GazerEntity gazerEntity = ModEntities.GAZER.get().create(serverLevel);
 
