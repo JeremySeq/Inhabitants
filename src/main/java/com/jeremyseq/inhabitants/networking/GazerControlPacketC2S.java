@@ -71,19 +71,13 @@ public class GazerControlPacketC2S {
             double speed = 0.3;
 
             // Set rotation from packet
-//            assert gazer != null;
             gazer.setYRot(msg.yaw);
             gazer.setXRot(msg.pitch);
             gazer.setYHeadRot(msg.yaw);
-            gazer.yBodyRot = msg.yaw;
+            gazer.setYBodyRot(msg.yaw);
 
             // apply movement relative to yaw
             moveRelativeToYaw(gazer, msg.yaw, msg.forward, msg.back, msg.left, msg.right, msg.jump, msg.sneak, speed);
-
-//            Inhabitants.LOGGER.debug("SERVER: Gazer {} controlled by player {}: pos=({}, {}, {}), rot=({}, {})",
-//                    gazer.getId(), player.getGameProfile().getName(),
-//                    gazer.getX(), gazer.getY(), gazer.getZ(),
-//                    gazer.getYRot(), gazer.getXRot());
         });
         ctx.get().setPacketHandled(true);
     }

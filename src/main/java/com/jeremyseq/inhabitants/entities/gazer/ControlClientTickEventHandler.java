@@ -39,12 +39,6 @@ public class ControlClientTickEventHandler {
 
             // Send input packet to the server
             ModNetworking.CHANNEL.sendToServer(new GazerControlPacketC2S(gazerId, forward, back, left, right, jump, sneak, yaw, pitch));
-
-//            Inhabitants.LOGGER.debug("CLIENT: Gazer {} controlled by player {}: pos=({}, {}, {}), rot=({}, {})",
-//                    gazer.getId(), mc.player.getGameProfile().getName(),
-//                    gazer.getX(), gazer.getY(), gazer.getZ(),
-//                    gazer.getYRot(), gazer.getXRot());
-
         }
     }
 
