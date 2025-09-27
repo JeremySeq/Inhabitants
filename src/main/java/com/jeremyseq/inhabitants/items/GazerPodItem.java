@@ -155,6 +155,8 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
 
                 gazer.returningPod = null;
 
+                gazer.setOwnerUUID(player.getUUID());
+
                 gazer.enterPodWithItem(player.getItemInHand(hand));
 
                 return InteractionResult.SUCCESS;
@@ -178,6 +180,10 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             tooltip.add(Component.literal("Contains a Gazer"));
         } else {
             tooltip.add(Component.literal("Empty Pod"));
+        }
+
+        if (getGazerId(stack) != null) {
+            tooltip.add(Component.literal("Gazer ID: " + getGazerId(stack).toString()));
         }
 
         super.appendHoverText(stack, level, tooltip, flag);
