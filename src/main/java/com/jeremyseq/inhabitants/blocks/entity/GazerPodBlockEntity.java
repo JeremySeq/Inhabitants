@@ -20,12 +20,8 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.RenderUtils;
 
-import java.util.Random;
-
 public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
-
-    private final Random random = new Random();
 
     private boolean hasGazer = true;
 
@@ -102,8 +98,7 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     public void tick() {
-        Inhabitants.LOGGER.debug("Gazer pod ticking at " + this.getBlockPos() + ", hasGazer: " + this.hasGazer());
-        if (level instanceof ServerLevel serverLevel && this.hasGazer() && random.nextInt(100) == 0) {
+        if (level instanceof ServerLevel serverLevel && this.hasGazer() && getTick(this) % 200 == 0) {
             // Spawn gazer
             GazerEntity gazerEntity = ModEntities.GAZER.get().create(serverLevel);
 
@@ -112,8 +107,6 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
             gazerEntity.moveTo(this.getBlockPos().above(1), 0, 0);
 
             serverLevel.addFreshEntity(gazerEntity);
-
-            Inhabitants.LOGGER.debug("Spawning gazer from pod at " + this.getBlockPos());
 
             gazerEntity.exitPod(false);
             this.setHasGazer(false);

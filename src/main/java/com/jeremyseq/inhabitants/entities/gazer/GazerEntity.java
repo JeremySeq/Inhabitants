@@ -41,7 +41,6 @@ import java.util.*;
 
 public class GazerEntity extends FlyingMob implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private final Random random = new Random();
 
     private int podEntryTick = -1;
 
@@ -147,7 +146,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         }
 
         // trigger RETURNING TO POD state
-        if (this.getGazerState() == GazerState.IDLE && random.nextInt(100) == 0) {
+        if (this.getGazerState() == GazerState.IDLE && this.tickCount % 200 == 0 && !this.isEnteringPod()) {
             // find closest GazerPodEntity without a gazer
             this.setGazerState(GazerState.RETURNING_TO_POD);
         }
@@ -170,11 +169,9 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
                 if (this.getNavigation().isDone() && this.distanceToSqr(returningPod.getBlockPos().getCenter()) >= 4.0) {
                     this.getNavigation().moveTo(center.x, center.y, center.z, 1.0);
-//                    Inhabitants.LOGGER.debug("GazerEntity {} recalculating path to pod {}", this.getUUID(), returningPod.getUUID());
                 }
                 // If close enough, enter pod
                 if (this.distanceToSqr(center) < 4.0 && !this.isEnteringPod()) {
-//                    Inhabitants.LOGGER.debug("GazerEntity {} entering pod {}", this.getUUID(), returningPod.getUUID());
                     this.setDeltaMovement(0, 0, 0);
                     this.enterPodWithBlock();
                 }
@@ -206,8 +203,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
 
         }
-
-        Inhabitants.LOGGER.debug("tickCount: {} podEntryTick: {} isEnteringPod: {}", this.tickCount, podEntryTick, this.isEnteringPod());
     }
 
     private GazerPodBlockEntity findNearestAvailablePod(double radius) {
