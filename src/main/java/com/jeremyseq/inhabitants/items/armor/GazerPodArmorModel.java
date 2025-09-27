@@ -8,7 +8,7 @@ import software.bernie.geckolib.model.GeoModel;
 public class GazerPodArmorModel extends GeoModel<GazerPodItem> {
     @Override
     public ResourceLocation getModelResource(GazerPodItem gazerPodItem) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/gazer_pod_item.json");
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/gazer_pod_item.geo.json");
     }
 
     @Override
