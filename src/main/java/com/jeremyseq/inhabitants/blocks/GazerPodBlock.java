@@ -7,7 +7,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
@@ -38,21 +37,16 @@ public class GazerPodBlock extends BaseEntityBlock {
 
     @Override
     public List<ItemStack> getDrops(BlockState pState, LootParams.Builder builder) {
-        ItemStack tool = builder.getOptionalParameter(LootContextParams.TOOL);
-        if (tool != null && tool.getEnchantmentLevel(Enchantments.SILK_TOUCH) > 0) {
-            if (builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof GazerPodBlockEntity pod) {
-                if (pod.hasGazer()) {
-                    ItemStack stack = new ItemStack(ModItems.GAZER_POD.get());
-                    stack.getOrCreateTag().putBoolean("HasGazer", true);
-                    return Collections.singletonList(stack);
-                } else {
-                    return Collections.singletonList(new ItemStack(ModItems.GAZER_POD.get()));
-                }
+        if (builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof GazerPodBlockEntity pod) {
+            if (pod.hasGazer()) {
+                ItemStack stack = new ItemStack(ModItems.GAZER_POD.get());
+                stack.getOrCreateTag().putBoolean("HasGazer", true);
+                return Collections.singletonList(stack);
+            } else {
+                return Collections.singletonList(new ItemStack(ModItems.GAZER_POD.get()));
             }
-            return Collections.singletonList(new ItemStack(ModItems.GAZER_POD.get()));
         }
-        return Collections.emptyList();
-
+        return Collections.singletonList(new ItemStack(ModItems.GAZER_POD.get()));
     }
 
     @Override
