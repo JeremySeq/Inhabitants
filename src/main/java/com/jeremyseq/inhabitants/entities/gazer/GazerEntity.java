@@ -146,7 +146,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         }
 
         // trigger RETURNING TO POD state
-        if (this.getGazerState() == GazerState.IDLE && this.tickCount % 200 == 0 && !this.isEnteringPod()) {
+        if (this.getGazerState() == GazerState.IDLE && this.tickCount % 600 == 0 && !this.isEnteringPod()) {
             // find closest GazerPodEntity without a gazer
             this.setGazerState(GazerState.RETURNING_TO_POD);
         }
@@ -170,6 +170,13 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
                     this.setGazerState(GazerState.IDLE);
                 }
             } else {
+                // double check pod validity
+                if (returningPod.isRemoved() || returningPod.hasGazer()) {
+                    this.returningPod = null;
+                    this.setGazerState(GazerState.IDLE);
+                    return;
+                }
+
                 // Only recalculate if navigation is done
                 Vec3 center = returningPod.getBlockPos().getCenter();
 
@@ -177,7 +184,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
                     this.getNavigation().moveTo(center.x, center.y, center.z, 1.0);
                 }
                 // If close enough, enter pod
-                if (this.distanceToSqr(center) < 4.0 && !this.isEnteringPod()) {
+                if (this.distanceToSqr(center) < 2.0 && !this.isEnteringPod()) {
                     this.setDeltaMovement(0, 0, 0);
                     this.enterPodWithBlock();
                 }
