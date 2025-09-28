@@ -182,10 +182,6 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
             tooltip.add(Component.literal("Empty Pod"));
         }
 
-        if (getGazerId(stack) != null) {
-            tooltip.add(Component.literal("Gazer ID: " + getGazerId(stack).toString()));
-        }
-
         super.appendHoverText(stack, level, tooltip, flag);
     }
 

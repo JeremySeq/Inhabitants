@@ -15,6 +15,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -373,5 +374,25 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
+    }
+
+    @Override
+    public void die(DamageSource cause) {
+        super.die(cause);
+
+        if (!level().isClientSide && this.getGazerState() == GazerState.BEING_CONTROLLED) {
+            this.setGazerState(GazerState.IDLE);
+
+            UUID ownerUUID = this.getOwnerUUID();
+            if (ownerUUID != null) {
+                Player player = this.level().getPlayerByUUID(ownerUUID);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                        new GazerCameraPacketS2C(this.getId(), false));
+                }
+            }
+        }
+
+        setOwnerUUID(null);
     }
 }

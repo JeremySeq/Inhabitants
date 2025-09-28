@@ -88,6 +88,7 @@ public class ModEntities {
                             .sized(.5f, .5f)
                             .clientTrackingRange(256)
                             .updateInterval(1)
+                            .fireImmune()
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "gazer").toString()));
 
     public static final RegistryObject<EntityType<WishfishEntity>> WISHFISH =
