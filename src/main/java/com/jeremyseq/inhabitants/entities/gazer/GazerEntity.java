@@ -339,6 +339,13 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             return PlayState.CONTINUE;
         }
 
+        // anim when gazer exits pod
+        if (this.tickCount < 20 && this.podEntryTick == -1) {
+            controller.setAnimation(RawAnimation.begin().then("exit pod", Animation.LoopType.PLAY_ONCE));
+            Inhabitants.LOGGER.debug("Playing take off animation");
+            return PlayState.CONTINUE;
+        }
+
         if (this.getDeltaMovement().lengthSqr() > 0.03) {
             controller.setAnimation(RawAnimation.begin().then("floating_movement", Animation.LoopType.LOOP));
             return PlayState.CONTINUE;
