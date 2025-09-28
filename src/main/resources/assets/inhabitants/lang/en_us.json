@@ -6,6 +6,7 @@
   "entity.inhabitants.impaler": "Impaler",
   "entity.inhabitants.zinger": "Zinger",
   "entity.inhabitants.wishfish": "Wishfish",
+  "entity.inhabitants.gazer": "Gazer",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -21,7 +22,8 @@
   "item.inhabitants.impaler_spawn_egg": "Impaler Spawn Egg",
   "item.inhabitants.impaler_spike": "Impaler Spike",
   "item.inhabitants.ancient_flute": "Ancient Flute",
-  "item.inhabitants.gazer_pod_item": "Gazer Pod",
+  "item.inhabitants.gazer_pod_item": "Gazer Bud",
+  "item.inhabitants.gazer_spawn_egg": "Gazer Spawn Egg",
   "item.inhabitants.wishfish_spawn_egg": "Wishfish Spawn Egg",
   "item.inhabitants.wishfish_bucket": "Bucket of Wishfish",
   "item.inhabitants.wishfish": "Wishfish",
@@ -39,5 +41,7 @@
   "sounds.inhabitants.warped_clam.closing": "Warped Clam closes",
   "sounds.inhabitants.warped_clam.opening": "Warped Clam opens",
   "sounds.inhabitants.warped_clam.closed_damage": "Warped Clam clanks",
-  "sounds.inhabitants.warped_clam.opened_damage": "Warped Clam hurts"
+  "sounds.inhabitants.warped_clam.opened_damage": "Warped Clam hurts",
+
+  "block.inhabitants.gazer_pod_block": "Gazer Bud"
 }
