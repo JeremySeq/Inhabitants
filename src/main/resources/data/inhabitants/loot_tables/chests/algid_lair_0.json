@@ -1,0 +1,111 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "min": 3,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:bone",
+          "weight": 10,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 2, "max": 6 } }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "inhabitants:glacierpine_sapling",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 1, "max": 2 } }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "inhabitants:glacierpine_log",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 2, "max": 4 } }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:arrow",
+          "weight": 8,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 5, "max": 16 } }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_nugget",
+          "weight": 6,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 1, "max": 32 } }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_ingot",
+          "weight": 4,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 1, "max": 7 } }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:stone",
+          "weight": 6,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 1, "max": 4 } }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_helmet",
+          "weight": 4,
+          "functions": [
+            { "function": "minecraft:enchant_randomly" }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_chestplate",
+          "weight": 3,
+          "functions": [
+            { "function": "minecraft:enchant_randomly" }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_leggings",
+          "weight": 3,
+          "functions": [
+            { "function": "minecraft:enchant_randomly" }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_boots",
+          "weight": 4,
+          "functions": [
+            { "function": "minecraft:enchant_randomly" }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:saddle",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "minecraft:name_tag",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

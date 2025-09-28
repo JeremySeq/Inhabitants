@@ -1,0 +1,15 @@
+{
+  "structures": [
+    {
+      "structure": "inhabitants:algid_lair",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 24,
+    "separation": 6,
+    "salt": 123456729,
+    "spread_type": "linear"
+  }
+}
