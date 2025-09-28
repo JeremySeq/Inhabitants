@@ -44,8 +44,11 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.WISHFISH_BUCKET.get());
                         pOutput.accept(gazer_pod);
                         pOutput.accept(ModItems.APEX_SPAWN_EGG.get());
-                        pOutput.accept(ModBlocks.CHISELED_ICE_ITEM.get());
                         pOutput.accept(ModBlocks.ICE_BRICKS_ITEM.get());
+                        pOutput.accept(ModBlocks.CHISELED_ICE_ITEM.get());
+                        pOutput.accept(ModBlocks.ICE_BRICK_STAIRS_ITEM.get());
+                        pOutput.accept(ModBlocks.ICE_BRICK_SLAB_ITEM.get());
+                        pOutput.accept(ModBlocks.ICE_BRICK_WALL_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_LOG_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_WOOD_ITEM.get());
                         pOutput.accept(ModBlocks.STRIPPED_GLACIERPINE_LOG_ITEM.get());
@@ -64,6 +67,11 @@ public class ModCreativeModeTabs {
 
     public static void addItemsToCreativeModeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModBlocks.ICE_BRICKS_ITEM.get());
+            event.accept(ModBlocks.CHISELED_ICE_ITEM.get());
+            event.accept(ModBlocks.ICE_BRICK_STAIRS_ITEM.get());
+            event.accept(ModBlocks.ICE_BRICK_SLAB_ITEM.get());
+            event.accept(ModBlocks.ICE_BRICK_WALL_ITEM.get());
             event.accept(ModBlocks.GLACIERPINE_LOG_ITEM.get());
             event.accept(ModBlocks.GLACIERPINE_WOOD_ITEM.get());
             event.accept(ModBlocks.STRIPPED_GLACIERPINE_LOG_ITEM.get());

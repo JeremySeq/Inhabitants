@@ -37,6 +37,20 @@ public class ModBlocks
 
     public static final RegistryObject<Item> ICE_BRICKS_ITEM = registerBlockItem("ice_bricks", ICE_BRICKS);
 
+    public static final RegistryObject<Block> ICE_BRICK_STAIRS = BLOCKS.register("ice_brick_stairs",
+            () -> new StairBlock(() -> ICE_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ICE_BRICKS.get())));
+    public static final RegistryObject<Item> ICE_BRICK_STAIRS_ITEM = registerBlockItem("ice_brick_stairs", ICE_BRICK_STAIRS);
+
+    public static final RegistryObject<Block> ICE_BRICK_SLAB = BLOCKS.register("ice_brick_slab",
+            () -> new SlabBlock(BlockBehaviour.Properties.copy(ICE_BRICKS.get())));
+    public static final RegistryObject<Item> ICE_BRICK_SLAB_ITEM = registerBlockItem("ice_brick_slab", ICE_BRICK_SLAB);
+
+    public static final RegistryObject<Block> ICE_BRICK_WALL = BLOCKS.register("ice_brick_wall",
+            () -> new WallBlock(BlockBehaviour.Properties.copy(ICE_BRICKS.get())));
+    public static final RegistryObject<Item> ICE_BRICK_WALL_ITEM = registerBlockItem("ice_brick_wall", ICE_BRICK_WALL);
+
+
     public static final RegistryObject<Block> GLACIERPINE_LOG = BLOCKS.register("glacierpine_log",
             () -> new RotatedPillarBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.ICE)

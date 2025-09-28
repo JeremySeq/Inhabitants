@@ -28,8 +28,12 @@
   "item.inhabitants.wishfish": "Wishfish",
   "item.inhabitants.apex_spawn_egg": "Apex Spawn Egg",
 
-  "block.inhabitants.chiseled_ice": "Chiseled Ice",
   "block.inhabitants.ice_bricks": "Ice Bricks",
+  "block.inhabitants.chiseled_ice": "Chiseled Ice",
+  "block.inhabitants.ice_brick_stairs": "Ice Brick Stairs",
+  "block.inhabitants.ice_brick_slab": "Ice Brick Slab",
+  "block.inhabitants.ice_brick_wall": "Ice Brick Wall",
+
   "block.inhabitants.glacierpine_log": "Glacierpine Log",
   "block.inhabitants.glacierpine_wood": "Glacierpine Wood",
   "block.inhabitants.stripped_glacierpine_log": "Stripped Glacierpine Log",
