@@ -191,6 +191,19 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             }
         }
 
+        boolean podInvalid = returningPod == null || returningPod.isRemoved() || returningPod.hasGazer();
+        boolean itemInvalid = returningPodItem == null || returningPodItem.isEmpty();
+
+        if (this.isEnteringPod() && podInvalid && itemInvalid) {
+            Inhabitants.LOGGER.debug("GazerEntity {} has no valid pod to enter, cancel enter", this.getUUID());
+            this.setGazerState(GazerState.IDLE);
+            this.setEnteringPod(false);
+            podEntryTick = -1;
+            returningPod = null;
+            returningPodItem = ItemStack.EMPTY;
+            return;
+        }
+
         // handle pod entry discard timing
         if (!level().isClientSide && podEntryTick > 0 && this.tickCount - podEntryTick > 40) {
 
@@ -202,6 +215,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
                 GazerPodItem.setGazerId(returningPodItem, this.getUUID());
                 GazerPodItem.setHasGazer(returningPodItem, true);
             }
+
             Inhabitants.LOGGER.debug("GazerEntity discarded");
 
             level().playSound(
