@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.blocks;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.worldgen.tree.GlacierpineTreeGrower;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
@@ -49,6 +50,16 @@ public class ModBlocks
     public static final RegistryObject<Block> ICE_BRICK_WALL = BLOCKS.register("ice_brick_wall",
             () -> new WallBlock(BlockBehaviour.Properties.copy(ICE_BRICKS.get())));
     public static final RegistryObject<Item> ICE_BRICK_WALL_ITEM = registerBlockItem("ice_brick_wall", ICE_BRICK_WALL);
+
+    public static final RegistryObject<Block> GLACIERPINE_SAPLING = BLOCKS.register("glacierpine_sapling",
+            () -> new SaplingBlock(new GlacierpineTreeGrower(),
+                    BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.PLANT)
+                            .noCollission()
+                            .randomTicks()
+                            .instabreak()
+                            .sound(SoundType.GRASS)));
+    public static final RegistryObject<Item> GLACIERPINE_SAPLING_ITEM = registerBlockItem("glacierpine_sapling", GLACIERPINE_SAPLING);
 
 
     public static final RegistryObject<Block> GLACIERPINE_LOG = BLOCKS.register("glacierpine_log",

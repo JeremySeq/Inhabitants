@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "": {
+      "model": "inhabitants:block/glacierpine_sapling"
+    }
+  },
+  "render_type": "minecraft:cutout"
+}
