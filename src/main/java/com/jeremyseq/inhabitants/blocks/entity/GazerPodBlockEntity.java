@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.blocks.entity;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.blocks.GazerPodBlockRegistry;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import net.minecraft.core.BlockPos;
@@ -28,6 +29,18 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     public GazerPodBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GAZER_POD_BLOCK_ENTITY.get(), pPos, pBlockState);
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        GazerPodBlockRegistry.register(this.getBlockPos());
+    }
+
+    @Override
+    public void setRemoved() {
+        GazerPodBlockRegistry.unregister(this.getBlockPos());
+        super.setRemoved();
     }
 
     public boolean hasGazer() {
@@ -99,29 +112,34 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     public void tick() {
-        tickCounter++;
-        if (level instanceof ServerLevel serverLevel && this.hasGazer() && tickCounter % 200 == 0) {
-            Inhabitants.LOGGER.debug("Spawning gazer from pod at {}", this.getBlockPos());
 
-            // Spawn gazer
-            GazerEntity gazerEntity = ModEntities.GAZER.get().create(serverLevel);
+        if (this.getLevel() instanceof ServerLevel serverLevel) {
+            tickCounter++;
 
-            assert gazerEntity != null;
+            if (this.hasGazer() && tickCounter % 200 == 0) {
+                Inhabitants.LOGGER.debug("Spawning gazer from pod at {}", this.getBlockPos());
 
-            gazerEntity.moveTo(this.getBlockPos().above(1), 0, 0);
+                // Spawn gazer
+                GazerEntity gazerEntity = ModEntities.GAZER.get().create(serverLevel);
 
-            serverLevel.addFreshEntity(gazerEntity);
+                assert gazerEntity != null;
 
-            gazerEntity.exitPod(false);
-            this.setHasGazer(false);
+                gazerEntity.moveTo(this.getBlockPos().above(1), 0, 0);
 
-            serverLevel.playSound(
-                    null,
-                    this.getBlockPos(),
-                    SoundEvents.BEEHIVE_EXIT,
-                    SoundSource.BLOCKS,
-                    1.0F, 1.0F
-            );
+                serverLevel.addFreshEntity(gazerEntity);
+
+                gazerEntity.exitPod(false);
+                this.setHasGazer(false);
+
+                serverLevel.playSound(
+                        null,
+                        this.getBlockPos(),
+                        SoundEvents.BEEHIVE_EXIT,
+                        SoundSource.BLOCKS,
+                        1.0F, 1.0F
+                );
+                tickCounter = 0;
+            }
         }
     }
 }
