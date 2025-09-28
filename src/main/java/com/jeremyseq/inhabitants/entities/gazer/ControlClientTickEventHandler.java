@@ -3,11 +3,15 @@ package com.jeremyseq.inhabitants.entities.gazer;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.networking.GazerControlPacketC2S;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientChunkCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.material.FogType;
+import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -50,6 +54,29 @@ public class ControlClientTickEventHandler {
         if (mc.getCameraEntity() instanceof GazerEntity) {
             event.setCanceled(true); // Cancel the hand rendering
         }
+    }
+
+    @SubscribeEvent
+    public static void onRenderGui(RenderGuiEvent.Pre event) {
+        Minecraft mc = Minecraft.getInstance();
+
+        // Check if the camera entity is a GazerEntity
+        if (mc.getCameraEntity() instanceof GazerEntity) {
+            event.setCanceled(true); // Cancel the GUI rendering
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRenderFog(ViewportEvent.RenderFog event) {
+        Camera camera = event.getCamera();
+        if (!(camera.getEntity() instanceof GazerEntity)) return;
+
+        if (camera.getFluidInCamera() == FogType.LAVA) {
+            event.setNearPlaneDistance(5.0F);
+            event.setFarPlaneDistance(64.0F);
+            event.setCanceled(true);
+        }
+
     }
 
     private static void forceChunksAround(Minecraft mc, BlockPos center, int radius) {
