@@ -6,6 +6,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -105,7 +106,7 @@ public class ModBlocks
 
     public static final RegistryObject<Block> GLACIERPINE_BUTTON = BLOCKS.register("glacierpine_button",
             () -> new ButtonBlock(BlockBehaviour.Properties.copy(GLACIERPINE_PLANKS.get())
-                    .noCollission().strength(0.5F), net.minecraft.world.level.block.state.properties.BlockSetType.OAK, 30, true));
+                    .noCollission().strength(0.5F), BlockSetType.OAK, 30, true));
 
     public static final RegistryObject<Item> GLACIERPINE_BUTTON_ITEM =
             registerBlockItem("glacierpine_button", GLACIERPINE_BUTTON);
@@ -118,19 +119,19 @@ public class ModBlocks
     public static final RegistryObject<Item> GLACIERPINE_PRESSURE_PLATE_ITEM =
             registerBlockItem("glacierpine_pressure_plate", GLACIERPINE_PRESSURE_PLATE);
 
-//    public static final RegistryObject<Block> GLACIERPINE_DOOR = BLOCKS.register("glacierpine_door",
-//            () -> new DoorBlock(BlockBehaviour.Properties.copy(GLACIERPINE_PLANKS.get())
-//                    .noOcclusion(), net.minecraft.world.level.block.state.properties.BlockSetType.OAK));
-//
-//    public static final RegistryObject<Item> GLACIERPINE_DOOR_ITEM =
-//            registerBlockItem("glacierpine_door", GLACIERPINE_DOOR);
-//
-//    public static final RegistryObject<Block> GLACIERPINE_TRAPDOOR = BLOCKS.register("glacierpine_trapdoor",
-//            () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(GLACIERPINE_PLANKS.get())
-//                    .noOcclusion(), net.minecraft.world.level.block.state.properties.BlockSetType.OAK));
-//
-//    public static final RegistryObject<Item> GLACIERPINE_TRAPDOOR_ITEM =
-//            registerBlockItem("glacierpine_trapdoor", GLACIERPINE_TRAPDOOR);
+    public static final RegistryObject<Block> GLACIERPINE_DOOR = BLOCKS.register("glacierpine_door",
+            () -> new DoorBlock(BlockBehaviour.Properties.copy(GLACIERPINE_PLANKS.get())
+                    .noOcclusion(), BlockSetType.OAK));
+
+    public static final RegistryObject<Item> GLACIERPINE_DOOR_ITEM =
+            registerBlockItem("glacierpine_door", GLACIERPINE_DOOR);
+
+    public static final RegistryObject<Block> GLACIERPINE_TRAPDOOR = BLOCKS.register("glacierpine_trapdoor",
+            () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(GLACIERPINE_PLANKS.get())
+                    .noOcclusion(), BlockSetType.OAK));
+
+    public static final RegistryObject<Item> GLACIERPINE_TRAPDOOR_ITEM =
+            registerBlockItem("glacierpine_trapdoor", GLACIERPINE_TRAPDOOR);
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         return BLOCKS.register(name, block);

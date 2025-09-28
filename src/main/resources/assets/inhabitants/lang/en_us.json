@@ -41,6 +41,8 @@
   "block.inhabitants.glacierpine_fence_gate": "Glacierpine Gate",
   "block.inhabitants.glacierpine_button": "Glacierpine Button",
   "block.inhabitants.glacierpine_pressure_plate": "Glacierpine Pressure Plate",
+  "block.inhabitants.glacierpine_door": "Glacierpine Door",
+  "block.inhabitants.glacierpine_trapdoor": "Glacierpine Trapdoor",
 
   "item.minecraft.potion.effect.adaptation": "Potion of Adaptation",
   "item.minecraft.potion.effect.long_adaptation": "Potion of Adaptation",

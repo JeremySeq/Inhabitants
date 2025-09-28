@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_left_open",
+  "textures": {
+    "bottom": "inhabitants:block/glacierpine_door_bottom",
+    "top": "inhabitants:block/glacierpine_door_top"
+  }
+}

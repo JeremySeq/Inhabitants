@@ -14,6 +14,8 @@ import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.potions.ModPotions;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.AxeItem;
@@ -94,6 +96,9 @@ public class Inhabitants
             MenuScreens.register(ModMenuTypes.ZINGER_CHEST.get(), ZingerChestScreen::new);
             event.enqueueWork(() -> {
                 DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(), new ImpalerSpikeDispenserBehavior());
+
+                ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_DOOR.get(), RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_TRAPDOOR.get(), RenderType.cutout());
             });
 
             ItemProperties.register(Items.CROSSBOW, ResourceLocation.fromNamespaceAndPath(MODID,"spike_loaded"), (stack, level, entity, seed) -> {

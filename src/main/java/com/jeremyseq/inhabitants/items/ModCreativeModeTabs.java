@@ -57,6 +57,8 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.GLACIERPINE_FENCE_GATE_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_PRESSURE_PLATE_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_BUTTON_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_DOOR_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_TRAPDOOR_ITEM.get());
                     })
                     .build());
 
@@ -73,10 +75,8 @@ public class ModCreativeModeTabs {
             event.accept(ModBlocks.GLACIERPINE_FENCE_GATE_ITEM.get());
             event.accept(ModBlocks.GLACIERPINE_PRESSURE_PLATE_ITEM.get());
             event.accept(ModBlocks.GLACIERPINE_BUTTON_ITEM.get());
-        } else if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
-            event.accept(ModBlocks.GLACIERPINE_FENCE_GATE_ITEM.get());
-            event.accept(ModBlocks.GLACIERPINE_PRESSURE_PLATE_ITEM.get());
-            event.accept(ModBlocks.GLACIERPINE_BUTTON_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_DOOR_ITEM.get());
+            event.accept(ModBlocks.GLACIERPINE_TRAPDOOR_ITEM.get());
         } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
             event.accept(ModBlocks.GLACIERPINE_LOG_ITEM.get());
         }
