@@ -1,13 +1,13 @@
 package com.jeremyseq.inhabitants.entities.gazer;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.blocks.GazerPodBlockRegistry;
 import com.jeremyseq.inhabitants.blocks.entity.GazerPodBlockEntity;
 import com.jeremyseq.inhabitants.items.GazerPodItem;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.GazerCameraPacketS2C;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -155,7 +155,13 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         if (this.getGazerState() == GazerState.RETURNING_TO_POD && !this.isEnteringPod()) {
             if (returningPod == null || returningPod.isRemoved() || returningPod.hasGazer()) {
                 // find closest GazerPodEntity without a gazer
-                this.returningPod = findNearestAvailablePod(50);
+                BlockPos nearestPodPos = GazerPodBlockRegistry.getNearestPodPosition(this.blockPosition());
+                if (nearestPodPos != null) {
+                    var be = level().getBlockEntity(nearestPodPos);
+                    if (be instanceof GazerPodBlockEntity pod && !pod.hasGazer()) {
+                        this.returningPod = pod;
+                    }
+                }
 
                 if (returningPod != null) {
                     Vec3 center = returningPod.getBlockPos().getCenter();
@@ -203,35 +209,6 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
 
 
         }
-    }
-
-    private GazerPodBlockEntity findNearestAvailablePod(double radius) {
-        BlockPos start = this.blockPosition();
-        int intRadius = (int) Math.ceil(radius);
-        Set<BlockPos> visited = new HashSet<>();
-        Queue<BlockPos> queue = new ArrayDeque<>();
-        queue.add(start);
-        visited.add(start);
-
-        while (!queue.isEmpty()) {
-            BlockPos pos = queue.poll();
-
-            if (level().isLoaded(pos)) {
-                var be = level().getBlockEntity(pos);
-                if (be instanceof GazerPodBlockEntity pod && !pod.hasGazer()) {
-                    return pod;
-                }
-            }
-
-            for (Direction dir : Direction.values()) {
-                BlockPos next = pos.relative(dir);
-                if (!visited.contains(next) && start.distManhattan(next) <= intRadius) {
-                    visited.add(next);
-                    queue.add(next);
-                }
-            }
-        }
-        return null;
     }
 
     @Override
