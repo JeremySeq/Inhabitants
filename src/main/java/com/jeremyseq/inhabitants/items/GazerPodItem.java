@@ -173,6 +173,21 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
         return false;
     }
 
+    @Override
+    public boolean isDamageable(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack pStack) {
+        return false;
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return 0;
+    }
+
     // ===== Tooltip =====
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
