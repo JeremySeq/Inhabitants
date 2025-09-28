@@ -7,6 +7,7 @@
   "entity.inhabitants.zinger": "Zinger",
   "entity.inhabitants.wishfish": "Wishfish",
   "entity.inhabitants.apex": "Apex",
+  "entity.inhabitants.gazer": "Gazer",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -22,12 +23,15 @@
   "item.inhabitants.impaler_spawn_egg": "Impaler Spawn Egg",
   "item.inhabitants.impaler_spike": "Impaler Spike",
   "item.inhabitants.ancient_flute": "Ancient Flute",
-  "item.inhabitants.gazer_pod_item": "Gazer Pod",
+  "item.inhabitants.gazer_pod_item": "Gazer Bud",
+  "item.inhabitants.gazer_spawn_egg": "Gazer Spawn Egg",
   "item.inhabitants.wishfish_spawn_egg": "Wishfish Spawn Egg",
   "item.inhabitants.wishfish_bucket": "Bucket of Wishfish",
   "item.inhabitants.wishfish": "Wishfish",
   "item.inhabitants.apex_spawn_egg": "Apex Spawn Egg",
   "item.inhabitants.apex_horn": "Apex Horn",
+
+  "block.inhabitants.gazer_pod_block": "Gazer Bud",
 
   "block.inhabitants.ice_bricks": "Ice Bricks",
   "block.inhabitants.chiseled_ice": "Chiseled Ice",
