@@ -82,6 +82,9 @@ public class ModItems {
     public static final RegistryObject<Item> APEX_SPAWN_EGG = ITEMS.register("apex_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.APEX, 0x6C7D8D, 0x79F0F4, new Item.Properties()));
 
+    public static final RegistryObject<Item> APEX_HORN = ITEMS.register("apex_horn",
+            () -> new ApexHorn(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
