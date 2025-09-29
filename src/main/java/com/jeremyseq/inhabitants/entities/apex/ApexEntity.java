@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -29,6 +30,7 @@ public class ApexEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     private int attackAnimTimer = 0;
+    private boolean randomChance = false; // used to trigger a rare idle animation
 
     public static final EntityDataAccessor<Boolean> SLEEPING = SynchedEntityData.defineId(ApexEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -82,7 +84,21 @@ public class ApexEntity extends Monster implements GeoEntity {
                 animationState.getController().setAnimation(RawAnimation.begin().then("walking", Animation.LoopType.LOOP));
             }
         } else {
-            animationState.getController().setAnimation(RawAnimation.begin().then("Idle", Animation.LoopType.LOOP));
+            if (randomChance) {
+                animationState.getController().setAnimation(RawAnimation.begin().then("Idle_rare", Animation.LoopType.PLAY_ONCE));
+                if (animationState.getController().hasAnimationFinished()) {
+                    animationState.getController().forceAnimationReset();
+                    randomChance = false;
+                    animationState.getController().forceAnimationReset();
+                }
+                return PlayState.CONTINUE;
+            }
+
+            animationState.getController().setAnimation(RawAnimation.begin().then("Idle", Animation.LoopType.PLAY_ONCE));
+            if (animationState.getController().hasAnimationFinished()) {
+                animationState.getController().forceAnimationReset();
+                randomChance = new Random().nextFloat() < 0.1f; // chance to trigger a rare idle animation
+            }
         }
         return PlayState.CONTINUE;
     }
@@ -118,6 +134,22 @@ public class ApexEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(SLEEPING, true);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+
+        tag.putBoolean("sleeping", entityData.get(SLEEPING));
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+
+        if (tag.contains("sleeping")) {
+            entityData.set(SLEEPING, tag.getBoolean("sleeping"));
+        }
     }
 
     @Override
