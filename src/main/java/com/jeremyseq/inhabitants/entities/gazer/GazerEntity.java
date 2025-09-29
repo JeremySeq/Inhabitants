@@ -81,7 +81,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     }
 
     @Override
-    public float getEyeHeight(Pose pPose) {
+    public float getEyeHeight(@NotNull Pose pPose) {
         return super.getEyeHeight(pPose) + 0.5f;
     }
 
@@ -96,12 +96,12 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     }
 
     @Override
-    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
+    protected void checkFallDamage(double y, boolean onGround, @NotNull BlockState state, @NotNull BlockPos pos) {
         // no fall damage
     }
 
     @Override
-    public boolean canAttack(LivingEntity target) {
+    public boolean canAttack(@NotNull LivingEntity target) {
         return false;
     }
 
@@ -244,7 +244,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     }
 
     @Override
-    public void remove(RemovalReason reason) {
+    public void remove(@NotNull RemovalReason reason) {
         super.remove(reason);
 
         if (this.getOwnerUUID() == null) return;
@@ -377,7 +377,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     }
 
     @Override
-    public void die(DamageSource cause) {
+    public void die(@NotNull DamageSource cause) {
         super.die(cause);
 
         if (!level().isClientSide && this.getGazerState() == GazerState.BEING_CONTROLLED) {

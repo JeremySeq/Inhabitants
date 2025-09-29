@@ -100,6 +100,7 @@ public class ControlClientTickEventHandler {
 
     private static boolean gazerIsApproachingUnloadedChunk(Minecraft mc, GazerEntity gazer) {
         // Player position
+        assert mc.player != null;
         double px = mc.player.getX();
         double pz = mc.player.getZ();
 

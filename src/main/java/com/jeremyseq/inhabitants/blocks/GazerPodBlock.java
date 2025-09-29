@@ -19,6 +19,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -31,12 +32,12 @@ public class GazerPodBlock extends BaseEntityBlock {
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+    public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
         return new GazerPodBlockEntity(blockPos, blockState);
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState pState, LootParams.Builder builder) {
+    public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.Builder builder) {
         if (builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof GazerPodBlockEntity pod) {
             if (pod.hasGazer()) {
                 ItemStack stack = new ItemStack(ModItems.GAZER_POD.get());
@@ -55,23 +56,23 @@ public class GazerPodBlock extends BaseEntityBlock {
     }
 
     @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
+    public float getDestroyProgress(@NotNull BlockState state, @NotNull Player player, @NotNull BlockGetter level, @NotNull BlockPos pos) {
         return Blocks.NETHERRACK.defaultBlockState().getDestroyProgress(player, level, pos);
     }
 
 
     @Override
-    public RenderShape getRenderShape(BlockState pState) {
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState pState) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return Block.box(3, 0, 3, 13, 10, 13);
     }
 
     @Override
-    protected void spawnDestroyParticles(Level pLevel, Player pPlayer, BlockPos pPos, BlockState pState) {
+    protected void spawnDestroyParticles(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull BlockPos pPos, @NotNull BlockState pState) {
         for (int i = 0; i < 20; i++) {
             double x = pPos.getX() + 0.5 + (pLevel.random.nextDouble() - 0.5);
             double y = pPos.getY() + 0.5 + (pLevel.random.nextDouble() - 0.5);
@@ -85,7 +86,7 @@ public class GazerPodBlock extends BaseEntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
         return (lvl, pos, st, be) -> {
             if (be instanceof GazerPodBlockEntity pod) pod.tick();
         };
