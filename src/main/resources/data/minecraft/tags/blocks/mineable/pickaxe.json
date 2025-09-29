@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "inhabitants:chiseled_ice",
+    "inhabitants:ice_bricks",
+    "inhabitants:ice_brick_stairs",
+    "inhabitants:ice_brick_slab",
+    "inhabitants:ice_brick_wall"
+  ]
+}

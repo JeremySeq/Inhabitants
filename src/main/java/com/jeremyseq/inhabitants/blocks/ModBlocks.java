@@ -34,7 +34,7 @@ public class ModBlocks
 
     public static final RegistryObject<Block> ICE_BRICKS = BLOCKS.register("ice_bricks",
             () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.ICE).friction(0.989F)
-                    .randomTicks().strength(2.8F).sound(SoundType.GLASS).noOcclusion()));
+                    .randomTicks().strength(2.0f).sound(SoundType.GLASS).noOcclusion()));
 
     public static final RegistryObject<Item> ICE_BRICKS_ITEM = registerBlockItem("ice_bricks", ICE_BRICKS);
 
