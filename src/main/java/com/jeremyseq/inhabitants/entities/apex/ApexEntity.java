@@ -4,16 +4,18 @@ import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -21,8 +23,12 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
+import java.util.Random;
+
 public class ApexEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+
+    private int attackAnimTimer = 0;
 
     public static final EntityDataAccessor<Boolean> SLEEPING = SynchedEntityData.defineId(ApexEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -47,13 +53,12 @@ public class ApexEntity extends Monster implements GeoEntity {
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new ApexSleepGoal(this));
-        this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 2));
+        this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.3D, 7, 4));
         this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, false));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
     }
 
     @Override
@@ -62,6 +67,9 @@ public class ApexEntity extends Monster implements GeoEntity {
         controllers.add(new AnimationController<>(this, "sleep_states", 0, state -> PlayState.STOP)
                 .triggerableAnim("sleep", RawAnimation.begin().then("sleeping", Animation.LoopType.PLAY_ONCE))
                 .triggerableAnim("wake", RawAnimation.begin().then("wake up", Animation.LoopType.PLAY_ONCE)));
+        controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
+                .triggerableAnim("attack1", RawAnimation.begin().then("attack_horn", Animation.LoopType.PLAY_ONCE))
+                .triggerableAnim("attack2", RawAnimation.begin().then("attack_horn2", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState defaults(AnimationState<T> animationState) {
@@ -78,6 +86,33 @@ public class ApexEntity extends Monster implements GeoEntity {
         }
         return PlayState.CONTINUE;
     }
+
+    @Override
+    protected void customServerAiStep() {
+        if (this.attackAnimTimer > 0) {
+            this.attackAnimTimer--;
+            if (this.attackAnimTimer == 0) {
+                LivingEntity target = getTarget();
+                if (target != null && distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target)) {
+                    super.doHurtTarget(target);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean doHurtTarget(@NotNull Entity target) {
+        if (!level().isClientSide) {
+            if (new Random().nextInt(2) == 0) {
+                triggerAnim("attack", "attack1");
+            } else {
+                triggerAnim("attack", "attack2");
+            }
+            this.attackAnimTimer = 10;
+        }
+        return true;
+    }
+
 
     @Override
     protected void defineSynchedData() {
