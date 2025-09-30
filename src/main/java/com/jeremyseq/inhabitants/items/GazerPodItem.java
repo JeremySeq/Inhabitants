@@ -126,7 +126,7 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
         ItemStack stack = context.getItemInHand();
 
         // Replace `ModBlocks.GAZER_POD_BLOCK` with your actual block instance
-        if (!level.isClientSide && level.getBlockState(pos).canBeReplaced()) {
+        if (level.getBlockState(pos).canBeReplaced()) {
             level.setBlock(pos, ModBlocks.GAZER_POD_BLOCK.get().defaultBlockState(), 3);
 
             // Transfer NBT to block entity
