@@ -43,7 +43,9 @@ public class GazerPodBlock extends BaseEntityBlock {
                 stack.getOrCreateTag().putBoolean("HasGazer", true);
                 return Collections.singletonList(stack);
             } else {
-                return Collections.singletonList(new ItemStack(ModItems.GAZER_POD.get()));
+                ItemStack stack = new ItemStack(ModItems.GAZER_POD.get());
+                stack.getOrCreateTag().putBoolean("HasGazer", false);
+                return Collections.singletonList(stack);
             }
         }
         return Collections.singletonList(new ItemStack(ModItems.GAZER_POD.get()));
