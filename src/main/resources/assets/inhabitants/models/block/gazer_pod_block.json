@@ -1,0 +1,6 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "inhabitants:block/gazer_pod_block"
+  }
+}

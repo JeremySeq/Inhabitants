@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "inhabitants:block/gazer_pod_block"
+    }
+  }
+}
