@@ -17,5 +17,5 @@
       "rolls": 1.0
     }
   ],
-  "random_sequence": "minecraft:blocks/stripped_glacierpine_log"
+  "random_sequence": "inhabitants:blocks/stripped_glacierpine_log"
 }
