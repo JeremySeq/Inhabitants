@@ -88,6 +88,9 @@ public class ModItems {
     public static final RegistryObject<Item> GAZER_SPAWN_EGG = ITEMS.register("gazer_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.GAZER, 0x8F0B48, 0xE1778D, new Item.Properties()));
 
+    public static final RegistryObject<Item> CATCHER_SPAWN_EGG = ITEMS.register("catcher_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.CATCHER, 0x664E80, 0xA46D3C, new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

@@ -8,6 +8,7 @@
   "entity.inhabitants.wishfish": "Wishfish",
   "entity.inhabitants.apex": "Apex",
   "entity.inhabitants.gazer": "Gazer",
+  "entity.inhabitants.catcher": "Catcher",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -30,6 +31,7 @@
   "item.inhabitants.wishfish": "Wishfish",
   "item.inhabitants.apex_spawn_egg": "Apex Spawn Egg",
   "item.inhabitants.apex_horn": "Apex Horn",
+  "item.inhabitants.catcher_spawn_egg": "Catcher Spawn Egg",
 
   "block.inhabitants.gazer_pod_block": "Gazer Bud",
 

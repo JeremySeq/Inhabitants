@@ -9,6 +9,8 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
+import com.jeremyseq.inhabitants.entities.catcher.CatcherEntity;
+import com.jeremyseq.inhabitants.entities.catcher.CatcherRenderer;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.entities.gazer.GazerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
@@ -103,6 +105,12 @@ public class ModEntities {
                             .sized(2.25f, 2.3f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "apex").toString()));
 
+    public static final RegistryObject<EntityType<CatcherEntity>> CATCHER =
+            REGISTRY.register("catcher",
+                    () -> EntityType.Builder.of(CatcherEntity::new, MobCategory.MONSTER)
+                            .sized(2.2f, 1.4f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "catcher").toString()));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
@@ -113,6 +121,7 @@ public class ModEntities {
         event.put(ModEntities.GAZER.get(), GazerEntity.setAttributes());
         event.put(ModEntities.WISHFISH.get(), WishfishEntity.setAttributes());
         event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
+        event.put(ModEntities.CATCHER.get(), CatcherEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -127,5 +136,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.GAZER.get(), GazerRenderer::new);
         EntityRenderers.register(ModEntities.WISHFISH.get(), WishfishRenderer::new);
         EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
+        EntityRenderers.register(ModEntities.CATCHER.get(), CatcherRenderer::new);
     }
 }
