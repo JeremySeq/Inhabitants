@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "group": "wooden_button",
+  "ingredients": [
+    {
+      "item": "inhabitants:glacierpine_planks"
+    }
+  ],
+  "result": {
+    "item": "inhabitants:glacierpine_button"
+  }
+}
