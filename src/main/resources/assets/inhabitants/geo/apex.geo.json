@@ -12,12 +12,12 @@
 			},
 			"bones": [
 				{
-					"name": "Dryfang",
+					"name": "beloceros",
 					"pivot": [0, 8.5, 0]
 				},
 				{
 					"name": "legs",
-					"parent": "Dryfang",
+					"parent": "beloceros",
 					"pivot": [0, 6.5, -19]
 				},
 				{
@@ -58,7 +58,7 @@
 				},
 				{
 					"name": "body",
-					"parent": "Dryfang",
+					"parent": "beloceros",
 					"pivot": [0, 20, 0],
 					"cubes": [
 						{"origin": [0, 18.5, -11], "size": [0, 21, 28], "uv": [0, 40]},

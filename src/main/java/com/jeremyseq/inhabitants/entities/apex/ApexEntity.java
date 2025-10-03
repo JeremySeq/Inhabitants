@@ -16,6 +16,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -55,8 +56,8 @@ public class ApexEntity extends Monster implements GeoEntity {
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new ApexSleepGoal(this));
-        this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.3D, 7, 4));
-        this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
+        this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 4));
+        this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.4D, true));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
@@ -71,7 +72,9 @@ public class ApexEntity extends Monster implements GeoEntity {
                 .triggerableAnim("wake", RawAnimation.begin().then("wake up", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
                 .triggerableAnim("attack1", RawAnimation.begin().then("attack_horn", Animation.LoopType.PLAY_ONCE))
-                .triggerableAnim("attack2", RawAnimation.begin().then("attack_horn2", Animation.LoopType.PLAY_ONCE)));
+                .triggerableAnim("attack2", RawAnimation.begin().then("attack_bite", Animation.LoopType.PLAY_ONCE)));
+        controllers.add(new AnimationController<>(this, "eat_bone", 0, state -> PlayState.STOP)
+                .triggerableAnim("eat_bone", RawAnimation.begin().then("eating bone", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState defaults(AnimationState<T> animationState) {
@@ -105,12 +108,23 @@ public class ApexEntity extends Monster implements GeoEntity {
 
     @Override
     protected void customServerAiStep() {
+
+        this.setSprinting(this.getTarget() != null && this.getTarget().isAlive());
+
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
             if (this.attackAnimTimer == 0) {
                 LivingEntity target = getTarget();
                 if (target != null && distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target)) {
-                    super.doHurtTarget(target);
+                    // mob to target
+                    Vec3 toTarget = target.position().subtract(this.position()).normalize();
+                    // mob's facing direction (yaw)
+                    Vec3 facing = Vec3.directionFromRotation(0, this.getYRot()).normalize();
+                    double dot = facing.dot(toTarget);
+                    // require within 60deg cone
+                    if (dot > 0.5) {
+                        super.doHurtTarget(target);
+                    }
                 }
             }
         }
