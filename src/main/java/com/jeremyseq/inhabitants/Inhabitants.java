@@ -104,6 +104,7 @@ public class Inhabitants
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_DOOR.get(), RenderType.cutout());
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_TRAPDOOR.get(), RenderType.cutout());
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_SAPLING.get(), RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(ModBlocks.WATERBERRY_BLOCK.get(), RenderType.cutout());
             });
 
             ItemProperties.register(Items.CROSSBOW, ResourceLocation.fromNamespaceAndPath(MODID,"spike_loaded"), (stack, level, entity, seed) -> {

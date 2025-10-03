@@ -11,6 +11,7 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
 import com.jeremyseq.inhabitants.entities.catcher.CatcherEntity;
 import com.jeremyseq.inhabitants.entities.catcher.CatcherRenderer;
+import com.jeremyseq.inhabitants.entities.catcher.WaterberryProjectile;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.entities.gazer.GazerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
@@ -24,6 +25,7 @@ import com.jeremyseq.inhabitants.entities.wishfish.WishfishRenderer;
 import com.jeremyseq.inhabitants.entities.zinger.ZingerEntity;
 import com.jeremyseq.inhabitants.entities.zinger.ZingerRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -111,6 +113,15 @@ public class ModEntities {
                             .sized(2.2f, 1.4f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "catcher").toString()));
 
+    public static final RegistryObject<EntityType<WaterberryProjectile>> WATERBERRY_PROJECTILE =
+            REGISTRY.register("waterberry_projectile", () ->
+                    EntityType.Builder.<WaterberryProjectile>of(WaterberryProjectile::new, MobCategory.MISC)
+                            .sized(0.25F, 0.25F)
+                            .clientTrackingRange(4)
+                            .updateInterval(10)
+                            .build("waterberry_projectile")
+            );
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
@@ -137,5 +148,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.WISHFISH.get(), WishfishRenderer::new);
         EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
         EntityRenderers.register(ModEntities.CATCHER.get(), CatcherRenderer::new);
+        EntityRenderers.register(ModEntities.WATERBERRY_PROJECTILE.get(), ThrownItemRenderer::new);
     }
 }

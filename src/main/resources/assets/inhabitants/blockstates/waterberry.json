@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "": {
+      "model": "inhabitants:block/waterberry"
+    }
+  },
+  "render_type": "minecraft:cutout"
+}
