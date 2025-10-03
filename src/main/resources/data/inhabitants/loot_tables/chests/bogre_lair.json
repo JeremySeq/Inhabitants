@@ -90,7 +90,7 @@
           "functions": [
             { "function": "minecraft:enchant_randomly" }
           ],
-          "weight": 3
+          "weight": 4
         },
         {
           "type": "item",
@@ -107,8 +107,40 @@
             { "function": "minecraft:set_count", "count": { "min": 6, "max": 23 } }
           ],
           "weight": 4
+        },
+        {
+          "type": "item",
+          "name": "minecraft:blaze_rod",
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 2, "max": 5 } }
+          ],
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:flint_and_steel",
+          "functions": [
+            {
+              "function": "minecraft:set_damage",
+              "damage": {
+                "min": 0.5,
+                "max": 0.9
+              }
+            }
+          ],
+          "weight": 7
+        },
+        {
+          "type": "empty",
+          "weight": 3
         }
       ]
     }
+
   ]
 }
