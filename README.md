@@ -6,7 +6,7 @@ _Work in Progress_
 **Requires Geckolib**
 
 A Minecraft mod that adds new fictional fauna.
-So far, 10 new mobs are planned, each with unique behaviors and interactions.
+So far, 8 mobs are planned, each with unique behaviors and interactions.
 
 ## Credits
 - [@JeremySeq](https://jeremyseq.dev/): lead coder
@@ -20,9 +20,10 @@ The following mobs are fully implemented and functional in the game.
 
 ![Bogre](images/bogre.png)
 
-
 ![Warped Clam](images/warped_clam.png)
 
 ![Abyssfish](images/pitfish.png)
 
 ![Impaler](images/impaler.png)
+
+![Beloceros](images/beloceros.png)
