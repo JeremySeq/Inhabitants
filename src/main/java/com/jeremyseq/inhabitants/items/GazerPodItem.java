@@ -5,7 +5,7 @@ import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.blocks.entity.GazerPodBlockEntity;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
-import com.jeremyseq.inhabitants.items.armor.GazerPodArmorRenderer;
+import com.jeremyseq.inhabitants.items.armor.gazer_pod.GazerPodArmorRenderer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

@@ -1,0 +1,77 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "inhabitants:item/chitin_shield",
+		"particle": "inhabitants:item/chitin_shield"
+	},
+	"elements": [
+		{
+			"from": [2, -6, 7],
+			"to": [14, 16, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [2, -6, 7]},
+			"faces": {
+				"north": {"uv": [0.38095, 0.38095, 4.95238, 8.7619], "texture": "#0"},
+				"east": {"uv": [0, 0.38095, 0.33333, 8.7619], "texture": "#0"},
+				"south": {"uv": [5.33333, 0.38095, 9.90476, 8.7619], "texture": "#0"},
+				"west": {"uv": [4.95238, 0.38095, 5.28571, 8.7619], "texture": "#0"},
+				"up": {"uv": [4.95238, 0, 9.33333, 0.33333], "texture": "#0"},
+				"down": {"uv": [0.38095, 0, 4.85714, 0.33333], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7, 3, 8],
+			"to": [9, 9, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 6, 8]},
+			"faces": {
+				"north": {"uv": [15.2381, 2.28571, 16, 4.57143], "texture": "#0"},
+				"east": {"uv": [12.95238, 2.28571, 15.2381, 4.57143], "texture": "#0"},
+				"south": {"uv": [12.19048, 0, 12.95238, 2.28571], "texture": "#0"},
+				"west": {"uv": [9.90476, 2.28571, 12.19048, 4.57143], "texture": "#0"},
+				"up": {"uv": [12.95238, 0, 13.71429, 2.27619], "texture": "#0"},
+				"down": {"uv": [12.19048, 2.28571, 12.95238, 4.57143], "texture": "#0"}
+			}
+		}
+	],
+	"gui_light": "front",
+	"overrides": [
+		{"predicate": {"inhabitants:blocking": 1}, "model": "inhabitants:item/chitin_shield_blocking"}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, -90, 0],
+			"translation": [3, 0, 4]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, -90, 0],
+			"translation": [3, 0, 4.25]
+		},
+		"firstperson_righthand": {
+			"rotation": [1.71, -11.07, -1.04],
+			"translation": [0.5, -2.75, -1]
+		},
+		"firstperson_lefthand": {
+			"rotation": [1.71, -11.07, -1.04],
+			"translation": [0.5, -2.75, -1]
+		},
+		"ground": {
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"gui": {
+			"rotation": [177.35, 39.35, -170.52],
+			"translation": [0, 1.75, 0],
+			"scale": [0.6, 0.6, 0.6]
+		},
+		"fixed": {
+			"translation": [0, 2.5, 0],
+			"scale": [0.8, 0.8, 0.8]
+		}
+	},
+	"groups": [
+		{
+			"name": "Chitinshield",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1]
+		}
+	]
+}

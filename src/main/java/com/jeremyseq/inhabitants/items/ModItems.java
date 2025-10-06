@@ -2,12 +2,10 @@ package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
+import com.jeremyseq.inhabitants.items.armor.ModArmorMaterials;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.food.Foods;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.MobBucketItem;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -95,6 +93,13 @@ public class ModItems {
 
     public static final RegistryObject<Item> CATCHER_SPAWN_EGG = ITEMS.register("catcher_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.CATCHER, 0x664E80, 0xA46D3C, new Item.Properties()));
+
+    public static final RegistryObject<Item> CHITIN_CHESTPLATE = ITEMS.register("chitin_chestplate",
+            () -> new ChitinChestplateItem(ModArmorMaterials.CHITIN, ArmorItem.Type.CHESTPLATE,
+                    new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> CHITIN_SHIELD = ITEMS.register("chitin_shield",
+            () -> new ShieldItem(new Item.Properties().durability(750)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.items.armor;
+package com.jeremyseq.inhabitants.items.armor.gazer_pod;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.items.ModItems;

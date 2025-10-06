@@ -32,6 +32,9 @@
   "item.inhabitants.apex_spawn_egg": "Beloceros Spawn Egg",
   "item.inhabitants.apex_horn": "Beloceros Horn",
   "item.inhabitants.catcher_spawn_egg": "Catcher Spawn Egg",
+  "item.inhabitants.chitin_chestplate": "Chitin Chestplate",
+  "item.inhabitants.chitin_shield": "Chitin Shield",
+
 
   "block.inhabitants.gazer_pod_block": "Gazer Bud",
   "block.inhabitants.waterberry": "Waterberry",
@@ -61,6 +64,7 @@
   "item.minecraft.potion.effect.long_adaptation": "Potion of Adaptation",
   "effect.inhabitants.adaptation": "Adaptation",
   "effect.inhabitants.concussion": "Concussion",
+  "effect.inhabitants.immunity": "Immunity",
 
   "advancement.inhabitants.david_and_goliath.title": "David and Goliath",
   "advancement.inhabitants.david_and_goliath.description": "Defeat the mighty Bogre.",
@@ -70,5 +74,7 @@
   "sounds.inhabitants.warped_clam.closing": "Warped Clam closes",
   "sounds.inhabitants.warped_clam.opening": "Warped Clam opens",
   "sounds.inhabitants.warped_clam.closed_damage": "Warped Clam clanks",
-  "sounds.inhabitants.warped_clam.opened_damage": "Warped Clam hurts"
+  "sounds.inhabitants.warped_clam.opened_damage": "Warped Clam hurts",
+
+  "item.inhabitants.chitin_chestplate.tooltip": "Grants immunity"
 }

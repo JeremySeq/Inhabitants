@@ -122,6 +122,11 @@ public class Inhabitants
                 (stack, level, entity, seed) -> GazerPodItem.hasGazer(stack) ? 1.0F : 0.0F
             );
 
+            ItemProperties.register(ModItems.CHITIN_SHIELD.get(), ResourceLocation.fromNamespaceAndPath(MODID, "blocking"),
+                    (stack, level, entity, seed) ->
+                            (entity != null && entity.isUsingItem() && entity.getUseItem() == stack) ? 1.0F : 0.0F
+            );
+
             BlockEntityRenderers.register(ModBlockEntities.GAZER_POD_BLOCK_ENTITY.get(), GazerPodBlockRenderer::new);
         }
     }
