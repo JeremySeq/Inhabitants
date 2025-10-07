@@ -1,13 +1,11 @@
 package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.food.Foods;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.MobBucketItem;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -87,6 +85,12 @@ public class ModItems {
 
     public static final RegistryObject<Item> GAZER_SPAWN_EGG = ITEMS.register("gazer_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.GAZER, 0x8F0B48, 0xE1778D, new Item.Properties()));
+
+    public static final RegistryObject<Item> WATERBERRY_BUSH_ITEM =
+            ITEMS.register("waterberry_bush", () -> new BlockItem(
+                    ModBlocks.WATERBERRY_BLOCK.get(),
+                    new Item.Properties()
+            ));
 
     public static final RegistryObject<Item> WATERBERRY_ITEM =
             ITEMS.register("waterberry", () -> new WaterberryItem(

@@ -164,8 +164,8 @@ public class ModBlocks
     public static final RegistryObject<Item> GLACIERPINE_TRAPDOOR_ITEM =
             registerBlockItem("glacierpine_trapdoor", GLACIERPINE_TRAPDOOR);
 
-    public static final RegistryObject<Block> WATERBERRY_BLOCK = BLOCKS.register("waterberry",
-            () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT)
+    public static final RegistryObject<Block> WATERBERRY_BLOCK = BLOCKS.register("waterberry_bush",
+            () -> new WaterberryBushBlock(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT)
                     .noCollission()
                     .randomTicks()
                     .instabreak()

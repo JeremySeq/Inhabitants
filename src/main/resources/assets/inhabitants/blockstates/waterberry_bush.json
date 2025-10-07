@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "inhabitants:block/waterberry"
+      "model": "inhabitants:block/waterberry_bush"
     }
   },
   "render_type": "minecraft:cutout"
