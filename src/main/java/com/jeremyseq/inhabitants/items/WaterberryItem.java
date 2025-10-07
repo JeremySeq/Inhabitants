@@ -1,25 +1,24 @@
 package com.jeremyseq.inhabitants.items;
 
-import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.catcher.WaterberryProjectile;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-public class WaterberryItem extends BlockItem {
+public class WaterberryItem extends Item {
     public static final FoodProperties FOOD = new FoodProperties.Builder()
             .nutrition(3)
             .saturationMod(0.4f)
             .build();
 
     public WaterberryItem(Properties props) {
-        super(ModBlocks.WATERBERRY_BLOCK.get(), props.food(FOOD));
+        super(props.food(FOOD));
     }
 
     @Override
