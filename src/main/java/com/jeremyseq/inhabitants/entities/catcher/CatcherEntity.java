@@ -1,6 +1,10 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -29,9 +33,18 @@ public class CatcherEntity extends Monster implements GeoEntity {
 
     private int attackAnimTimer = 0;
 
+    private static final EntityDataAccessor<String> STATE =
+            SynchedEntityData.defineId(CatcherEntity.class, EntityDataSerializers.STRING);
+
     public CatcherEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.setPersistenceRequired();
+    }
+
+    public enum State {
+        IDLE,
+        BURROWED,
+        AMBUSH
     }
 
     public static AttributeSupplier setAttributes() {
@@ -48,6 +61,9 @@ public class CatcherEntity extends Monster implements GeoEntity {
     }
 
     protected void addBehaviourGoals() {
+        this.goalSelector.addGoal(1, new CatcherAmbushGoal(this));
+        this.goalSelector.addGoal(2, new CatcherBurrowGoal(this));
+
         this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
 
@@ -88,6 +104,35 @@ public class CatcherEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(STATE, State.IDLE.name());
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
+        super.addAdditionalSaveData(pCompound);
+        pCompound.putString("State", this.getState().name());
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
+        super.readAdditionalSaveData(pCompound);
+
+        if (pCompound.contains("State")) {
+            this.setState(State.valueOf(pCompound.getString("State")));
+        }
+    }
+
+    public State getState() {
+        return State.valueOf(this.entityData.get(STATE));
+    }
+
+    public void setState(State state) {
+        this.entityData.set(STATE, state.name());
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "defaults_controller", 0, this::defaults));
         controllers.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
@@ -96,7 +141,7 @@ public class CatcherEntity extends Monster implements GeoEntity {
                 .triggerableAnim("attack", RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "ground_change", 0, state -> PlayState.STOP)
                 .triggerableAnim("emerging", RawAnimation.begin().then("emerging", Animation.LoopType.PLAY_ONCE))
-                .triggerableAnim("digging", RawAnimation.begin().then("digging", Animation.LoopType.PLAY_ONCE)));
+                .triggerableAnim("digging", RawAnimation.begin().then("digging", Animation.LoopType.HOLD_ON_LAST_FRAME)));
     }
 
     private <T extends GeoAnimatable> PlayState defaults(AnimationState<T> animationState) {
