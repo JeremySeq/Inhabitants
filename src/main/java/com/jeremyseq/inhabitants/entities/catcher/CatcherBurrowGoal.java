@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +14,10 @@ public class CatcherBurrowGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        // handle relaunch session case
+        if (catcher.getState() == CatcherEntity.State.BURROWED)
+            return true;
+
         // only burrow if no target nearby and on sand and idle
         return catcher.getTarget() == null && catcher.onGround() && catcher.getState() == CatcherEntity.State.IDLE
                 && catcher.level().getBlockState(catcher.blockPosition().below()).is(BlockTags.SAND);
@@ -24,7 +27,7 @@ public class CatcherBurrowGoal extends Goal {
     public void start() {
         catcher.setState(CatcherEntity.State.BURROWED);
         catcher.triggerAnim("ground_change", "digging");
-        snapToBlockCenter();
+        catcher.snapToBlockCenter();
         catcher.setNoGravity(true);
         catcher.getNavigation().stop();
     }
@@ -44,14 +47,5 @@ public class CatcherBurrowGoal extends Goal {
     @Override
     public void tick() {
         catcher.setDeltaMovement(Vec3.ZERO);
-    }
-
-    public void snapToBlockCenter() {
-        BlockPos pos = this.catcher.blockPosition();
-        double centerX = pos.getX() + 0.5D;
-        double centerZ = pos.getZ() + 0.5D;
-
-        this.catcher.setPos(centerX, pos.getY(), centerZ);
-        this.catcher.setDeltaMovement(Vec3.ZERO);
     }
 }

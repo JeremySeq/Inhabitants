@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -130,6 +131,15 @@ public class CatcherEntity extends Monster implements GeoEntity {
 
     public void setState(State state) {
         this.entityData.set(STATE, state.name());
+    }
+
+    public void snapToBlockCenter() {
+        BlockPos pos = this.blockPosition();
+        double centerX = pos.getX() + 0.5D;
+        double centerZ = pos.getZ() + 0.5D;
+
+        this.setPos(centerX, pos.getY(), centerZ);
+        this.setDeltaMovement(Vec3.ZERO);
     }
 
     @Override
