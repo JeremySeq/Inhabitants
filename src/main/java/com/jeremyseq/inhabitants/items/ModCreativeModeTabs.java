@@ -67,6 +67,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.GLACIERPINE_TRAPDOOR_ITEM.get());
                         pOutput.accept(ModItems.WATERBERRY_ITEM.get());
                         pOutput.accept(ModItems.CATCHER_SPAWN_EGG.get());
+                        pOutput.accept(ModItems.CHITIN.get());
                         pOutput.accept(ModItems.CHITIN_CHESTPLATE.get());
                         pOutput.accept(ModItems.CHITIN_SHIELD.get());
                     })

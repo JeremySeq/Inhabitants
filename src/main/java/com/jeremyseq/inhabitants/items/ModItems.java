@@ -101,6 +101,9 @@ public class ModItems {
     public static final RegistryObject<Item> CHITIN_SHIELD = ITEMS.register("chitin_shield",
             () -> new ShieldItem(new Item.Properties().durability(750)));
 
+    public static final RegistryObject<Item> CHITIN = ITEMS.register("chitin",
+            () -> new Item(new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
