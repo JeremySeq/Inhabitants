@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
+import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -9,6 +10,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class CatcherBurrowGoal extends Goal {
     private final CatcherEntity catcher;
+    private int burrowTicks;
 
     public CatcherBurrowGoal(CatcherEntity catcher) {
         this.catcher = catcher;
@@ -21,7 +23,8 @@ public class CatcherBurrowGoal extends Goal {
             return true;
 
         // only burrow if no target nearby and on sand and idle
-        if (catcher.getTarget() == null && catcher.onGround() && catcher.getState() == CatcherEntity.State.IDLE) {
+        Player nearest = catcher.level().getNearestPlayer(catcher, 5.0D);
+        if (nearest == null && catcher.onGround() && catcher.getState() == CatcherEntity.State.IDLE) {
             if (catcher.level().getBlockState(catcher.blockPosition().below()).is(BlockTags.SAND)) {
                 return true;
             }
@@ -42,7 +45,7 @@ public class CatcherBurrowGoal extends Goal {
                 }
 
                 if (nearestSand != null) {
-                    catcher.getNavigation().moveTo(nearestSand.getX() + 0.5, nearestSand.getY(), nearestSand.getZ() + 0.5, 1.0);
+                    catcher.getNavigation().moveTo(nearestSand.getX(), nearestSand.getY(), nearestSand.getZ(), 1.0);
                 }
             }
         }
@@ -52,16 +55,22 @@ public class CatcherBurrowGoal extends Goal {
 
     @Override
     public void start() {
-        catcher.setState(CatcherEntity.State.BURROWED);
+//        catcher.setState(CatcherEntity.State.BURROWED);
         catcher.triggerAnim("ground_change", "digging");
         catcher.snapToBlockCenter();
         catcher.setNoGravity(true);
         catcher.getNavigation().stop();
+
+        burrowTicks = 20; // 1 second burrow anim delay
     }
 
     @Override
     public void stop() {
         catcher.setNoGravity(false);
+        catcher.setInvisible(false);
+        catcher.level().removeBlock(catcher.blockPosition(), false);
+        catcher.setState(CatcherEntity.State.IDLE);
+        catcher.triggerAnim("ground_change", "emerging");
     }
 
     @Override
@@ -74,5 +83,13 @@ public class CatcherBurrowGoal extends Goal {
     @Override
     public void tick() {
         catcher.setDeltaMovement(Vec3.ZERO);
+
+        burrowTicks--;
+        if (burrowTicks <= 0) {
+            // finished burrowing, now wait for ambush
+            catcher.level().setBlock(catcher.blockPosition(), ModBlocks.WATERBERRY_BLOCK.get().defaultBlockState(), 3);
+            catcher.setInvisible(true);
+            catcher.setState(CatcherEntity.State.BURROWED);
+        }
     }
 }

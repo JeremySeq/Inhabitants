@@ -13,6 +13,7 @@ public class CatcherAmbushGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        if (catcher.getState() == CatcherEntity.State.AMBUSH) return true; // handle relaunch session case
         if (catcher.getState() != CatcherEntity.State.BURROWED) return false;
         Player player = catcher.level().getNearestPlayer(catcher, 5.0D);
         return player != null && catcher.hasLineOfSight(player);
@@ -29,7 +30,10 @@ public class CatcherAmbushGoal extends Goal {
     @Override
     public void tick() {
         emergeTicks--;
-        if (emergeTicks <= 0) {
+        if (emergeTicks > 0) {
+            // stay in place while emerging
+            catcher.setDeltaMovement(0, 0, 0);
+        } else {
             // finished emerging, now attack
             catcher.setTarget(catcher.level().getNearestPlayer(catcher, 10.0D)); // maybe unecessary
             catcher.setState(CatcherEntity.State.IDLE);
