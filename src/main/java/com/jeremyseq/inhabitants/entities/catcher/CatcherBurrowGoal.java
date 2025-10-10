@@ -1,8 +1,10 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 
 public class CatcherBurrowGoal extends Goal {
@@ -19,8 +21,33 @@ public class CatcherBurrowGoal extends Goal {
             return true;
 
         // only burrow if no target nearby and on sand and idle
-        return catcher.getTarget() == null && catcher.onGround() && catcher.getState() == CatcherEntity.State.IDLE
-                && catcher.level().getBlockState(catcher.blockPosition().below()).is(BlockTags.SAND);
+        if (catcher.getTarget() == null && catcher.onGround() && catcher.getState() == CatcherEntity.State.IDLE) {
+            if (catcher.level().getBlockState(catcher.blockPosition().below()).is(BlockTags.SAND)) {
+                return true;
+            }
+            else {
+                // navigate to nearest sand block
+                BlockPos nearestSand = null;
+                int searchRadius = 5;
+                for (int x = -searchRadius; x <= searchRadius; x++) {
+                    for (int z = -searchRadius; z <= searchRadius; z++) {
+                        BlockPos basePos = catcher.blockPosition().offset(x, 0, z);
+                        BlockPos topPos = catcher.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, basePos);
+                        if (catcher.level().getBlockState(topPos.below()).is(BlockTags.SAND)) {
+                            if (nearestSand == null || catcher.blockPosition().distSqr(topPos) < catcher.blockPosition().distSqr(nearestSand)) {
+                                nearestSand = topPos;
+                            }
+                        }
+                    }
+                }
+
+                if (nearestSand != null) {
+                    catcher.getNavigation().moveTo(nearestSand.getX() + 0.5, nearestSand.getY(), nearestSand.getZ() + 0.5, 1.0);
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
