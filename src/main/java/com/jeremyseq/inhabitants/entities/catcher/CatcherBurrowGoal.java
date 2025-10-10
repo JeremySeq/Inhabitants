@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
+import com.jeremyseq.inhabitants.blocks.WaterberryBushBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -87,7 +88,11 @@ public class CatcherBurrowGoal extends Goal {
         burrowTicks--;
         if (burrowTicks <= 0) {
             // finished burrowing, now wait for ambush
-            catcher.level().setBlock(catcher.blockPosition(), ModBlocks.WATERBERRY_BLOCK.get().defaultBlockState(), 3);
+            catcher.level().setBlock(
+                catcher.blockPosition(),
+                ModBlocks.WATERBERRY_BLOCK.get().defaultBlockState().setValue(WaterberryBushBlock.FAKE, true),
+                3
+            );
             catcher.setInvisible(true);
             catcher.setState(CatcherEntity.State.BURROWED);
         }
