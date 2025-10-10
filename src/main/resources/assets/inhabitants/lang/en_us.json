@@ -67,6 +67,11 @@
   "effect.inhabitants.concussion": "Concussion",
   "effect.inhabitants.immunity": "Immunity",
 
+  "item.minecraft.tipped_arrow.effect.immunity": "Tipped Arrow of Immunity",
+  "item.minecraft.potion.effect.immunity": "Potion of Immunity",
+  "item.minecraft.splash_potion.effect.immunity": "Splash Potion of Immunity",
+  "item.minecraft.lingering_potion.effect.immunity": "Lingering Potion of Immunity",
+
   "advancement.inhabitants.david_and_goliath.title": "David and Goliath",
   "advancement.inhabitants.david_and_goliath.description": "Defeat the mighty Bogre.",
   "advancement.inhabitants.ate_fish_snot_chowder.title": "Is this even edible?",
