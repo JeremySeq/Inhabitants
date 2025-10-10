@@ -77,5 +77,10 @@
   "sounds.inhabitants.warped_clam.closed_damage": "Warped Clam clanks",
   "sounds.inhabitants.warped_clam.opened_damage": "Warped Clam hurts",
 
-  "item.inhabitants.chitin_chestplate.tooltip": "Grants immunity"
+  "item.inhabitants.chitin_chestplate.tooltip": "Grants immunity",
+  "upgrade.chitin.applies_to": "Shield",
+  "upgrade.chitin.title": "Chitin Upgrade",
+  "upgrade.chitin.ingredients": "Chitin",
+  "upgrade.chitin.base_slot_description": "Add shield",
+  "upgrade.chitin.additions_slot_description": "Add chitin"
 }

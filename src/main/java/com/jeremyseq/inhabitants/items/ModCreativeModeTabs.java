@@ -69,6 +69,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.CATCHER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.CHITIN.get());
                         pOutput.accept(ModItems.CHITIN_CHESTPLATE.get());
+                        pOutput.accept(ModItems.CHITIN_UPGRADE_SMITHING_TEMPLATE.get());
                         pOutput.accept(ModItems.CHITIN_SHIELD.get());
                     })
                     .build());
