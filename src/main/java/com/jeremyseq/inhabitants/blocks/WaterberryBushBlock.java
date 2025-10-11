@@ -10,7 +10,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -28,6 +30,12 @@ public class WaterberryBushBlock extends Block {
     public WaterberryBushBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FAKE, false));
+    }
+
+    @Override
+    public boolean canSurvive(@NotNull BlockState state, LevelReader world, BlockPos pos) {
+        BlockState below = world.getBlockState(pos.below());
+        return below.is(Blocks.SAND);
     }
 
     @Override
