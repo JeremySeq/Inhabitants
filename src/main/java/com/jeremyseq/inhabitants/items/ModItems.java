@@ -98,7 +98,7 @@ public class ModItems {
                     new Item.Properties()
             ));
 
-    public static final RegistryObject<Item> WATERBERRY_ITEM =
+    public static final RegistryObject<Item> WATERBERRY =
             ITEMS.register("waterberry", () -> new WaterberryItem(
                     new Item.Properties().stacksTo(16)
             ));
