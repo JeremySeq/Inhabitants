@@ -51,7 +51,9 @@ public class CatcherAmbushGoal extends Goal {
             );
 
             // play sound
-            serverLevel.playSound(null, catcher.blockPosition(), SoundEvents.SAND_STEP, catcher.getSoundSource(), 1.0F, 1.0F);
+            if (emergeTicks >= 10) {
+                serverLevel.playSound(null, catcher.blockPosition(), SoundEvents.SAND_STEP, catcher.getSoundSource(), 1.0F, 1.0F);
+            }
         }
 
         emergeTicks--;
