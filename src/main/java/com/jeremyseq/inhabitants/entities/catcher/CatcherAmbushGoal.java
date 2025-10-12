@@ -1,7 +1,13 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
+import com.jeremyseq.inhabitants.Inhabitants;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
 
 public class CatcherAmbushGoal extends Goal {
     private final CatcherEntity catcher;
@@ -21,6 +27,7 @@ public class CatcherAmbushGoal extends Goal {
 
     @Override
     public void start() {
+        Inhabitants.LOGGER.debug("Catcher starting to emerge");
         catcher.setState(CatcherEntity.State.AMBUSH);
         catcher.triggerAnim("ground_change", "emerging");
         catcher.setNoGravity(false);
@@ -29,11 +36,32 @@ public class CatcherAmbushGoal extends Goal {
 
     @Override
     public void tick() {
+        // stay in place while emerging
+        catcher.setDeltaMovement(0, 0, 0);
+
+        Inhabitants.LOGGER.debug("Catcher emerging, ticks left: " + emergeTicks);
+
+        if (catcher.level() instanceof ServerLevel serverLevel) {
+
+            Inhabitants.LOGGER.debug("Catcher spawning particles while emerging");
+
+            // spawn particles
+            serverLevel.sendParticles(
+                    new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState()),
+                    catcher.getX(), catcher.getY() + 0.1D, catcher.getZ(),
+                    5,
+                    (catcher.getRandom().nextDouble() - 0.5D) * 0.1D,
+                    0.1D,
+                    (catcher.getRandom().nextDouble() - 0.5D) * 0.1D,
+                    0.0D
+            );
+
+            // play sound
+            serverLevel.playSound(null, catcher.blockPosition(), SoundEvents.SAND_STEP, catcher.getSoundSource(), 1.0F, 1.0F);
+        }
+
         emergeTicks--;
-        if (emergeTicks > 0) {
-            // stay in place while emerging
-            catcher.setDeltaMovement(0, 0, 0);
-        } else {
+        if (emergeTicks <= 0) {
             // finished emerging, now attack
             catcher.setTarget(catcher.level().getNearestPlayer(catcher, 10.0D)); // maybe unecessary
             catcher.setState(CatcherEntity.State.IDLE);

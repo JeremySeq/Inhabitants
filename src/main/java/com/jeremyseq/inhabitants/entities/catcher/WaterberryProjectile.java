@@ -25,7 +25,7 @@ public class WaterberryProjectile extends ThrowableItemProjectile {
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.WATERBERRY_ITEM.get();
+        return ModItems.WATERBERRY.get();
     }
 
     @Override

@@ -67,7 +67,7 @@ public class WaterberryBushBlock extends Block {
 
     @Override
     public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
-        return List.of(new ItemStack(ModItems.WATERBERRY_ITEM.get(), 1));
+        return List.of(new ItemStack(ModItems.WATERBERRY.get(), 1));
     }
 
     @Override

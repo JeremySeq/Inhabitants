@@ -65,7 +65,8 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.GLACIERPINE_BUTTON_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_DOOR_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_TRAPDOOR_ITEM.get());
-                        pOutput.accept(ModItems.WATERBERRY_ITEM.get());
+                        pOutput.accept(ModItems.WATERBERRY.get());
+                        pOutput.accept(ModBlocks.WATERBERRY_BLOCK.get());
                         pOutput.accept(ModItems.CATCHER_SPAWN_EGG.get());
                     })
                     .build());

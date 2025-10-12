@@ -1,11 +1,17 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.blocks.WaterberryBushBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 
@@ -24,7 +30,7 @@ public class CatcherBurrowGoal extends Goal {
             return true;
 
         // only burrow if no target nearby and on sand and idle
-        Player nearest = catcher.level().getNearestPlayer(catcher, 5.0D);
+        Player nearest = catcher.level().getNearestPlayer(catcher, 20.0D);
         if (nearest == null && catcher.onGround() && catcher.getState() == CatcherEntity.State.IDLE) {
             if (catcher.level().getBlockState(catcher.blockPosition().below()).is(BlockTags.SAND)) {
                 return true;
@@ -56,13 +62,14 @@ public class CatcherBurrowGoal extends Goal {
 
     @Override
     public void start() {
-//        catcher.setState(CatcherEntity.State.BURROWED);
         catcher.triggerAnim("ground_change", "digging");
         catcher.snapToBlockCenter();
         catcher.setNoGravity(true);
         catcher.getNavigation().stop();
 
         burrowTicks = 20; // 1 second burrow anim delay
+
+        Inhabitants.LOGGER.debug("Catcher starting to burrow");
     }
 
     @Override
@@ -70,8 +77,6 @@ public class CatcherBurrowGoal extends Goal {
         catcher.setNoGravity(false);
         catcher.setInvisible(false);
         catcher.level().removeBlock(catcher.blockPosition(), false);
-        catcher.setState(CatcherEntity.State.IDLE);
-        catcher.triggerAnim("ground_change", "emerging");
     }
 
     @Override
@@ -95,6 +100,22 @@ public class CatcherBurrowGoal extends Goal {
             );
             catcher.setInvisible(true);
             catcher.setState(CatcherEntity.State.BURROWED);
+        } else {
+            if (catcher.level() instanceof ServerLevel serverLevel) {
+                // spawn particles
+                serverLevel.sendParticles(
+                        new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState()),
+                        catcher.getX(), catcher.getY() + 0.1D, catcher.getZ(),
+                        5,
+                        catcher.getRandom().nextDouble() - 0.5D,
+                        catcher.getRandom().nextDouble() * 0.3D,
+                        catcher.getRandom().nextDouble() - 0.5D,
+                        0.5D
+                );
+
+                // play sound
+                serverLevel.playSound(null, catcher.blockPosition(), SoundEvents.SAND_STEP, catcher.getSoundSource(), 1.0F, 1.0F);
+            }
         }
     }
 }
