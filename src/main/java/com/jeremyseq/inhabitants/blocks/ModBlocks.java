@@ -170,6 +170,8 @@ public class ModBlocks
                     .randomTicks()
                     .instabreak()
                     .sound(SoundType.GRASS)));
+    public static final RegistryObject<Item> WATERBERRY_BUSH_ITEM =
+            registerBlockItem("waterberry_bush", WATERBERRY_BLOCK);
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         return BLOCKS.register(name, block);
