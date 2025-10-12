@@ -12,6 +12,7 @@ import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBeh
 import com.jeremyseq.inhabitants.items.GazerPodItem;
 import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.potions.ModPotions;
 import com.mojang.logging.LogUtils;

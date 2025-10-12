@@ -1,5 +1,6 @@
-package com.jeremyseq.inhabitants;
+package com.jeremyseq.inhabitants.loot_modifiers;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import com.mojang.serialization.Codec;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -12,6 +13,9 @@ public class ModLootModifiers {
             DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, Inhabitants.MODID);
 
     public static final RegistryObject<Codec<ReplaceWithItemLootModifier>> REPLACE_ITEM = LOOT_MODIFIERS.register("replace_item_loot_modifier", () -> ReplaceWithItemLootModifier.CODEC);
+
+    public static final RegistryObject<Codec<AddChitinTemplateModifier>> ADD_CHITIN_TEMPLATE =
+            LOOT_MODIFIERS.register("add_chitin_template", () -> AddChitinTemplateModifier.CODEC);
 
     public static void register(IEventBus bus) {
         LOOT_MODIFIERS.register(bus);

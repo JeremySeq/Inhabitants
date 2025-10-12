@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants;
+package com.jeremyseq.inhabitants.loot_modifiers;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
