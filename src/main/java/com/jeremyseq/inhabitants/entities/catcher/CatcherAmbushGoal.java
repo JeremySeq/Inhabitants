@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +26,6 @@ public class CatcherAmbushGoal extends Goal {
 
     @Override
     public void start() {
-        Inhabitants.LOGGER.debug("Catcher starting to emerge");
         catcher.setState(CatcherEntity.State.AMBUSH);
         catcher.triggerAnim("ground_change", "emerging");
         catcher.setNoGravity(false);
@@ -39,11 +37,7 @@ public class CatcherAmbushGoal extends Goal {
         // stay in place while emerging
         catcher.setDeltaMovement(0, 0, 0);
 
-        Inhabitants.LOGGER.debug("Catcher emerging, ticks left: " + emergeTicks);
-
         if (catcher.level() instanceof ServerLevel serverLevel) {
-
-            Inhabitants.LOGGER.debug("Catcher spawning particles while emerging");
 
             // spawn particles
             serverLevel.sendParticles(

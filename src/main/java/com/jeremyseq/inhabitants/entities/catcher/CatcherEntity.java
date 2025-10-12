@@ -55,6 +55,11 @@ public class CatcherEntity extends Monster implements GeoEntity {
                 .add(Attributes.MOVEMENT_SPEED, .25f).build();
     }
 
+    @Override
+    public boolean isAffectedByPotions() {
+        return false;
+    }
+
     protected void registerGoals() {
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 30f, 1));
         this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
