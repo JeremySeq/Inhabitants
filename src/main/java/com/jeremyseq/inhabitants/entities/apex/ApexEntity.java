@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
+import com.jeremyseq.inhabitants.entities.goals.CooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -57,7 +58,7 @@ public class ApexEntity extends Monster implements GeoEntity {
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new ApexSleepGoal(this));
         this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 4));
-        this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.4D, true));
+        this.goalSelector.addGoal(6, new CooldownMeleeAttackGoal(this, 1.4D, true, 15));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
