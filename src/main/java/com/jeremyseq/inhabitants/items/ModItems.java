@@ -103,6 +103,9 @@ public class ModItems {
             () -> new ChitinChestplateItem(ModArmorMaterials.CHITIN, ArmorItem.Type.CHESTPLATE,
                     new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> CHITIN_CHESTPLATE_ELYTRA = ITEMS.register("chitin_chestplate_elytra",
+            ChitinChestplateElytraItem::new);
+
     public static final RegistryObject<Item> CHITIN_SHIELD = ITEMS.register("chitin_shield",
             () -> new ShieldItem(new Item.Properties().durability(750)));
 
