@@ -1,10 +1,10 @@
 package com.jeremyseq.inhabitants.items.armor;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.LazyLoadedValue;
@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 public enum ModArmorMaterials implements ArmorMaterial {
     CHITIN("chitin", 20, new int[]{0, 0, 8, 0}, 12,
             SoundEvents.ARMOR_EQUIP_LEATHER, 2.0F, 0.0F,
-            () -> Ingredient.of(ItemStack.EMPTY)); // TODO: add chitin as repair item
+            () -> Ingredient.of(ModItems.CHITIN.get()));
 
     private static final int[] HEALTH_PER_SLOT = new int[]{13, 15, 16, 11};
     private final String name;
