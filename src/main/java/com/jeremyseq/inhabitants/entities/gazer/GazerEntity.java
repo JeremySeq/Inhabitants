@@ -147,7 +147,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         }
 
         // trigger RETURNING TO POD state
-        if (this.getGazerState() == GazerState.IDLE && this.tickCount % 600 == 0 && !this.isEnteringPod()) {
+        if (this.getGazerState() == GazerState.IDLE && this.tickCount % 400 == 0 && !this.isEnteringPod()) {
             // find closest GazerPodEntity without a gazer
             this.setGazerState(GazerState.RETURNING_TO_POD);
         }
