@@ -194,7 +194,6 @@ public class CooldownMeleeAttackGoal extends Goal {
             this.resetAttackCooldown();
             this.mob.swing(InteractionHand.MAIN_HAND);
             this.mob.doHurtTarget(target);
-            System.out.println("Bogre attacked! Cooldown set to " + attackInterval + " ticks");
         }
     }
 
