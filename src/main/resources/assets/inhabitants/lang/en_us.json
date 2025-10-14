@@ -88,5 +88,8 @@
   "upgrade.chitin.title": "Chitin Upgrade",
   "upgrade.chitin.ingredients": "Chitin",
   "upgrade.chitin.base_slot_description": "Add shield",
-  "upgrade.chitin.additions_slot_description": "Add chitin"
+  "upgrade.chitin.additions_slot_description": "Add chitin",
+
+  "key.categories.inhabitants": "Inhabitants",
+  "key.control_gazer": "Control Gazer"
 }
