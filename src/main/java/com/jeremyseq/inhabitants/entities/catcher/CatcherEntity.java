@@ -50,8 +50,8 @@ public class CatcherEntity extends Monster implements GeoEntity {
 
     public static AttributeSupplier setAttributes() {
         return Monster.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 30f)
-                .add(Attributes.ATTACK_DAMAGE, 13f)
+                .add(Attributes.MAX_HEALTH, 20f)
+                .add(Attributes.ATTACK_DAMAGE, 5f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5f)
                 .add(Attributes.MOVEMENT_SPEED, .25f).build();
     }
