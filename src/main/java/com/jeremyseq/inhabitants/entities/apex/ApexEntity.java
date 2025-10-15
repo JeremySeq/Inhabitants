@@ -46,6 +46,7 @@ public class ApexEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_DAMAGE, 30F)
                 .add(Attributes.ATTACK_SPEED, .5)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.75f)
                 .add(Attributes.MOVEMENT_SPEED, .2f).build();
     }
 
