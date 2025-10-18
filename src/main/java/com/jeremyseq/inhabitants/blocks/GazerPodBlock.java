@@ -54,12 +54,12 @@ public class GazerPodBlock extends BaseEntityBlock {
 
     @Override
     public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {
-        return Blocks.NETHERRACK.defaultBlockState().canHarvestBlock(level, pos, player);
+        return true;
     }
 
     @Override
     public float getDestroyProgress(@NotNull BlockState state, @NotNull Player player, @NotNull BlockGetter level, @NotNull BlockPos pos) {
-        return Blocks.NETHERRACK.defaultBlockState().getDestroyProgress(player, level, pos);
+        return Blocks.CRIMSON_FUNGUS.defaultBlockState().getDestroyProgress(player, level, pos);
     }
 
 

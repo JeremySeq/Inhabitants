@@ -111,7 +111,7 @@ public class GazerPodBlockEntity extends BlockEntity implements GeoBlockEntity {
         if (this.getLevel() instanceof ServerLevel serverLevel) {
             tickCounter++;
 
-            if (this.hasGazer() && tickCounter % 800 == 0) {
+            if (this.hasGazer() && tickCounter % 400 == 0) {
                 Inhabitants.LOGGER.debug("Spawning gazer from pod at {}", this.getBlockPos());
 
                 // Spawn gazer
