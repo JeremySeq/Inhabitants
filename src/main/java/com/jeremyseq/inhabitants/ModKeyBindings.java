@@ -10,8 +10,8 @@ import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModKeyBindings {
-    public static final KeyMapping CONTROL_GAZER_KEY = new KeyMapping(
-            "key.control_gazer", // The translation key of the key binding's name
+    public static final KeyMapping INHABITANTS_KEY = new KeyMapping(
+            "key.inhabitants_key", // The translation key of the key binding's name
             InputConstants.Type.KEYSYM, // The type of the key binding, in this case, a keyboard key
             GLFW.GLFW_KEY_H, // The default key for the key binding
             "key.categories." + Inhabitants.MODID // The translation key of the key binding's category
@@ -19,6 +19,7 @@ public class ModKeyBindings {
 
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
-        event.register(CONTROL_GAZER_KEY);
+        event.register(INHABITANTS_KEY);
     }
 }
+    
