@@ -49,27 +49,6 @@
 					]
 				},
 				{
-					"name": "eyelash",
-					"parent": "eye",
-					"pivot": [0, -0.25833, 0.3]
-				},
-				{
-					"name": "top",
-					"parent": "eyelash",
-					"pivot": [0, 3.74167, -9.95],
-					"cubes": [
-						{"origin": [-4, 3.74167, -12.95], "size": [8, 0, 3], "pivot": [0, 3.74167, -9.95], "rotation": [-60, 0, 0], "uv": [31, 0]}
-					]
-				},
-				{
-					"name": "bottom",
-					"parent": "eyelash",
-					"pivot": [0, -4.25833, -9.95],
-					"cubes": [
-						{"origin": [-4, -4.25833, -12.95], "size": [8, 0, 3], "pivot": [0, -4.25833, -9.95], "rotation": [60, 0, 0], "uv": [31, 0]}
-					]
-				},
-				{
 					"name": "pod",
 					"parent": "gazer_pod_block",
 					"pivot": [1, 0, 22],
