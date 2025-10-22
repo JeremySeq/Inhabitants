@@ -105,6 +105,7 @@ public class Inhabitants
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_DOOR.get(), RenderType.cutout());
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_TRAPDOOR.get(), RenderType.cutout());
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_SAPLING.get(), RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_LEAVES.get(), RenderType.cutoutMipped());
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.WATERBERRY_BLOCK.get(), RenderType.cutout());
             });
 

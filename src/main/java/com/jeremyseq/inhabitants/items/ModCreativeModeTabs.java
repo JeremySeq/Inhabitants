@@ -52,6 +52,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.ICE_BRICK_SLAB_ITEM.get());
                         pOutput.accept(ModBlocks.ICE_BRICK_WALL_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_SAPLING_ITEM.get());
+                        pOutput.accept(ModBlocks.GLACIERPINE_LEAVES_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_LOG_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_WOOD_ITEM.get());
                         pOutput.accept(ModBlocks.STRIPPED_GLACIERPINE_LOG_ITEM.get());

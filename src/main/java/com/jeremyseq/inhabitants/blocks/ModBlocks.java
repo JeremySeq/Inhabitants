@@ -67,6 +67,10 @@ public class ModBlocks
                             .sound(SoundType.GRASS)));
     public static final RegistryObject<Item> GLACIERPINE_SAPLING_ITEM = registerBlockItem("glacierpine_sapling", GLACIERPINE_SAPLING);
 
+    public static final RegistryObject<Block> GLACIERPINE_LEAVES = BLOCKS.register("glacierpine_leaves",
+            () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.SPRUCE_LEAVES)));
+    public static final RegistryObject<Item> GLACIERPINE_LEAVES_ITEM = registerBlockItem("glacierpine_leaves", GLACIERPINE_LEAVES);
+
 
     public static final RegistryObject<Block> GLACIERPINE_LOG = BLOCKS.register("glacierpine_log",
             () -> new RotatedPillarBlock(BlockBehaviour.Properties.of()

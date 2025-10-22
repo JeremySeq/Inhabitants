@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "inhabitants:block/glacierpine_leaves"
+  }
+}
