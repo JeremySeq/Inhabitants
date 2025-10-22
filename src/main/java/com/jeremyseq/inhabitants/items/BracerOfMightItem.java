@@ -27,7 +27,7 @@ public class BracerOfMightItem extends Item {
         if (slot < 9) {
             MobEffectInstance current = player.getEffect(MobEffects.DAMAGE_BOOST);
             if (current == null || current.getAmplifier() < 1 || current.getDuration() <= 10) {
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 1, true, false, true));
+                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 20, 1, true, false, true));
             }
         }
     }

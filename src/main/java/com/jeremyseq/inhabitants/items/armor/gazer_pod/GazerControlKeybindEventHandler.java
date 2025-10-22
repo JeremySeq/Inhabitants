@@ -20,7 +20,7 @@ import java.util.UUID;
 public class GazerControlKeybindEventHandler {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (ModKeyBindings.CONTROL_GAZER_KEY.consumeClick()) {
+        if (ModKeyBindings.INHABITANTS_KEY.consumeClick()) {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player == null) return;
 

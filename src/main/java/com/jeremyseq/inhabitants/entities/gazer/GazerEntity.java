@@ -361,7 +361,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
             return PlayState.CONTINUE;
         }
 
-        if (this.getDeltaMovement().lengthSqr() > 0.03) {
+        if (this.getDeltaMovement().length() > 0.01) {
             controller.setAnimation(RawAnimation.begin().then("floating_movement", Animation.LoopType.LOOP));
             return PlayState.CONTINUE;
         } else {
