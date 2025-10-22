@@ -125,18 +125,18 @@ public class BogreEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_SPEED, .5)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0F)
-                .add(Attributes.MOVEMENT_SPEED, .2f).build();
+                .add(Attributes.MOVEMENT_SPEED, .17f).build();
     }
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.4f, false, 40, true, true));
+        this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.3f, false, 40, true, true));
         this.goalSelector.addGoal(7, new BogreConditionalStrollGoal(this, 1.0D));
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "defaults_controller", 0, this::defaults));
+        controllerRegistrar.add(new AnimationController<>(this, "defaults_controller", 0, this::defaults).transitionLength(3));
         controllerRegistrar.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
                 .triggerableAnim("hurt", RawAnimation.begin().then("taking_damage", Animation.LoopType.PLAY_ONCE)));
         controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
