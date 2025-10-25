@@ -4,7 +4,7 @@
   "spawners": {
     "type": "inhabitants:impaler",
     "category": "monster",
-    "weight": 60,
+    "weight": 40,
     "minCount": 1,
     "maxCount": 1
   }
