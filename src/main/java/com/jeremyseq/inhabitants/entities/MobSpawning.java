@@ -46,7 +46,9 @@ public class MobSpawning {
                 ModEntities.CATCHER.get(),
                 SpawnPlacements.Type.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                Monster::checkAnyLightMonsterSpawnRules,
+                (type, level, reason, pos, random) ->
+                        Monster.checkAnyLightMonsterSpawnRules(type, level, reason, pos, random)
+                                && pos.getY() > level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ()) - 15,
                 SpawnPlacementRegisterEvent.Operation.REPLACE
         );
 

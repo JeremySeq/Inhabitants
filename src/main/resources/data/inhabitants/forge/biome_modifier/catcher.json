@@ -5,8 +5,8 @@
   ],
   "spawners": {
     "type": "inhabitants:catcher",
-    "category": "monster",
-    "weight": 10,
+    "category": "creature",
+    "weight": 20,
     "minCount": 1,
     "maxCount": 2
   },
