@@ -67,6 +67,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     }
 
     protected void addBehaviourGoals() {
+        this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new RestrictSunGoal(this));
         this.goalSelector.addGoal(2, new FleeSunGoal(this, 1.0D));
         this.goalSelector.addGoal(3, new ImpalerRageGoal(this));
