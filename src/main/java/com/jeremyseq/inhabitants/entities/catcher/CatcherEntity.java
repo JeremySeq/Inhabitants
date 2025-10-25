@@ -39,7 +39,6 @@ public class CatcherEntity extends Monster implements GeoEntity {
 
     public CatcherEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        this.setPersistenceRequired();
     }
 
     public enum State {

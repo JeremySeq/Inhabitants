@@ -38,6 +38,7 @@ public class ApexEntity extends Monster implements GeoEntity {
 
     public ApexEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        this.setPersistenceRequired();
     }
 
     public static AttributeSupplier setAttributes() {
