@@ -15,6 +15,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -133,6 +134,7 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
         // if being controlled, check owner validity
         if (this.getGazerState() == GazerState.BEING_CONTROLLED && !level().isClientSide) {
             ServerPlayer owner = (ServerPlayer) this.level().getPlayerByUUID(this.getOwnerUUID());
+
             if (owner == null
                     || owner.isDeadOrDying()
                     || owner.getItemBySlot(EquipmentSlot.HEAD).getItem() != ModItems.GAZER_POD.get()) {
@@ -143,6 +145,21 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
                     ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> owner),
                             new GazerCameraPacketS2C(this.getId(), false));
                 }
+            } else {
+                // server side control from GazerEntity
+
+                float playerYaw = Mth.wrapDegrees(owner.getYHeadRot());
+                float playerPitch = Mth.wrapDegrees(owner.getXRot());
+
+                // compute shortest-angle deltas (result in -180..180)
+                float deltaYaw = Mth.wrapDegrees(playerYaw - this.getYRot());
+                float deltaPitch = Mth.wrapDegrees(playerPitch - this.getXRot());
+
+                // apply the shortest deltas to the gazer instead of setting absolute wrapped values
+                this.setYRot(this.getYRot() + deltaYaw);
+                this.setXRot(this.getXRot() + deltaPitch);
+                this.setYHeadRot(this.getYRot());
+                this.setYBodyRot(this.getYRot());
             }
         }
 

@@ -7,12 +7,15 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientChunkCache;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.material.FogType;
 import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -38,12 +41,60 @@ public class ControlClientTickEventHandler {
 
             UUID gazerId = gazer.getUUID();
 
-            float yaw = mc.player.getYHeadRot() % 360F;
-            float pitch = mc.player.getXRot();
+            float playerYaw = Mth.wrapDegrees(mc.player.getYHeadRot());
+            float playerPitch = Mth.wrapDegrees(mc.player.getXRot());
+
+            // compute shortest-angle deltas (result in -180..180)
+            float deltaYaw = Mth.wrapDegrees(playerYaw - gazer.getYRot());
+            float deltaPitch = Mth.wrapDegrees(playerPitch - gazer.getXRot());
+
+            // apply the shortest deltas to the gazer instead of setting absolute wrapped values
+            gazer.setYRot(gazer.getYRot() + deltaYaw);
+            gazer.setXRot(gazer.getXRot() + deltaPitch);
+            gazer.setYHeadRot(gazer.getYRot());
+            gazer.setYBodyRot(gazer.getYRot());
+
+//            Inhabitants.LOGGER.debug("Sending Gazer control packet: forward={}, back={}, left={}, right={}, jump={}, sneak={}, yaw={}, pitch={}",
+//                    forward, back, left, right, jump, sneak, yaw, pitch);
+
+            Inhabitants.LOGGER.debug("CLIENT: Player Position: x={}, y={}, z={}", mc.player.getX(), mc.player.getY(), mc.player.getZ());
 
             // Send input packet to the server
-            ModNetworking.CHANNEL.sendToServer(new GazerControlPacketC2S(gazerId, forward, back, left, right, jump, sneak, yaw, pitch));
+            ModNetworking.CHANNEL.sendToServer(new GazerControlPacketC2S(gazerId, forward, back, left, right, jump, sneak, gazer.getYRot(), gazer.getXRot()));
         }
+    }
+
+    @SubscribeEvent
+    public static void onAttack(AttackEntityEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        // Only process if the camera entity is a GazerEntity
+        if (!(mc.getCameraEntity() instanceof GazerEntity)) return;
+
+        event.setCanceled(true); // Cancel the attack event
+    }
+
+    @SubscribeEvent
+    public static void onDestroyBlock(BlockEvent.BreakEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        // Only process if the camera entity is a GazerEntity
+        if (!(mc.getCameraEntity() instanceof GazerEntity)) return;
+
+        event.setCanceled(true); // Cancel the block break event
+    }
+
+    @SubscribeEvent
+    public static void onPlaceBlock(BlockEvent.EntityPlaceEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        // Only process if the camera entity is a GazerEntity
+        if (!(mc.getCameraEntity() instanceof GazerEntity)) return;
+
+        event.setCanceled(true); // Cancel the block placement event
     }
 
     @SubscribeEvent

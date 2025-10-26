@@ -70,12 +70,6 @@ public class GazerControlPacketC2S {
 
             double speed = 0.3;
 
-            // Set rotation from packet
-            gazer.setYRot(msg.yaw);
-            gazer.setXRot(msg.pitch);
-            gazer.setYHeadRot(msg.yaw);
-            gazer.setYBodyRot(msg.yaw);
-
             // apply movement relative to yaw
             moveRelativeToYaw(gazer, msg.yaw, msg.forward, msg.back, msg.left, msg.right, msg.jump, msg.sneak, speed);
         });
