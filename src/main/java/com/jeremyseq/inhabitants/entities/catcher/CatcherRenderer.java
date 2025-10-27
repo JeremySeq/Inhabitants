@@ -9,6 +9,7 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 public class CatcherRenderer extends GeoEntityRenderer<CatcherEntity> {
     public CatcherRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new CatcherModel());
+        this.shadowRadius = 1.5f;
     }
 
     @Override

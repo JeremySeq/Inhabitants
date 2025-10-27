@@ -9,6 +9,7 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 public class ApexRenderer extends GeoEntityRenderer<ApexEntity> {
     public ApexRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new ApexModel());
+        this.shadowRadius = 1.5f;
     }
 
     @Override
