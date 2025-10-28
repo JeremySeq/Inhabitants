@@ -40,7 +40,8 @@ public class BoulderEntity extends Monster implements GeoEntity {
 
     protected void registerGoals() {
         this.goalSelector.addGoal(2, new AnimatedCooldownMeleeAttackGoal(this, 1,
-                true, 50, "attack", "melee", 35, 19));
+                true, 50, "attack", "melee",
+                35, 19).setFreezeMovement(15, 22));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D, 0.0F));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));

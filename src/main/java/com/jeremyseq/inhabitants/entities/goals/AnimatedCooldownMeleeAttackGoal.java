@@ -8,7 +8,8 @@ import software.bernie.geckolib.animatable.GeoEntity;
 /**
  * Extends CooldownMeleeAttackGoal to include an attack animation phase
  * where the mob cannot move or turn for a given duration.
- * Also allows specifying at what tick during the animation the hit should occur.
+ * Allows specifying at what tick during the animation the hit should occur.
+ * Allows for freezing the mob's movement during specified ticks of the animation.
  */
 public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
 
@@ -17,8 +18,11 @@ public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
     private final int animationDuration;
     private final int attackHitTick;
     private final GeoEntity geckomob;
-    private int animationTicksRemaining = 0;
+    private int animationTicks = -1;
     private boolean hitDone = false;
+
+    private int startFreezeTick;
+    private int endFreezeTick;
 
     public <T extends PathfinderMob & GeoEntity> AnimatedCooldownMeleeAttackGoal(
             T mob,
@@ -38,14 +42,24 @@ public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
         this.geckomob = mob;
     }
 
+    public AnimatedCooldownMeleeAttackGoal setFreezeMovement(int startTick, int endTick) {
+        this.startFreezeTick = startTick;
+        this.endFreezeTick = endTick;
+        return this;
+    }
+
     @Override
     public void tick() {
-        if (animationTicksRemaining > 0) {
-            animationTicksRemaining--;
+        if (animationTicks < this.animationDuration) {
+            animationTicks++;
 
-            this.mob.getNavigation().stop();
+            boolean freezeMovement = animationTicks >= startFreezeTick && animationTicks <= endFreezeTick;
 
-            if (!hitDone && animationDuration - animationTicksRemaining == attackHitTick) {
+            if (freezeMovement) {
+                this.mob.getNavigation().stop();
+            }
+
+            if (!hitDone && animationTicks == attackHitTick) {
                 LivingEntity target = this.mob.getTarget();
                 if (target != null && target.isAlive()) {
                     double distSq = this.mob.distanceToSqr(target);
@@ -57,11 +71,11 @@ public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
                 hitDone = true;
             }
 
-            if (animationTicksRemaining <= 0) {
+            if (animationTicks >= this.animationDuration) {
                 hitDone = false;
             }
 
-            return;
+            if (freezeMovement) return;
         }
 
         super.tick();
@@ -73,17 +87,18 @@ public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
         if (distanceToTargetSq <= attackReach && this.ticksUntilNextAttack <= 0) {
             this.resetAttackCooldown();
 
-            this.animationTicksRemaining = this.animationDuration;
+            this.animationTicks = 0;
             this.hitDone = false;
             this.mob.getNavigation().stop();
 
+            this.geckomob.stopTriggeredAnimation(controllerName, animationName);
             this.geckomob.triggerAnim(controllerName, animationName);
         }
     }
 
     @Override
     public boolean canContinueToUse() {
-        if (animationTicksRemaining > 0)
+        if (animationTicks < this.animationDuration)
             return true;
         return super.canContinueToUse();
     }
