@@ -9,6 +9,7 @@
   "entity.inhabitants.apex": "Beloceros",
   "entity.inhabitants.gazer": "Gazer",
   "entity.inhabitants.catcher": "Catcher",
+  "entity.inhabitants.boulder": "Boulder",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -37,6 +38,7 @@
   "item.inhabitants.chitin_chestplate": "Chitin Chestplate",
   "item.inhabitants.chitin_shield": "Chitin Shield",
   "item.inhabitants.chitin_chestplate_elytra": "Chitin Chestplate with Elytra",
+  "item.inhabitants.boulder_spawn_egg": "Boulder Spawn Egg",
 
   "block.inhabitants.gazer_pod_block": "Gazer Bud",
   "block.inhabitants.waterberry_bush": "Waterberry Bush",

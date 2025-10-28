@@ -26,7 +26,7 @@ public class CooldownMeleeAttackGoal extends Goal {
     private double pathedTargetY;
     private double pathedTargetZ;
     private int ticksUntilNextPathRecalculation;
-    private int ticksUntilNextAttack;
+    protected int ticksUntilNextAttack;
     private final int attackInterval; // how many ticks between attacks
     private long lastCanUseCheck;
     private static final long COOLDOWN_BETWEEN_CAN_USE_CHECKS = 20L;
@@ -74,7 +74,7 @@ public class CooldownMeleeAttackGoal extends Goal {
         }
 
         this.path = this.mob.getNavigation().createPath(target, 0);
-        return this.path != null || this.getAttackReachSqr(target) >= this.mob.distanceToSqr(target.getX(), target.getY(), target.getZ());
+        return this.path != null || this.mob.getMeleeAttackRangeSqr(target) >= this.mob.distanceToSqr(target.getX(), target.getY(), target.getZ());
     }
 
     @Override
@@ -189,7 +189,7 @@ public class CooldownMeleeAttackGoal extends Goal {
     }
 
     protected void checkAndPerformAttack(LivingEntity target, double distanceToTargetSq) {
-        double attackReach = this.getAttackReachSqr(target);
+        double attackReach = this.mob.getMeleeAttackRangeSqr(target);
         if (distanceToTargetSq <= attackReach && this.ticksUntilNextAttack <= 0) {
             this.resetAttackCooldown();
             this.mob.swing(InteractionHand.MAIN_HAND);
@@ -199,9 +199,5 @@ public class CooldownMeleeAttackGoal extends Goal {
 
     protected void resetAttackCooldown() {
         this.ticksUntilNextAttack = this.adjustedTickDelay(this.attackInterval);
-    }
-
-    protected double getAttackReachSqr(LivingEntity target) {
-        return this.mob.getBbWidth() * 2.0F * this.mob.getBbWidth() * 2.0F + target.getBbWidth();
     }
 }

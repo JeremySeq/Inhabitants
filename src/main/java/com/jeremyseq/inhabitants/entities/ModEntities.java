@@ -9,6 +9,8 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
+import com.jeremyseq.inhabitants.entities.boulder.BoulderEntity;
+import com.jeremyseq.inhabitants.entities.boulder.BoulderRenderer;
 import com.jeremyseq.inhabitants.entities.catcher.CatcherEntity;
 import com.jeremyseq.inhabitants.entities.catcher.CatcherRenderer;
 import com.jeremyseq.inhabitants.entities.catcher.WaterberryProjectile;
@@ -122,6 +124,12 @@ public class ModEntities {
                             .build("waterberry_projectile")
             );
 
+    public static final RegistryObject<EntityType<BoulderEntity>> BOULDER =
+            REGISTRY.register("boulder",
+                    () -> EntityType.Builder.of(BoulderEntity::new, MobCategory.MONSTER)
+                            .sized(.9f, 1.6f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "boulder").toString()));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
@@ -133,6 +141,7 @@ public class ModEntities {
         event.put(ModEntities.WISHFISH.get(), WishfishEntity.setAttributes());
         event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
         event.put(ModEntities.CATCHER.get(), CatcherEntity.setAttributes());
+        event.put(ModEntities.BOULDER.get(), BoulderEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -149,5 +158,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
         EntityRenderers.register(ModEntities.CATCHER.get(), CatcherRenderer::new);
         EntityRenderers.register(ModEntities.WATERBERRY_PROJECTILE.get(), ThrownItemRenderer::new);
+        EntityRenderers.register(ModEntities.BOULDER.get(), BoulderRenderer::new);
     }
 }
