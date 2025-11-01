@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.networking;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -59,8 +60,6 @@ public class GazerControlPacketC2S {
 
     public static void handle(GazerControlPacketC2S msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-//            Inhabitants.LOGGER.debug("SERVER: Received GazerControlPacketC2S: gazerId={}, forward={}, back={}, left={}, right={}, jump={}, sneak={}, yaw={}, pitch={}",
-//                    msg.gazerId, msg.forward, msg.back, msg.left, msg.right, msg.jump, msg.sneak, msg.yaw, msg.pitch);
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return; // sanity check
 
@@ -70,6 +69,14 @@ public class GazerControlPacketC2S {
 
             double speed = 0.3;
 
+            float packetYaw = Mth.wrapDegrees(msg.yaw);
+            float packetPitch = Mth.clamp(msg.pitch, -90f, 90f);
+
+            gazer.setYRot(packetYaw);
+            gazer.setXRot(packetPitch);
+            gazer.setYHeadRot(packetYaw);
+            gazer.setYBodyRot(packetYaw);
+
             // apply movement relative to yaw
             moveRelativeToYaw(gazer, msg.yaw, msg.forward, msg.back, msg.left, msg.right, msg.jump, msg.sneak, speed);
         });
@@ -77,6 +84,8 @@ public class GazerControlPacketC2S {
     }
 
     public static void moveRelativeToYaw(Entity entity, float yaw, boolean forward, boolean back, boolean left, boolean right, boolean jump, boolean sneak, double speed) {
+        yaw = Mth.wrapDegrees(yaw);
+
         float dx = 0, dz = 0;
         if (forward) dz += 1;
         if (back) dz -= 1;
