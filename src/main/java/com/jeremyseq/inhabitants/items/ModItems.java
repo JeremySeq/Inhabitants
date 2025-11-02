@@ -57,7 +57,7 @@ public class ModItems {
             () -> new ForgeSpawnEggItem(ModEntities.ABYSSFISH, 0x509297, 0xA9CDD1, new Item.Properties()));
 
     public static final RegistryObject<Item> IMPALER_SPAWN_EGG = ITEMS.register("impaler_spawn_egg",
-            () -> new ForgeSpawnEggItem(ModEntities.IMPALER, 0xAB7C53, 0x8E826F, new Item.Properties()));
+            () -> new ForgeSpawnEggItem(ModEntities.IMPALER, 0x969090, 0x9d9382, new Item.Properties()));
 
     public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
             () -> new Item(new Item.Properties()));
