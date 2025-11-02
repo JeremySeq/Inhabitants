@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.catcher;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.goals.CooldownMeleeAttackGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -82,7 +81,6 @@ public class CatcherEntity extends Monster implements GeoEntity {
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
             if (this.attackAnimTimer == 0) {
-                Inhabitants.LOGGER.debug("finished attack anim");
                 LivingEntity target = getTarget();
                 if (target != null && distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target)) {
                     // mob to target
@@ -102,7 +100,6 @@ public class CatcherEntity extends Monster implements GeoEntity {
     @Override
     public boolean doHurtTarget(@NotNull Entity target) {
         if (!level().isClientSide) {
-            Inhabitants.LOGGER.debug("trigger attack anim");
             triggerAnim("attack", "attack");
             this.attackAnimTimer = 10;
         }
