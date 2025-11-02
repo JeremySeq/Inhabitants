@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.boulder;
 
 import com.jeremyseq.inhabitants.entities.goals.AnimatedCooldownMeleeAttackGoal;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -30,12 +32,26 @@ public class BoulderEntity extends Monster implements GeoEntity {
 
     public static AttributeSupplier setAttributes() {
         return Monster.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 20f)
+                .add(Attributes.MAX_HEALTH, 115f)
                 .add(Attributes.ATTACK_DAMAGE, 6.0D)
                 .add(Attributes.FOLLOW_RANGE, 48.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.25f)
                 .add(Attributes.KNOCKBACK_RESISTANCE, .25f)
                 .add(Attributes.MOVEMENT_SPEED, 0.2F).build();
+    }
+
+    @Override
+    public boolean hurt(@NotNull DamageSource source, float amount) {
+        if (source.getEntity() instanceof Player player) {
+            player.getMainHandItem();
+            var item = player.getMainHandItem().getItem();
+
+            if (item instanceof PickaxeItem) {
+                amount *= 2.5f;
+            }
+        }
+
+        return super.hurt(source, amount);
     }
 
     protected void registerGoals() {
