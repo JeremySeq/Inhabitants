@@ -17,7 +17,11 @@ public class ImpalerModel extends GeoModel<ImpalerEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ImpalerEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler.png");
+        if (animatable.getTextureType() == 0) {
+            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler.png");
+        } else {
+            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler_dripstone.png");
+        }
     }
 
     @Override
