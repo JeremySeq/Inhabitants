@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -56,7 +55,6 @@ public class ImpalerScreamGoal extends Goal {
             mob.getEntityData().set(ImpalerEntity.SCREAM_TRIGGER, false);
             mob.getEntityData().set(ImpalerEntity.SCREAM_TRIGGER, true);
 
-            Inhabitants.LOGGER.debug("TRIGGER SCREAM");
             EntityUtil.shockwave(mob, 10, 10);
             mob.level().playSound(null, mob.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 10f, 0.9F);
             // give nearby players the concussion effect

@@ -9,6 +9,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
@@ -22,8 +23,11 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -42,6 +46,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public int screamCooldown = 0;
     public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> SCREAM_TRIGGER = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
+
+    public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
     private int attackAnimTimer = 0;
 
@@ -272,11 +278,37 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         super.defineSynchedData();
         entityData.define(SPIKED, false);
         entityData.define(SCREAM_TRIGGER, true);
+        entityData.define(TEXTURE, getBiomeTextureType());
+    }
+
+    private int getBiomeTextureType() {
+        if (this.level().getBiome(this.blockPosition()).is(Biomes.DRIPSTONE_CAVES)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public int getTextureType() {
+        return entityData.get(TEXTURE);
+    }
+
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor pLevel,
+                                                  @NotNull DifficultyInstance pDifficulty,
+                                                  @NotNull MobSpawnType pReason,
+                                                  @Nullable SpawnGroupData pSpawnData,
+                                                  @Nullable CompoundTag pDataTag) {
+        if (pSpawnData == null) {
+            this.entityData.set(TEXTURE, getBiomeTextureType());
+        }
+        return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.putInt("textureType", entityData.get(TEXTURE));
         tag.putInt("screamCooldown", this.screamCooldown);
     }
 
@@ -285,6 +317,12 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         super.readAdditionalSaveData(tag);
         if (tag.contains("screamCooldown")) {
             this.screamCooldown = tag.getInt("screamCooldown");
+        }
+
+        if (tag.contains("textureType")) {
+            entityData.set(TEXTURE, tag.getInt("textureType"));
+        } else {
+            entityData.set(TEXTURE, getBiomeTextureType());
         }
     }
 

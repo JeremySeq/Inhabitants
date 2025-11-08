@@ -321,18 +321,6 @@
 							"uv": {
 								"north": {"uv": [38, 5], "uv_size": [5, 9]},
 								"east": {"uv": [0, 0], "uv_size": [0, 9]},
-								"west": {"uv": [0, 0], "uv_size": [0, 9]},
-								"up": {"uv": [0, 0], "uv_size": [5, 0]},
-								"down": {"uv": [5, 0], "uv_size": [-5, 0]}
-							}
-						},
-						{
-							"origin": [0.925, 34.2068, -12.05015],
-							"size": [5, 9, 0],
-							"pivot": [4.825, 36.5068, -12.05015],
-							"rotation": [-105, 30, -90],
-							"uv": {
-								"east": {"uv": [0, 0], "uv_size": [0, 9]},
 								"south": {"uv": [31, 42], "uv_size": [5, 9]},
 								"west": {"uv": [0, 0], "uv_size": [0, 9]},
 								"up": {"uv": [0, 0], "uv_size": [5, 0]},
@@ -353,18 +341,6 @@
 							"rotation": [-105, -30, 90],
 							"uv": {
 								"north": {"uv": [43, 5], "uv_size": [-5, 9]},
-								"east": {"uv": [0, 0], "uv_size": [0, 9]},
-								"west": {"uv": [0, 0], "uv_size": [0, 9]},
-								"up": {"uv": [0, 0], "uv_size": [5, 0]},
-								"down": {"uv": [0, 0], "uv_size": [5, 0]}
-							}
-						},
-						{
-							"origin": [-5.925, 34.2068, -12.05015],
-							"size": [5, 9, 0],
-							"pivot": [-4.825, 36.5068, -12.05015],
-							"rotation": [-105, -30, 90],
-							"uv": {
 								"east": {"uv": [0, 0], "uv_size": [0, 9]},
 								"south": {"uv": [36, 42], "uv_size": [-5, 9]},
 								"west": {"uv": [0, 0], "uv_size": [0, 9]},
@@ -667,7 +643,7 @@
 					]
 				},
 				{
-					"name": "spikes6",
+					"name": "spikes3",
 					"parent": "righthand",
 					"pivot": [-10.99998, 22.99995, -11.49999],
 					"cubes": [
@@ -686,7 +662,7 @@
 					]
 				},
 				{
-					"name": "spikes7",
+					"name": "spikes4",
 					"parent": "righthand",
 					"pivot": [-9.5, 22, -10.5],
 					"cubes": [
@@ -705,7 +681,7 @@
 					]
 				},
 				{
-					"name": "spikes8",
+					"name": "spikes5",
 					"parent": "righthand",
 					"pivot": [-9, 26, -10.5],
 					"cubes": [
@@ -743,7 +719,7 @@
 					]
 				},
 				{
-					"name": "spikes3",
+					"name": "spikes6",
 					"parent": "lefthand",
 					"pivot": [9, 26, -10.5],
 					"cubes": [
@@ -762,7 +738,7 @@
 					]
 				},
 				{
-					"name": "spikes4",
+					"name": "spikes7",
 					"parent": "lefthand",
 					"pivot": [9.5, 22, -10.5],
 					"cubes": [
@@ -781,7 +757,7 @@
 					]
 				},
 				{
-					"name": "spikes5",
+					"name": "spikes8",
 					"parent": "lefthand",
 					"pivot": [9, 18, -10.5],
 					"cubes": [
