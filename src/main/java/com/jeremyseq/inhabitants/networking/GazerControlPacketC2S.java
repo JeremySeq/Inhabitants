@@ -69,14 +69,6 @@ public class GazerControlPacketC2S {
 
             double speed = 0.3;
 
-            float packetYaw = Mth.wrapDegrees(msg.yaw);
-            float packetPitch = Mth.clamp(msg.pitch, -90f, 90f);
-
-            gazer.setYRot(packetYaw);
-            gazer.setXRot(packetPitch);
-            gazer.setYHeadRot(packetYaw);
-            gazer.setYBodyRot(packetYaw);
-
             // apply movement relative to yaw
             moveRelativeToYaw(gazer, msg.yaw, msg.forward, msg.back, msg.left, msg.right, msg.jump, msg.sneak, speed);
         });
