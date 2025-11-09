@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.items;
 
+import com.jeremyseq.inhabitants.effects.ModEffects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -25,9 +26,11 @@ public class BracerOfMightItem extends Item {
 
         // Only apply if item is in hotbar (slots 0–8)
         if (slot < 9) {
-            MobEffectInstance current = player.getEffect(MobEffects.DAMAGE_BOOST);
-            if (current == null || current.getAmplifier() < 1 || current.getDuration() <= 10) {
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 20, 1, true, false, true));
+            if (!player.hasEffect(MobEffects.DAMAGE_BOOST) && !player.hasEffect(ModEffects.IMMUNITY.get())) {
+                MobEffectInstance current = player.getEffect(MobEffects.DAMAGE_BOOST);
+                if (current == null || current.getAmplifier() < 1 || current.getDuration() <= 10) {
+                    player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 20, 1, true, false, true));
+                }
             }
         }
     }

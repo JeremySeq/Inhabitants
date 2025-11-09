@@ -23,7 +23,7 @@ public class ModEffectEvents {
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
 
-        if (entity.getItemBySlot(EquipmentSlot.CHEST).getItem() == ModItems.CHITIN_CHESTPLATE.get()) {
+        if (entity.getItemBySlot(EquipmentSlot.CHEST).getItem() == ModItems.CHITIN_CHESTPLATE.get() || entity.getItemBySlot(EquipmentSlot.CHEST).getItem() == ModItems.CHITIN_CHESTPLATE_ELYTRA.get()) {
             entity.addEffect(new MobEffectInstance(ModEffects.IMMUNITY.get(), 30, 0, false, false, true));
         }
 
