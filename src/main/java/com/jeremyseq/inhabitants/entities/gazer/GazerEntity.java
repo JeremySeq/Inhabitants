@@ -131,7 +131,8 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public void tick() {
         super.tick();
 
-        Player owner = this.level().getPlayerByUUID(this.getOwnerUUID());
+        UUID ownerUUID = this.getOwnerUUID();
+        Player owner = ownerUUID == null ? null : this.level().getPlayerByUUID(ownerUUID);
 
         // if being controlled, check owner validity
         if (this.getGazerState() == GazerState.BEING_CONTROLLED && !level().isClientSide) {
