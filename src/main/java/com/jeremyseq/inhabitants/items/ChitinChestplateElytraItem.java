@@ -1,6 +1,8 @@
 package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.items.armor.ModArmorMaterials;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -8,8 +10,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ChitinChestplateElytraItem extends ArmorItem {
     public ChitinChestplateElytraItem() {
@@ -53,5 +60,12 @@ public class ChitinChestplateElytraItem extends ArmorItem {
 
     public @NotNull EquipmentSlot getEquipmentSlot() {
         return EquipmentSlot.CHEST;
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
+        pTooltipComponents.add(Component.translatable("item.inhabitants.chitin_chestplate.tooltip")
+                .withStyle(ChatFormatting.BLUE));
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
 }

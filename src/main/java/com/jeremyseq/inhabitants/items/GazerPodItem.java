@@ -6,6 +6,7 @@ import com.jeremyseq.inhabitants.blocks.entity.GazerPodBlockEntity;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.items.armor.gazer_pod.GazerPodArmorRenderer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -192,9 +193,9 @@ public class GazerPodItem extends ArmorItem implements GeoItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (hasGazer(stack)) {
-            tooltip.add(Component.literal("Contains a Gazer"));
+            tooltip.add(Component.literal("Contains a Gazer").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         } else {
-            tooltip.add(Component.literal("Empty Pod"));
+            tooltip.add(Component.literal("Empty Pod").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         }
 
         super.appendHoverText(stack, level, tooltip, flag);

@@ -15,6 +15,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -130,9 +131,11 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
     public void tick() {
         super.tick();
 
+        UUID ownerUUID = this.getOwnerUUID();
+        Player owner = ownerUUID == null ? null : this.level().getPlayerByUUID(ownerUUID);
+
         // if being controlled, check owner validity
         if (this.getGazerState() == GazerState.BEING_CONTROLLED && !level().isClientSide) {
-            ServerPlayer owner = (ServerPlayer) this.level().getPlayerByUUID(this.getOwnerUUID());
             if (owner == null
                     || owner.isDeadOrDying()
                     || owner.getItemBySlot(EquipmentSlot.HEAD).getItem() != ModItems.GAZER_POD.get()) {
@@ -140,10 +143,48 @@ public class GazerEntity extends FlyingMob implements GeoEntity {
                 // force stop
                 this.setGazerState(GazerState.IDLE);
                 if (owner != null && !owner.level().isClientSide) {
-                    ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> owner),
+                    ModNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) owner),
                             new GazerCameraPacketS2C(this.getId(), false));
                 }
             }
+        }
+
+        if (this.getGazerState() == GazerState.BEING_CONTROLLED && owner != null) {
+            Inhabitants.LOGGER.debug("Server Control Tick");
+
+            // raw targets from owner
+            float playerYaw = owner.getYHeadRot();
+            float playerPitch = owner.getXRot();
+
+            // current values on this entity
+            float currentYaw = this.getYHeadRot();
+            float currentPitch = this.getXRot();
+
+            // shortest yaw difference, smooth toward it, then wrap
+            float yawDelta = Mth.wrapDegrees(playerYaw - currentYaw);
+            float smoothYaw = Mth.wrapDegrees(currentYaw + yawDelta);
+
+            // clamp and smooth pitch separately
+            float clampedPitch = Mth.clamp(playerPitch, -90f, 90f);
+            float pitchDelta = clampedPitch - currentPitch;
+            float smoothPitch = currentPitch + pitchDelta;
+
+            if ((this.yRotO < 0.0f && smoothYaw >= 0.0f) || (this.yRotO > 0.0f && smoothYaw <= 0.0f)) {
+                // crossing zero, prevent interpolation issues
+                float adjPrevYaw = this.yRotO;
+                while (smoothYaw - adjPrevYaw > 180.0f) adjPrevYaw += 360.0f;
+                while (smoothYaw - adjPrevYaw < -180.0f) adjPrevYaw -= 360.0f;
+
+                this.yRotO = adjPrevYaw;
+                this.yHeadRotO = adjPrevYaw;
+                this.yBodyRotO = adjPrevYaw;
+            }
+
+            // apply rotations
+            this.setYRot(smoothYaw);
+            this.setYHeadRot(smoothYaw);
+            this.setYBodyRot(smoothYaw);
+            this.setXRot(smoothPitch);
         }
 
         // trigger RETURNING TO POD state

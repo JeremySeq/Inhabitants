@@ -20,7 +20,7 @@ public class ChitinChestplateItem extends ArmorItem {
     @Override
     public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
         pTooltipComponents.add(Component.translatable("item.inhabitants.chitin_chestplate.tooltip")
-                .withStyle(ChatFormatting.GRAY));
+                .withStyle(ChatFormatting.BLUE));
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
 }

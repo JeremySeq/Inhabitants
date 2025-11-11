@@ -5,14 +5,11 @@ import com.jeremyseq.inhabitants.networking.GazerControlPacketC2S;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientChunkCache;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.material.FogType;
-import net.minecraftforge.client.event.RenderGuiEvent;
-import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -20,6 +17,7 @@ import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID)
 public class ControlClientTickEventHandler {
+
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
@@ -38,16 +36,51 @@ public class ControlClientTickEventHandler {
 
             UUID gazerId = gazer.getUUID();
 
-            float yaw = mc.player.getYHeadRot() % 360F;
-            float pitch = mc.player.getXRot();
+            float playerYaw = mc.player.getYHeadRot();
+            float playerPitch = mc.player.getXRot();
 
-            // Send input packet to the server
-            ModNetworking.CHANNEL.sendToServer(new GazerControlPacketC2S(gazerId, forward, back, left, right, jump, sneak, yaw, pitch));
+            Inhabitants.LOGGER.debug("CLIENT: Sending Gazer control packet: forward={}, back={}, left={}, right={}, jump={}, sneak={}, yaw={}, pitch={}",
+                    forward, back, left, right, jump, sneak, playerYaw, playerPitch);
+
+            ModNetworking.CHANNEL.sendToServer(new GazerControlPacketC2S(gazerId, forward, back, left, right, jump, sneak, playerYaw, playerPitch));
         }
     }
 
     @SubscribeEvent
-    public static void onRenderHand(RenderHandEvent event) {
+    public static void onAttack(AttackEntityEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        // Only process if the camera entity is a GazerEntity
+        if (!(mc.getCameraEntity() instanceof GazerEntity)) return;
+
+        event.setCanceled(true); // Cancel the attack event
+    }
+
+    @SubscribeEvent
+    public static void onDestroyBlock(BlockEvent.BreakEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        // Only process if the camera entity is a GazerEntity
+        if (!(mc.getCameraEntity() instanceof GazerEntity)) return;
+
+        event.setCanceled(true); // Cancel the block break event
+    }
+
+    @SubscribeEvent
+    public static void onPlaceBlock(BlockEvent.EntityPlaceEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        // Only process if the camera entity is a GazerEntity
+        if (!(mc.getCameraEntity() instanceof GazerEntity)) return;
+
+        event.setCanceled(true); // Cancel the block placement event
+    }
+
+    @SubscribeEvent
+    public static void onRenderHand(net.minecraftforge.client.event.RenderHandEvent event) {
         Minecraft mc = Minecraft.getInstance();
 
         // Check if the camera entity is a GazerEntity
@@ -57,7 +90,7 @@ public class ControlClientTickEventHandler {
     }
 
     @SubscribeEvent
-    public static void onRenderGui(RenderGuiEvent.Pre event) {
+    public static void onRenderGui(net.minecraftforge.client.event.RenderGuiEvent.Pre event) {
         Minecraft mc = Minecraft.getInstance();
 
         // Check if the camera entity is a GazerEntity
@@ -79,45 +112,4 @@ public class ControlClientTickEventHandler {
 
     }
 
-    private static void forceChunksAround(Minecraft mc, BlockPos center, int radius) {
-        if (mc.level == null) return;
-
-        ClientChunkCache chunkCache = mc.level.getChunkSource();
-
-        int centerChunkX = center.getX() >> 4;
-        int centerChunkZ = center.getZ() >> 4;
-
-        for (int dx = -radius; dx <= radius; dx++) {
-            for (int dz = -radius; dz <= radius; dz++) {
-                int chunkX = centerChunkX + dx;
-                int chunkZ = centerChunkZ + dz;
-
-                // Force the chunk to be loaded by requesting it from the server
-                chunkCache.getChunk(chunkX, chunkZ, ChunkStatus.FULL, true);
-            }
-        }
-    }
-
-    private static boolean gazerIsApproachingUnloadedChunk(Minecraft mc, GazerEntity gazer) {
-        // Player position
-        assert mc.player != null;
-        double px = mc.player.getX();
-        double pz = mc.player.getZ();
-
-        // Gazer position
-        double gx = gazer.getX();
-        double gz = gazer.getZ();
-
-        // Render distance in chunks
-        int renderDistanceChunks = mc.options.renderDistance().get();
-        double maxDistanceBlocks = renderDistanceChunks * 16; // 1 chunk = 16 blocks
-
-        // Distance in XZ plane
-        double dx = gx - px;
-        double dz = gz - pz;
-        double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
-
-        // 90% of render distance
-        return horizontalDistance >= maxDistanceBlocks * 0.9;
-    }
 }
