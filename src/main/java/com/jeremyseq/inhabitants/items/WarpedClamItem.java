@@ -34,9 +34,10 @@ public class WarpedClamItem extends Item {
             clam.setPos(x, y, z);
 
             // face the same direction the player is looking
-            clam.setYRot(context.getRotation());
-            clam.setYBodyRot(context.getRotation());
-            clam.setYHeadRot(context.getRotation());
+            float yaw = context.getRotation();
+            int direction = Math.round(yaw / 45f) & 7;
+            clam.setDir(direction);
+            clam.updateRot();
 
             if (itemStack.getTag() != null && itemStack.getTag().contains("has_pearl")) {
                 clam.setHasPearl(itemStack.getTag().getBoolean("has_pearl"));

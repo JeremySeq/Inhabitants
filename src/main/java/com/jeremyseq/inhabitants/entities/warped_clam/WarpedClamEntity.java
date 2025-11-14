@@ -44,6 +44,8 @@ import java.util.List;
 public class WarpedClamEntity extends Mob implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
+    public static final EntityDataAccessor<Integer> DIRECTION = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.INT);
+
     public static final EntityDataAccessor<Boolean> OPEN = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> FLING_ANIM = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> HAS_PEARL = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
@@ -85,6 +87,10 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             this.setYBodyRot(yaw);
         }
 
+        float yaw = this.getYRot();
+        int direction = Math.round(yaw / 45f) & 7;
+        setDir(direction);
+
         return pSpawnData;
     }
 
@@ -125,9 +131,16 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         return true;
     }
 
+    public void updateRot() {
+        this.setYRot(directionToYaw(getDir()));
+        this.setYHeadRot(getYRot());
+    }
+
     @Override
     public void tick() {
         super.tick();
+
+        updateRot();
 
         // regen pearl
         if (!hasPearl() && pearlRegenTimer > 0) {
@@ -195,11 +208,22 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
 
     }
 
+    private static float directionToYaw(int dir) {
+        return dir * 45f;
+    }
+
     @Override
     protected @NotNull InteractionResult mobInteract(Player player, @NotNull InteractionHand hand) {
         ItemStack item = player.getItemInHand(hand);
 
         if (item.getItem() instanceof ShovelItem) {
+
+            if (player.isCrouching()) {
+                rotateClam();
+                updateRot();
+                return InteractionResult.sidedSuccess(level().isClientSide);
+            }
+
             item.hurtAndBreak(3, player, (p) -> p.broadcastBreakEvent(hand));
             if (!level().isClientSide) {
                 this.discard();
@@ -250,6 +274,15 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
                     ModSoundEvents.WARPED_CLAM_CLOSING.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
         }
     }
+
+    private void rotateClam() {
+        int dir = (getDir() + 1) & 7;
+        setDir(dir);
+
+        level().playSound(null, blockPosition(),
+                SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 0.6f, 1.2f);
+    }
+
 
     private void launchEntity() {
         AABB box = getBoundingBox().move(0, 0.4, 0);
@@ -344,6 +377,13 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         super.onSyncedDataUpdated(pKey);
     }
 
+    public int getDir() {
+        return entityData.get(DIRECTION);
+    }
+    public void setDir(int dir) {
+        entityData.set(DIRECTION, dir & 7);
+    }
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
@@ -355,6 +395,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         entityData.define(FLING_ANIM, false);
         entityData.define(HAS_PEARL, true);
         entityData.define(OPEN, false);
+        entityData.define(DIRECTION, 0);
     }
 
     @Override
@@ -363,6 +404,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
 
         tag.putBoolean("hasPearl", hasPearl());
         tag.putInt("pearlRegenTimer", this.pearlRegenTimer);
+        tag.putInt("direction", getDir());
     }
 
     @Override
@@ -377,6 +419,10 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             this.pearlRegenTimer = tag.getInt("pearlRegenTimer");
         } else {
             this.pearlRegenTimer = 0;
+        }
+
+        if (tag.contains("direction")) {
+            setDir(tag.getInt("direction"));
         }
     }
 }
