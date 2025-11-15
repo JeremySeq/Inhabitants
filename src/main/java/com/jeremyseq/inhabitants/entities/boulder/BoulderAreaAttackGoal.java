@@ -105,7 +105,7 @@ public class BoulderAreaAttackGoal extends Goal {
         List<LivingEntity> targets = mob.level().getEntitiesOfClass(
                 LivingEntity.class,
                 getAttackBox(),
-                e -> e != mob && e.isAlive()
+                e -> e != mob && e.isAlive() && (!(e instanceof BoulderEntity))
         );
 
         for (LivingEntity target : targets) {
