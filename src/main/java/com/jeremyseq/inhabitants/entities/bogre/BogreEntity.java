@@ -232,7 +232,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
             if (this.attackAnimTimer == 0) {
-                EntityUtil.shockwave(this, SHOCKWAVE_RADIUS, SHOCKWAVE_DAMAGE);
+                EntityUtil.shockwave(this, SHOCKWAVE_RADIUS, SHOCKWAVE_DAMAGE, entity -> entity == this);
             }
         }
 

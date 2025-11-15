@@ -18,6 +18,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class EntityUtil {
     public static void throwItemStack(Level level, Entity entity, ItemStack stack, float speed, float upwardBias) {
@@ -48,13 +49,16 @@ public class EntityUtil {
      *
      * @param shockwave_damage damage at the center of the shockwave
      */
-    public static void shockwave(LivingEntity user, double shockwave_radius, float shockwave_damage) {
+    public static void shockwave(LivingEntity user, double shockwave_radius, float shockwave_damage, Predicate<LivingEntity> ignore) {
         AABB shockwaveArea = new AABB(user.getX() - shockwave_radius, user.getY() - 1, user.getZ() - shockwave_radius,
                 user.getX() + shockwave_radius, user.getY() + 2, user.getZ() + shockwave_radius);
         List<LivingEntity> affectedEntities = user.level().getEntitiesOfClass(LivingEntity.class, shockwaveArea,
                 entity -> !entity.isSpectator() && entity.isAlive());
 
         for (LivingEntity affected : affectedEntities) {
+            if (ignore.test(affected)) {
+                continue;
+            }
             if (affected instanceof Player player) {
                 if (player.isCreative()) {
                     continue;
