@@ -32,7 +32,7 @@ public class BoulderEntity extends Monster implements GeoEntity {
 
     public static AttributeSupplier setAttributes() {
         return Monster.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 115f)
+                .add(Attributes.MAX_HEALTH, 20f)
                 .add(Attributes.ATTACK_DAMAGE, 6.0D)
                 .add(Attributes.FOLLOW_RANGE, 48.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.25f)
