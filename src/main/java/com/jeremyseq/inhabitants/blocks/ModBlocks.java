@@ -177,6 +177,17 @@ public class ModBlocks
     public static final RegistryObject<Item> WATERBERRY_BUSH_ITEM =
             registerBlockItem("waterberry_bush", WATERBERRY_BLOCK);
 
+    public static final RegistryObject<Block> ANCIENT_STONE_PILLAR = BLOCKS.register("ancient_stone_pillar",
+            () -> new AncientStonePillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE)));
+    public static final RegistryObject<Item> ANCIENT_STONE_PILLAR_ITEM =
+            registerBlockItem("ancient_stone_pillar", ANCIENT_STONE_PILLAR);
+
+    public static final RegistryObject<Block> ANCIENT_STONE = BLOCKS.register("ancient_stone",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE)));
+    public static final RegistryObject<Item> ANCIENT_STONE_ITEM =
+            registerBlockItem("ancient_stone", ANCIENT_STONE);
+
+
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         return BLOCKS.register(name, block);
     }

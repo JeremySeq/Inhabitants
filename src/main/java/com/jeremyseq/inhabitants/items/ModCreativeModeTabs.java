@@ -74,6 +74,8 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.CHITIN_UPGRADE_SMITHING_TEMPLATE.get());
                         pOutput.accept(ModItems.CHITIN_SHIELD.get());
                         pOutput.accept(ModItems.BOULDER_SPAWN_EGG.get());
+                        pOutput.accept(ModBlocks.ANCIENT_STONE_ITEM.get());
+                        pOutput.accept(ModBlocks.ANCIENT_STONE_PILLAR_ITEM.get());
                     })
                     .build());
 

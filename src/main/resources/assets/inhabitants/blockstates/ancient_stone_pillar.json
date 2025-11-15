@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "end=0": {
+      "model": "inhabitants:block/ancient_stone_pillar"
+    },
+    "end=1": {
+      "model": "inhabitants:block/ancient_stone_pillar_end_top"
+    },
+    "end=2": {
+      "model": "inhabitants:block/ancient_stone_pillar_end_bottom"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "inhabitants:block/ancient_stone_pillar_top",
+    "side": "inhabitants:block/ancient_stone_pillar_side_end_bottom"
+  }
+}
