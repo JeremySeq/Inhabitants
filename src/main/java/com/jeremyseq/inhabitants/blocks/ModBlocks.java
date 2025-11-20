@@ -187,9 +187,22 @@ public class ModBlocks
     public static final RegistryObject<Item> ANCIENT_STONE_ITEM =
             registerBlockItem("ancient_stone", ANCIENT_STONE);
 
+    public static final RegistryObject<Block> SCROLL = registerBlock(
+            "scroll",
+            () -> new ScrollBlock(Block.Properties.copy(Blocks.BLACK_BANNER).noOcclusion().noCollission())
+    );
+
+    public static final RegistryObject<Item> SCROLL_SMALL = registerScrollItem("scroll_small", SCROLL, "item.inhabitants.scroll_small");
+    public static final RegistryObject<Item> SCROLL_MEDIUM = registerScrollItem("scroll_medium", SCROLL, "item.inhabitants.scroll_medium");
+    public static final RegistryObject<Item> SCROLL_LARGE = registerScrollItem("scroll_large", SCROLL, "item.inhabitants.scroll_large");
+
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         return BLOCKS.register(name, block);
+    }
+
+    private static <T extends Block> RegistryObject<Item> registerScrollItem(String name, RegistryObject<T> block, String langKey) {
+        return ModItems.ITEMS.register(name, () -> new ScrollItem(block.get(), new Item.Properties(), langKey));
     }
 
     private static <T extends Block> RegistryObject<Item> registerBlockItem(String name, RegistryObject<T> block) {

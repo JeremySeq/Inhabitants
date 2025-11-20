@@ -40,6 +40,9 @@
   "item.inhabitants.chitin_shield": "Chitin Shield",
   "item.inhabitants.chitin_chestplate_elytra": "Chitin Chestplate with Elytra",
   "item.inhabitants.boulder_spawn_egg": "Boulder Spawn Egg",
+  "item.inhabitants.scroll_small": "Small Scroll",
+  "item.inhabitants.scroll_medium": "Medium Scroll",
+  "item.inhabitants.scroll_large": "Large Scroll",
 
   "block.inhabitants.gazer_pod_block": "Gazer Bud",
   "block.inhabitants.waterberry_bush": "Waterberry Bush",

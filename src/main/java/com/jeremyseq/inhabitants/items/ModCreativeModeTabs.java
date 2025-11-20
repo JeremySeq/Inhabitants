@@ -76,6 +76,9 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BOULDER_SPAWN_EGG.get());
                         pOutput.accept(ModBlocks.ANCIENT_STONE_ITEM.get());
                         pOutput.accept(ModBlocks.ANCIENT_STONE_PILLAR_ITEM.get());
+                        pOutput.accept(ModBlocks.SCROLL_SMALL.get());
+                        pOutput.accept(ModBlocks.SCROLL_MEDIUM.get());
+                        pOutput.accept(ModBlocks.SCROLL_LARGE.get());
                     })
                     .build());
 

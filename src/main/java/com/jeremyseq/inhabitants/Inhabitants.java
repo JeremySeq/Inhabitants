@@ -2,7 +2,6 @@ package com.jeremyseq.inhabitants;
 
 import com.google.common.collect.ImmutableMap;
 import com.jeremyseq.inhabitants.blocks.entity.ModBlockEntities;
-import com.jeremyseq.inhabitants.blocks.entity.client.GazerPodBlockRenderer;
 import com.jeremyseq.inhabitants.gui.ModMenuTypes;
 import com.jeremyseq.inhabitants.gui.client.ZingerChestScreen;
 import com.jeremyseq.inhabitants.effects.ModEffects;
@@ -19,7 +18,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.AxeItem;
@@ -128,8 +126,6 @@ public class Inhabitants
                     (stack, level, entity, seed) ->
                             (entity != null && entity.isUsingItem() && entity.getUseItem() == stack) ? 1.0F : 0.0F
             );
-
-            BlockEntityRenderers.register(ModBlockEntities.GAZER_POD_BLOCK_ENTITY.get(), GazerPodBlockRenderer::new);
         }
     }
 }
