@@ -6,9 +6,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -19,7 +18,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ScrollBlock extends BaseEntityBlock {
+public class ScrollBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty SIZE = IntegerProperty.create("size", 0, 2);
 
@@ -55,6 +54,7 @@ public class ScrollBlock extends BaseEntityBlock {
         return new ScrollBlockEntity(pPos, pState);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public @NotNull VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
         int height = switch (pState.getValue(SIZE)) {
@@ -72,6 +72,18 @@ public class ScrollBlock extends BaseEntityBlock {
     }
 
     @Override
+    public BlockState rotate(BlockState state, LevelAccessor level, BlockPos pos, Rotation direction) {
+        return state.setValue(FACING, direction.rotate(state.getValue(FACING)));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public @NotNull BlockState mirror(BlockState pState, Mirror pMirror) {
+        return pState.setValue(FACING, pMirror.mirror(pState.getValue(FACING)));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
     public @NotNull ItemStack getCloneItemStack(@NotNull BlockGetter level, @NotNull BlockPos pos, BlockState state) {
         int size = state.getValue(SIZE);
 
@@ -82,6 +94,7 @@ public class ScrollBlock extends BaseEntityBlock {
         };
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public java.util.@NotNull List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.@NotNull Builder builder) {
         int size = state.getValue(SIZE);
