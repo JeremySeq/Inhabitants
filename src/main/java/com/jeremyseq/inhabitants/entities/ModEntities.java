@@ -14,6 +14,8 @@ import com.jeremyseq.inhabitants.entities.boulder.BoulderRenderer;
 import com.jeremyseq.inhabitants.entities.catcher.CatcherEntity;
 import com.jeremyseq.inhabitants.entities.catcher.CatcherRenderer;
 import com.jeremyseq.inhabitants.entities.catcher.WaterberryProjectile;
+import com.jeremyseq.inhabitants.entities.dryfang.DryfangEntity;
+import com.jeremyseq.inhabitants.entities.dryfang.DryfangRenderer;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.entities.gazer.GazerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
@@ -109,6 +111,12 @@ public class ModEntities {
                             .sized(2.25f, 2.3f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "apex").toString()));
 
+    public static final RegistryObject<EntityType<DryfangEntity>> DRYFANG =
+            REGISTRY.register("dryfang",
+                    () -> EntityType.Builder.of(DryfangEntity::new, MobCategory.MONSTER)
+                            .sized(1.75f, 1.2f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "dryfang").toString()));
+
     public static final RegistryObject<EntityType<CatcherEntity>> CATCHER =
             REGISTRY.register("catcher",
                     () -> EntityType.Builder.of(CatcherEntity::new, MobCategory.MONSTER)
@@ -142,6 +150,7 @@ public class ModEntities {
         event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
         event.put(ModEntities.CATCHER.get(), CatcherEntity.setAttributes());
         event.put(ModEntities.BOULDER.get(), BoulderEntity.setAttributes());
+        event.put(ModEntities.DRYFANG.get(), DryfangEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -159,5 +168,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.CATCHER.get(), CatcherRenderer::new);
         EntityRenderers.register(ModEntities.WATERBERRY_PROJECTILE.get(), ThrownItemRenderer::new);
         EntityRenderers.register(ModEntities.BOULDER.get(), BoulderRenderer::new);
+        EntityRenderers.register(ModEntities.DRYFANG.get(), DryfangRenderer::new);
     }
 }
