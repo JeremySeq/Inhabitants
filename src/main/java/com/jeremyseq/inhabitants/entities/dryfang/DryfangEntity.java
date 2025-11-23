@@ -5,6 +5,7 @@ import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -16,6 +17,8 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -29,6 +32,8 @@ public class DryfangEntity extends Monster implements GeoEntity {
 
     private static final EntityDataAccessor<Boolean> ANGRY =
             SynchedEntityData.defineId(DryfangEntity.class, EntityDataSerializers.BOOLEAN);
+
+    private int attackAnimTimer = 0;
 
     public DryfangEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -62,6 +67,36 @@ public class DryfangEntity extends Monster implements GeoEntity {
     public void setTarget(@Nullable LivingEntity pTarget) {
         this.setAngry(pTarget != null);
         super.setTarget(pTarget);
+    }
+
+    @Override
+    protected void customServerAiStep() {
+        if (this.attackAnimTimer > 0) {
+            this.attackAnimTimer--;
+            if (this.attackAnimTimer == 0) {
+                LivingEntity target = getTarget();
+                if (target != null && distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target)) {
+                    // mob to target
+                    Vec3 toTarget = target.position().subtract(this.position()).normalize();
+                    // mob's facing direction (yaw)
+                    Vec3 facing = Vec3.directionFromRotation(0, this.getYRot()).normalize();
+                    double dot = facing.dot(toTarget);
+                    // require within 60deg cone
+                    if (dot > 0.5) {
+                        super.doHurtTarget(target);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean doHurtTarget(@NotNull Entity target) {
+        if (!level().isClientSide) {
+            triggerAnim("attack", "attack");
+            this.attackAnimTimer = 5;
+        }
+        return true;
     }
 
     @Override
