@@ -52,5 +52,13 @@ public class MobSpawning {
                 SpawnPlacementRegisterEvent.Operation.REPLACE
         );
 
+        event.register(
+                ModEntities.DRYFANG.get(),
+                SpawnPlacements.Type.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                (type, level, reason, pos, random) -> pos.getY() > level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ()) - 15,
+                SpawnPlacementRegisterEvent.Operation.REPLACE
+        );
+
     }
 }

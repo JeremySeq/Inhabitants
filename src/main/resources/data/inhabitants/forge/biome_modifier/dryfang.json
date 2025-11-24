@@ -1,0 +1,25 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "minecraft:badlands",
+    "minecraft:eroded_badlands",
+    "minecraft:wooded_badlands"
+  ],
+  "spawners": {
+    "type": "inhabitants:dryfang",
+    "category": "creature",
+    "weight": 100,
+    "minCount": 3,
+    "maxCount": 6
+  },
+  "conditions": [
+    {
+      "condition": "forge:biome_tags",
+      "biome_tag": "minecraft:is_overworld"
+    },
+    {
+      "condition": "forge:height",
+      "min": 60
+    }
+  ]
+}

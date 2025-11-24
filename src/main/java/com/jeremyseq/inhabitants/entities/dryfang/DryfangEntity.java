@@ -5,6 +5,7 @@ import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -65,7 +66,13 @@ public class DryfangEntity extends Monster implements GeoEntity {
 
     @Override
     public void setTarget(@Nullable LivingEntity pTarget) {
-        this.setAngry(pTarget != null);
+        if (pTarget != null) {
+            this.playSound(SoundEvents.WOLF_GROWL, 1.0F, 1.0F);
+            this.setAngry(true);
+        } else {
+            this.setAngry(false);
+        }
+
         super.setTarget(pTarget);
     }
 
@@ -96,6 +103,7 @@ public class DryfangEntity extends Monster implements GeoEntity {
             triggerAnim("attack", "attack");
             this.attackAnimTimer = 5;
         }
+        this.playSound(SoundEvents.WOLF_PANT, 1.0F, 1.0F);
         return true;
     }
 
