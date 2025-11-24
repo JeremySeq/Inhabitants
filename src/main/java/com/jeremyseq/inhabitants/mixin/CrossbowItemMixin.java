@@ -10,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -22,12 +23,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.function.Predicate;
+
 @Mixin(CrossbowItem.class)
 public abstract class CrossbowItemMixin {
 
     @Shadow
     private static boolean loadProjectile(LivingEntity pShooter, ItemStack pCrossbowStack, ItemStack pAmmoStack, boolean pHasAmmo, boolean pIsCreative) {
         return false;
+    }
+
+    @Inject(method="getAllSupportedProjectiles", at=@At("HEAD"), cancellable = true)
+    private void getAllSupportedProjectiles(CallbackInfoReturnable<Predicate<ItemStack>> cir) {
+        cir.setReturnValue(ProjectileWeaponItem.ARROW_ONLY.or((item) -> item.is(ModItems.IMPALER_SPIKE.get())));
+        cir.cancel();
     }
 
     @Inject(method="tryLoadProjectiles", at=@At("HEAD"), cancellable = true)
