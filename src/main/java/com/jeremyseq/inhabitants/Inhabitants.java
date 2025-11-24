@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants;
 
 import com.google.common.collect.ImmutableMap;
 import com.jeremyseq.inhabitants.blocks.entity.ModBlockEntities;
+import com.jeremyseq.inhabitants.entities.dryfang.throwing_knife.ThrowingKnifeDispenserBehavior;
 import com.jeremyseq.inhabitants.gui.ModMenuTypes;
 import com.jeremyseq.inhabitants.gui.client.ZingerChestScreen;
 import com.jeremyseq.inhabitants.effects.ModEffects;
@@ -99,6 +100,7 @@ public class Inhabitants
             MenuScreens.register(ModMenuTypes.ZINGER_CHEST.get(), ZingerChestScreen::new);
             event.enqueueWork(() -> {
                 DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(), new ImpalerSpikeDispenserBehavior());
+                DispenserBlock.registerBehavior(ModItems.THROWING_KNIFE.get(), new ThrowingKnifeDispenserBehavior());
 
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_DOOR.get(), RenderType.cutout());
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_TRAPDOOR.get(), RenderType.cutout());

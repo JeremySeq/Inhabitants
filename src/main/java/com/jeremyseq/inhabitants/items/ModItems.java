@@ -91,6 +91,12 @@ public class ModItems {
     public static final RegistryObject<Item> CORNUCOPIA = ITEMS.register("cornucopia",
             () -> new Cornucopia(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
+    public static final RegistryObject<Item> SHARP_FANG = ITEMS.register("sharp_fang",
+            () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> THROWING_KNIFE = ITEMS.register("throwing_knife",
+            () -> new ThrowingKnifeItem(new Item.Properties().stacksTo(16)));
+
     public static final RegistryObject<Item> GAZER_SPAWN_EGG = ITEMS.register("gazer_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.GAZER, 0x8F0B48, 0xE1778D, new Item.Properties()));
 

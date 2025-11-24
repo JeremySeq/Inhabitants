@@ -16,6 +16,8 @@ import com.jeremyseq.inhabitants.entities.catcher.CatcherRenderer;
 import com.jeremyseq.inhabitants.entities.catcher.WaterberryProjectile;
 import com.jeremyseq.inhabitants.entities.dryfang.DryfangEntity;
 import com.jeremyseq.inhabitants.entities.dryfang.DryfangRenderer;
+import com.jeremyseq.inhabitants.entities.dryfang.throwing_knife.ThrowingKnifeProjectile;
+import com.jeremyseq.inhabitants.entities.dryfang.throwing_knife.ThrowingKnifeRenderer;
 import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
 import com.jeremyseq.inhabitants.entities.gazer.GazerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
@@ -132,6 +134,15 @@ public class ModEntities {
                             .build("waterberry_projectile")
             );
 
+    public static final RegistryObject<EntityType<ThrowingKnifeProjectile>> THROWING_KNIFE_PROJECTILE =
+            REGISTRY.register("throwing_knife_projectile",
+                    () -> EntityType.Builder.<ThrowingKnifeProjectile>of(
+                                    ThrowingKnifeProjectile::new, MobCategory.MISC)
+                            .sized(0.5F, 0.5F)
+                            .clientTrackingRange(4)
+                            .updateInterval(20)
+                            .build("throwing_knife_projectile"));
+
     public static final RegistryObject<EntityType<BoulderEntity>> BOULDER =
             REGISTRY.register("boulder",
                     () -> EntityType.Builder.of(BoulderEntity::new, MobCategory.MONSTER)
@@ -169,5 +180,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.WATERBERRY_PROJECTILE.get(), ThrownItemRenderer::new);
         EntityRenderers.register(ModEntities.BOULDER.get(), BoulderRenderer::new);
         EntityRenderers.register(ModEntities.DRYFANG.get(), DryfangRenderer::new);
+        EntityRenderers.register(ModEntities.THROWING_KNIFE_PROJECTILE.get(), ThrowingKnifeRenderer::new);
     }
 }
