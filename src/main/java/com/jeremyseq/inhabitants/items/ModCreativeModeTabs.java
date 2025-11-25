@@ -47,6 +47,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.CORNUCOPIA.get());
                         pOutput.accept(ModItems.SHARP_FANG.get());
                         pOutput.accept(ModItems.THROWING_KNIFE.get());
+                        pOutput.accept(ModItems.HUNTER_BOOTS.get());
                         pOutput.accept(ModBlocks.ICE_BRICKS_ITEM.get());
                         pOutput.accept(ModBlocks.CHISELED_ICE_ITEM.get());
                         pOutput.accept(ModBlocks.ICE_BRICK_STAIRS_ITEM.get());

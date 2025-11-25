@@ -97,6 +97,10 @@ public class ModItems {
     public static final RegistryObject<Item> THROWING_KNIFE = ITEMS.register("throwing_knife",
             () -> new ThrowingKnifeItem(new Item.Properties().stacksTo(16)));
 
+    public static final RegistryObject<Item> HUNTER_BOOTS = ITEMS.register("hunter_boots",
+            () -> new HunterBootsItem(ArmorMaterials.IRON, ArmorItem.Type.BOOTS,
+                    new Item.Properties().stacksTo(1)));
+
     public static final RegistryObject<Item> GAZER_SPAWN_EGG = ITEMS.register("gazer_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.GAZER, 0x8F0B48, 0xE1778D, new Item.Properties()));
 

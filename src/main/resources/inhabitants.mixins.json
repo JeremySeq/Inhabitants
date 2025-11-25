@@ -5,7 +5,9 @@
   "refmap": "inhabitants.refmap.json",
   "mixins": [
     "CrossbowItemMixin",
-    "EntityEffectsMixin"
+    "EntityEffectsMixin",
+    "HunterBootsSuppressGameEventMixin",
+    "HunterBootsSuppressSoundMixin"
   ],
   "client": [
   ],
