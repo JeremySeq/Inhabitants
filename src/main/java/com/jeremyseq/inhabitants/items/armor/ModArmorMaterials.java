@@ -18,7 +18,7 @@ public enum ModArmorMaterials implements ArmorMaterial {
             () -> Ingredient.of(ModItems.CHITIN.get())),
 
     HUNTER("hunter", 15, new int[]{3, 0, 0, 0}, 15,
-        SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.05F,
+        SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F,
             () -> Ingredient.of(ModItems.SHARP_FANG.get()));
 
     private static final int[] HEALTH_PER_SLOT = new int[]{13, 15, 16, 11};

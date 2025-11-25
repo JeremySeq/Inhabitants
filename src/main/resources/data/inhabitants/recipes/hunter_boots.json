@@ -8,13 +8,13 @@
     "F": {
       "item": "inhabitants:sharp_fang"
     },
-    "I": {
-      "item": "inhabitants:impaler_spike"
+    "R": {
+      "item": "minecraft:rabbit_foot"
     }
   },
   "pattern": [
-    "IFI",
-    "FBF"
+    "FFF",
+    "RBR"
   ],
   "result": {
     "item": "inhabitants:hunter_boots"
