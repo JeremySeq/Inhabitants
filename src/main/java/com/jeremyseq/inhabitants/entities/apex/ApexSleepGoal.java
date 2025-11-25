@@ -16,7 +16,7 @@ public class ApexSleepGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return this.apex.getEntityData().get(ApexEntity.SLEEPING);
+        return this.apex.getState() == ApexEntity.State.SLEEPING;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class ApexSleepGoal extends Goal {
         if (this.apex.getTarget() != null || this.apex.getLastHurtByMob() != null) {
             this.trigger = true;
             apex.triggerAnim("sleep_states", "wake");
-            apex.getEntityData().set(ApexEntity.SLEEPING, false);
+            apex.setState(ApexEntity.State.IDLE);
         }
 
         if (trigger) {

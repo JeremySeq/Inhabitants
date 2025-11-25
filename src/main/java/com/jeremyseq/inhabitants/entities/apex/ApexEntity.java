@@ -1,14 +1,10 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
-import com.jeremyseq.inhabitants.entities.goals.CooldownMeleeAttackGoal;
-import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -17,7 +13,6 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -31,10 +26,18 @@ import java.util.Random;
 public class ApexEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
-    private int attackAnimTimer = 0;
     private boolean randomChance = false; // used to trigger a rare idle animation
 
-    public static final EntityDataAccessor<Boolean> SLEEPING = SynchedEntityData.defineId(ApexEntity.class, EntityDataSerializers.BOOLEAN);
+    public enum State {
+        IDLE,       // awake and idling
+        SLEEPING,   // sleeping
+        WINDUP,     // wind-up before charging
+        CHARGING,   // charging loop
+        STUNNED     // stunned after hitting a block
+    }
+
+    private static final EntityDataAccessor<String> STATE =
+            SynchedEntityData.defineId(ApexEntity.class, EntityDataSerializers.STRING);
 
     public ApexEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -48,6 +51,7 @@ public class ApexEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_SPEED, .5)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.75f)
+                .add(Attributes.FOLLOW_RANGE, 32.0D)
                 .add(Attributes.MOVEMENT_SPEED, .2f).build();
     }
 
@@ -59,8 +63,7 @@ public class ApexEntity extends Monster implements GeoEntity {
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new ApexSleepGoal(this));
-        this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 4));
-        this.goalSelector.addGoal(6, new CooldownMeleeAttackGoal(this, 1.4D, true, 15));
+        this.goalSelector.addGoal(2, new ApexChargeAttackGoal(this, 1.0D, 22, 40, 52));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
@@ -73,22 +76,32 @@ public class ApexEntity extends Monster implements GeoEntity {
         controllers.add(new AnimationController<>(this, "sleep_states", 0, state -> PlayState.STOP)
                 .triggerableAnim("sleep", RawAnimation.begin().then("sleeping", Animation.LoopType.PLAY_ONCE))
                 .triggerableAnim("wake", RawAnimation.begin().then("wake up", Animation.LoopType.PLAY_ONCE)));
-        controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
-                .triggerableAnim("attack1", RawAnimation.begin().then("attack_horn", Animation.LoopType.PLAY_ONCE))
-                .triggerableAnim("attack2", RawAnimation.begin().then("attack_bite", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "eat_bone", 0, state -> PlayState.STOP)
                 .triggerableAnim("eat_bone", RawAnimation.begin().then("eating bone", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState defaults(AnimationState<T> animationState) {
-        if (this.entityData.get(SLEEPING)) {
+        State s = this.getState();
+
+        if (s == State.STUNNED) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("stunned", Animation.LoopType.PLAY_ONCE));
+            return PlayState.CONTINUE;
+        }
+
+        if (s == State.WINDUP) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("running attack prepare", Animation.LoopType.PLAY_ONCE));
+            return PlayState.CONTINUE;
+        }
+
+        if (s == State.CHARGING) {
+            animationState.getController().setAnimation(RawAnimation.begin().then("charging", Animation.LoopType.LOOP));
+            return PlayState.CONTINUE;
+        }
+
+        if (s == State.SLEEPING) {
             animationState.getController().setAnimation(RawAnimation.begin().then("sleeping", Animation.LoopType.LOOP));
         } else if (animationState.isMoving()) {
-            if (this.isSprinting()) {
-                animationState.getController().setAnimation(RawAnimation.begin().then("running", Animation.LoopType.LOOP));
-            } else {
-                animationState.getController().setAnimation(RawAnimation.begin().then("walking", Animation.LoopType.LOOP));
-            }
+            animationState.getController().setAnimation(RawAnimation.begin().then("walking", Animation.LoopType.LOOP));
         } else {
             if (randomChance) {
                 animationState.getController().setAnimation(RawAnimation.begin().then("Idle_rare", Animation.LoopType.PLAY_ONCE));
@@ -100,7 +113,7 @@ public class ApexEntity extends Monster implements GeoEntity {
                 return PlayState.CONTINUE;
             }
 
-            animationState.getController().setAnimation(RawAnimation.begin().then("Idle", Animation.LoopType.PLAY_ONCE));
+            animationState.getController().setAnimation(RawAnimation.begin().then("Idle", Animation.LoopType.LOOP));
             if (animationState.getController().hasAnimationFinished()) {
                 animationState.getController().forceAnimationReset();
                 randomChance = new Random().nextFloat() < 0.1f; // chance to trigger a rare idle animation
@@ -110,63 +123,34 @@ public class ApexEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    protected void customServerAiStep() {
-
-        this.setSprinting(this.getTarget() != null && this.getTarget().isAlive());
-
-        if (this.attackAnimTimer > 0) {
-            this.attackAnimTimer--;
-            if (this.attackAnimTimer == 0) {
-                LivingEntity target = getTarget();
-                if (target != null && distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target)) {
-                    // mob to target
-                    Vec3 toTarget = target.position().subtract(this.position()).normalize();
-                    // mob's facing direction (yaw)
-                    Vec3 facing = Vec3.directionFromRotation(0, this.getYRot()).normalize();
-                    double dot = facing.dot(toTarget);
-                    // require within 60deg cone
-                    if (dot > 0.5) {
-                        super.doHurtTarget(target);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public boolean doHurtTarget(@NotNull Entity target) {
-        if (!level().isClientSide) {
-            if (new Random().nextInt(2) == 0) {
-                triggerAnim("attack", "attack1");
-            } else {
-                triggerAnim("attack", "attack2");
-            }
-            this.attackAnimTimer = 10;
-        }
-        return true;
-    }
-
-
-    @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(SLEEPING, true);
+        this.entityData.define(STATE, State.SLEEPING.name());
     }
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-
-        tag.putBoolean("sleeping", entityData.get(SLEEPING));
+        if (this.getState() == State.SLEEPING) {
+            tag.putString("State", State.SLEEPING.name());
+        } else {
+            tag.putString("State", State.IDLE.name());
+        }
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-
-        if (tag.contains("sleeping")) {
-            entityData.set(SLEEPING, tag.getBoolean("sleeping"));
+        if (tag.contains("State")) {
+            this.setState(ApexEntity.State.valueOf(tag.getString("State")));
         }
+    }
+
+    public State getState() {
+        return State.valueOf(this.entityData.get(STATE));
+    }
+    public void setState(State state) {
+        this.entityData.set(STATE, state.name());
     }
 
     @Override
