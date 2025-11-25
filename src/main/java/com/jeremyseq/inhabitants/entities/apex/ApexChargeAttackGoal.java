@@ -1,7 +1,11 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
+import com.jeremyseq.inhabitants.Inhabitants;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
@@ -79,6 +83,8 @@ public class ApexChargeAttackGoal extends Goal {
             windupTicks--;
             // keep facing target
             mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+
+            mob.playSound(SoundEvents.SAND_STEP, 0.5F, 1.0F);
             if (windupTicks == 0) {
                 // start charging
                 startedCharging = true;
@@ -110,12 +116,8 @@ public class ApexChargeAttackGoal extends Goal {
             Vec3 motion = new Vec3(this.chargeDir.x * chargeSpeed, vy, this.chargeDir.z * chargeSpeed);
 
             // hit a block -> stunned
-            if (mob.horizontalCollision) {
-                mob.setState(ApexEntity.State.STUNNED);
-                this.stunTicks = this.stunTicksStart;
-                this.startedCharging = false;
-                mob.setDeltaMovement(Vec3.ZERO);
-                mob.setSprinting(false);
+            if (mob.horizontalCollision || mob.minorHorizontalCollision) {
+                this.stun();
                 return;
             }
 
@@ -139,12 +141,15 @@ public class ApexChargeAttackGoal extends Goal {
 
                 if (dot > threshold) {
                     mob.doHurtTarget(hitEntity);
-                    // stop charging after hitting an entity
-                    mob.setState(ApexEntity.State.IDLE);
-                    mob.setSprinting(false);
-                    this.startedCharging = false;
-                    this.chargeTicks = 0;
-                    return;
+                    ItemStack offhandItem = hitEntity.getItemBySlot(EquipmentSlot.OFFHAND);
+
+                    // if holding a shield, damage it upon impact and become stunned
+                    if (hitEntity.isBlocking()) {
+                        Inhabitants.LOGGER.debug("Apex hit shield during charge, damaging shield and stunning.");
+                        offhandItem.hurtAndBreak(offhandItem.getMaxDamage(), mob, (e) -> e.broadcastBreakEvent(EquipmentSlot.OFFHAND));
+                        this.stun();
+                        return;
+                    }
                 }
             }
 
@@ -165,5 +170,13 @@ public class ApexChargeAttackGoal extends Goal {
         mob.setYRot(yaw);
         mob.setYHeadRot(yaw);
         mob.setXRot(0.0F);
+    }
+
+    public void stun() {
+        mob.setState(ApexEntity.State.STUNNED);
+        this.stunTicks = this.stunTicksStart;
+        this.startedCharging = false;
+        mob.setDeltaMovement(Vec3.ZERO);
+        mob.setSprinting(false);
     }
 }
