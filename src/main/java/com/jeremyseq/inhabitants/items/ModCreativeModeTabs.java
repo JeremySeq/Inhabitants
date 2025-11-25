@@ -45,6 +45,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.APEX_SPAWN_EGG.get());
                         pOutput.accept(ModItems.APEX_HORN.get());
                         pOutput.accept(ModItems.CORNUCOPIA.get());
+                        pOutput.accept(ModItems.DRYFANG_SPAWN_EGG.get());
                         pOutput.accept(ModItems.SHARP_FANG.get());
                         pOutput.accept(ModItems.THROWING_KNIFE.get());
                         pOutput.accept(ModItems.HUNTER_BOOTS.get());

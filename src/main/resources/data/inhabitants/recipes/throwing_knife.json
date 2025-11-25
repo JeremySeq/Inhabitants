@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "s": {
+      "item": "minecraft:stick"
+    },
+    "f": {
+      "item": "inhabitants:sharp_fang"
+    }
+  },
+  "pattern": [
+    "f",
+    "s"
+  ],
+  "result": {
+    "item": "inhabitants:throwing_knife"
+  },
+  "show_notification": true
+}

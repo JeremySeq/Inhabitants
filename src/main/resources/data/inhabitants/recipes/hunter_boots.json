@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "minecraft:leather_boots"
+    },
+    "F": {
+      "item": "inhabitants:sharp_fang"
+    },
+    "I": {
+      "item": "inhabitants:impaler_spike"
+    }
+  },
+  "pattern": [
+    "IFI",
+    "FBF"
+  ],
+  "result": {
+    "item": "inhabitants:hunter_boots"
+  },
+  "show_notification": true
+}
