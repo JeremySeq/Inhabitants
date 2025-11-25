@@ -110,13 +110,13 @@ public class ModEntities {
     public static final RegistryObject<EntityType<ApexEntity>> APEX =
             REGISTRY.register("apex",
                     () -> EntityType.Builder.of(ApexEntity::new, MobCategory.MONSTER)
-                            .sized(2.25f, 2.3f)
+                            .sized(2.25f, 2.0f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "apex").toString()));
 
     public static final RegistryObject<EntityType<DryfangEntity>> DRYFANG =
             REGISTRY.register("dryfang",
                     () -> EntityType.Builder.of(DryfangEntity::new, MobCategory.MONSTER)
-                            .sized(1.75f, 1.2f)
+                            .sized(1.5f, 1.0f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "dryfang").toString()));
 
     public static final RegistryObject<EntityType<CatcherEntity>> CATCHER =
