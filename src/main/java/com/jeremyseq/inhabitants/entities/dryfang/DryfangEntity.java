@@ -20,6 +20,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -29,8 +30,8 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.OptionalInt;
 
 public class DryfangEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -41,7 +42,7 @@ public class DryfangEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> PACK_LEADER_ID =
             SynchedEntityData.defineId(DryfangEntity.class, EntityDataSerializers.INT);
 
-    private static final double PACK_RADIUS = 16.0D;
+    private static final double PACK_RADIUS = 8.0D;
     private static final int PACK_MIN = 3;
     private static final int PACK_MAX = 6;
 
@@ -49,6 +50,11 @@ public class DryfangEntity extends Monster implements GeoEntity {
 
     public DryfangEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+    }
+
+    @Override
+    public boolean canSwimInFluidType(FluidType type) {
+        return true;
     }
 
     public static AttributeSupplier setAttributes() {
@@ -110,7 +116,23 @@ public class DryfangEntity extends Monster implements GeoEntity {
             }
         }
 
-        // pack formation: server side only
+        // set angry state based on target and reset target if dead
+        if (this.getTarget() == null || !this.getTarget().isAlive()) {
+            this.setAngry(false);
+            this.setTarget(null);
+        } else {
+            this.setAngry(true);
+        }
+
+        // reset target if dryfang and is not rival
+        LivingEntity target = this.getTarget();
+        if (target instanceof DryfangEntity targetDryfang) {
+            if (targetDryfang.getPackLeaderId() == this.getPackLeaderId() || targetDryfang.getPackLeaderId() < 0) {
+                this.setTarget(null);
+            }
+        }
+
+        // pack formation and behavior
         if (!this.level().isClientSide) {
             if (getPackLeaderEntity() == null) {
                 List<DryfangEntity> nearby = this.level().getEntitiesOfClass(
@@ -119,20 +141,66 @@ public class DryfangEntity extends Monster implements GeoEntity {
                         e -> true
                 );
 
-                int total = nearby.size();
-                if (total >= PACK_MIN && total <= PACK_MAX) {
-                    // pack leader: lowest entity id
-                    OptionalInt minIdOpt = nearby.stream().mapToInt(Entity::getId).min();
-                    int leaderId = minIdOpt.getAsInt();
-                    for (DryfangEntity d : nearby) {
-                        d.setPackLeaderId(leaderId);
+                // get pack leaders within range
+                List<DryfangEntity> nearbyLeaders = nearby.stream()
+                        .filter(DryfangEntity::isLeader)
+                        .toList();
+
+                // if no pack leaders nearby, create new pack if enough dryfangs and become leader
+                if (nearbyLeaders.isEmpty()) {
+                    if (nearby.size() >= PACK_MIN) {
+                        for (DryfangEntity d : nearby) {
+                            d.setPackLeaderId(this.getId());
+                        }
                     }
                 }
             } else {
                 // clear leader if leader removed or too far
                 Entity leader = getPackLeaderEntity();
-                if (leader == null || leader.isRemoved() || leader.distanceToSqr(this) > PACK_RADIUS * PACK_RADIUS) {
+                if (leader == null || !leader.isAlive() || leader.isRemoved() || leader.distanceToSqr(this) > PACK_RADIUS * PACK_RADIUS) {
                     setPackLeaderId(-1);
+                    return;
+                }
+
+                // attack nearest leader who is not your leader
+                List<DryfangEntity> nearbyRivals = this.level().getEntitiesOfClass(
+                        DryfangEntity.class,
+                        this.getBoundingBox().inflate(PACK_RADIUS),
+                        e -> e.getPackLeaderId() != this.getPackLeaderId() && e.getPackLeaderId() >= 0
+                );
+
+                List<DryfangEntity> sorted = nearbyRivals.stream()
+                        .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(this)))
+                        .toList();
+
+                if (!sorted.isEmpty()) {
+                    DryfangEntity targetDryfang = sorted.get(0);
+                    this.setTarget(targetDryfang);
+                }
+
+                // leader recruits new members
+                if (this.isLeader()) {
+
+                    List<DryfangEntity> nearby = this.level().getEntitiesOfClass(
+                            DryfangEntity.class,
+                            this.getBoundingBox().inflate(PACK_RADIUS),
+                            e -> true
+                    );
+
+                    // get pack members within range
+                    List<DryfangEntity> nearbyMembers = nearby.stream()
+                            .filter(d -> d.getPackLeaderId() == this.getPackLeaderId())
+                            .toList();
+
+                    // get dryfangs without a pack leader
+                    List<DryfangEntity> nearbyLoners = nearby.stream()
+                            .filter(d -> d.getPackLeaderId() < 0)
+                            .toList();
+
+                    // recruit new members if under max
+                    if (nearbyMembers.size() < PACK_MAX && !nearbyLoners.isEmpty()) {
+                        nearbyLoners.get(0).setPackLeaderId(this.getPackLeaderId());
+                    }
                 }
             }
         }
@@ -156,8 +224,6 @@ public class DryfangEntity extends Monster implements GeoEntity {
         int id = getPackLeaderId();
         if (id < 0) {
             return null;
-        } else {
-            this.level();
         }
         Entity e = this.level().getEntity(id);
         return e instanceof DryfangEntity ? e : null;
@@ -181,13 +247,13 @@ public class DryfangEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag pCompound) {
+    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.putInt("PackLeaderId", getPackLeaderId());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag pCompound) {
+    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         setPackLeaderId(pCompound.getInt("PackLeaderId"));
     }

@@ -64,6 +64,7 @@ public class MeatyPlayerTargetGoal extends TargetGoal {
         return targetPlayer != null
                 && targetPlayer.isAlive()
                 && hasMeat(targetPlayer)
+                && !targetPlayer.isCreative()
                 && this.mob.distanceTo(targetPlayer) <= this.getFollowDistance();
     }
 
