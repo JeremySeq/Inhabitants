@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.entities.dryfang;
 
 import com.jeremyseq.inhabitants.entities.goals.CooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -28,11 +29,21 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
+import java.util.List;
+import java.util.OptionalInt;
+
 public class DryfangEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     private static final EntityDataAccessor<Boolean> ANGRY =
             SynchedEntityData.defineId(DryfangEntity.class, EntityDataSerializers.BOOLEAN);
+
+    private static final EntityDataAccessor<Integer> PACK_LEADER_ID =
+            SynchedEntityData.defineId(DryfangEntity.class, EntityDataSerializers.INT);
+
+    private static final double PACK_RADIUS = 16.0D;
+    private static final int PACK_MIN = 3;
+    private static final int PACK_MAX = 6;
 
     private int attackAnimTimer = 0;
 
@@ -55,6 +66,9 @@ public class DryfangEntity extends Monster implements GeoEntity {
     protected void registerGoals() {
         this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 4));
         this.goalSelector.addGoal(6, new CooldownMeleeAttackGoal(this, 1.4D, true, 15));
+
+        this.goalSelector.addGoal(7, new FollowPackGoal(this, 1.0D, 2.0D, 4.0D));
+
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
 
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 30f, 1));
@@ -95,6 +109,58 @@ public class DryfangEntity extends Monster implements GeoEntity {
                 }
             }
         }
+
+        // pack formation: server side only
+        if (!this.level().isClientSide) {
+            if (getPackLeaderEntity() == null) {
+                List<DryfangEntity> nearby = this.level().getEntitiesOfClass(
+                        DryfangEntity.class,
+                        this.getBoundingBox().inflate(PACK_RADIUS),
+                        e -> true
+                );
+
+                int total = nearby.size();
+                if (total >= PACK_MIN && total <= PACK_MAX) {
+                    // pack leader: lowest entity id
+                    OptionalInt minIdOpt = nearby.stream().mapToInt(Entity::getId).min();
+                    int leaderId = minIdOpt.getAsInt();
+                    for (DryfangEntity d : nearby) {
+                        d.setPackLeaderId(leaderId);
+                    }
+                }
+            } else {
+                // clear leader if leader removed or too far
+                Entity leader = getPackLeaderEntity();
+                if (leader == null || leader.isRemoved() || leader.distanceToSqr(this) > PACK_RADIUS * PACK_RADIUS) {
+                    setPackLeaderId(-1);
+                }
+            }
+        }
+    }
+
+    // Pack leader accessor helpers
+    public int getPackLeaderId() {
+        return this.entityData.get(PACK_LEADER_ID);
+    }
+
+    public void setPackLeaderId(int id) {
+        this.entityData.set(PACK_LEADER_ID, id);
+    }
+
+    public boolean isLeader() {
+        return getPackLeaderId() == this.getId();
+    }
+
+    @Nullable
+    public Entity getPackLeaderEntity() {
+        int id = getPackLeaderId();
+        if (id < 0) {
+            return null;
+        } else {
+            this.level();
+        }
+        Entity e = this.level().getEntity(id);
+        return e instanceof DryfangEntity ? e : null;
     }
 
     @Override
@@ -111,6 +177,19 @@ public class DryfangEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(ANGRY, false);
+        this.entityData.define(PACK_LEADER_ID, -1);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag pCompound) {
+        super.addAdditionalSaveData(pCompound);
+        pCompound.putInt("PackLeaderId", getPackLeaderId());
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag pCompound) {
+        super.readAdditionalSaveData(pCompound);
+        setPackLeaderId(pCompound.getInt("PackLeaderId"));
     }
 
     public boolean isAngry() {
