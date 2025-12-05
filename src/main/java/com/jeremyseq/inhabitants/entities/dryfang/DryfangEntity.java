@@ -16,7 +16,10 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -70,6 +73,8 @@ public class DryfangEntity extends Monster implements GeoEntity {
 
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(1, new EatMeatDropGoal(this, 1.0D, 8.0D));
+
         this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 4));
         this.goalSelector.addGoal(6, new CooldownMeleeAttackGoal(this, 1.4D, true, 15));
 
@@ -82,6 +87,8 @@ public class DryfangEntity extends Monster implements GeoEntity {
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new MeatyPlayerTargetGoal(this, false));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Animal.class, false, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Zombie.class, false));
     }
 
     @Override
