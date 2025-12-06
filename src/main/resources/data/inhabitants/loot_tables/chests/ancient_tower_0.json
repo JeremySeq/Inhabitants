@@ -1,0 +1,112 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "name": "materials",
+      "rolls": 2,
+      "entries": [
+        { "type": "minecraft:item", "name": "minecraft:iron_ingot", "weight": 4, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":8}}]},
+        { "type": "minecraft:item", "name": "minecraft:andesite", "weight": 3, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":8}}]},
+        { "type": "minecraft:item", "name": "minecraft:diorite", "weight": 3, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":8}}]},
+        { "type": "minecraft:item", "name": "minecraft:granite", "weight": 3, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":8}}]},
+        { "type": "minecraft:item", "name": "minecraft:cobblestone", "weight": 2, "functions":[{"function":"minecraft:set_count","count":{"min":2,"max":8}}]},
+        { "type": "minecraft:item", "name": "minecraft:stone", "weight": 2, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":8}}]}
+      ]
+    },
+    {
+      "name": "food",
+      "rolls": 2,
+      "entries": [
+        { "type": "minecraft:item", "name": "minecraft:bread", "weight": 4, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:apple", "weight": 3, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:carrot", "weight": 3, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:potato", "weight": 3, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:wheat_seeds", "weight": 2, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:brown_mushroom", "weight": 1, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":1}}]},
+        { "type": "minecraft:item", "name": "minecraft:red_mushroom", "weight": 1, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":1}}]}
+      ]
+    },
+    {
+      "name": "tools_misc",
+      "rolls": 2,
+      "entries": [
+        { "type": "minecraft:item", "name": "minecraft:torch", "weight": 5, "functions":[{"function":"minecraft:set_count","count":{"min":2,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:gunpowder", "weight": 2, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:leather", "weight": 2, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:string", "weight": 2, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:feather", "weight": 2, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]},
+        { "type": "minecraft:item", "name": "minecraft:bone", "weight": 1, "functions":[{"function":"minecraft:set_count","count":{"min":1,"max":4}}]}
+      ]
+    },
+    {
+      "name": "armor_weapon",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_sword",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_damage",
+              "damage": { "min": 0.2, "max": 0.8 }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_helmet",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_damage",
+              "damage": { "min": 0.2, "max": 0.8 }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_chestplate",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_damage",
+              "damage": { "min": 0.2, "max": 0.8 }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_leggings",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_damage",
+              "damage": { "min": 0.2, "max": 0.8 }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_boots",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_damage",
+              "damage": { "min": 0.2, "max": 0.8 }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "decor_misc",
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "minecraft:flower_pot", "weight": 1 },
+        { "type": "minecraft:item", "name": "minecraft:oak_sapling", "weight": 1 },
+        { "type": "minecraft:item", "name": "minecraft:spruce_sapling", "weight": 1 }
+      ]
+    }
+  ]
+}
