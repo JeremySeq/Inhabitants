@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.entities.boulder;
 
-import net.minecraft.core.particles.ParticleTypes;
+import com.jeremyseq.inhabitants.ModParticles;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -67,17 +67,6 @@ public class BoulderAreaAttackGoal extends Goal {
         mob.getNavigation().stop();
         mob.setYRot(mob.yBodyRot);
 
-        if (mob.level() instanceof ServerLevel server && animationTimer % 2 == 0) {
-            for (int i = 0; i < 8; i++) {
-                double angle = mob.getRandom().nextDouble() * Math.PI * 2;
-                double radius = mob.getRandom().nextDouble() * range * 0.6;
-                double px = mob.getX() + Math.cos(angle) * radius;
-                double py = mob.getY() + 0.1;
-                double pz = mob.getZ() + Math.sin(angle) * radius;
-                server.sendParticles(ParticleTypes.POOF, px, py, pz, 1, 0, 0, 0, 0);
-            }
-        }
-
         if (!hitDone && animationTimer == doDamageTick) {
             performAreaAttack();
             hitDone = true;
@@ -92,13 +81,13 @@ public class BoulderAreaAttackGoal extends Goal {
 
     private void performAreaAttack() {
         if (mob.level() instanceof ServerLevel server) {
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 150; i++) {
                 double angle = mob.getRandom().nextDouble() * Math.PI * 2;
                 double radius = mob.getRandom().nextDouble() * range;
                 double px = mob.getX() + Math.cos(angle) * radius;
                 double py = mob.getY();
                 double pz = mob.getZ() + Math.sin(angle) * radius;
-                server.sendParticles(ParticleTypes.EXPLOSION, px, py, pz, 1, 0, 0, 0, 0);
+                server.sendParticles(ModParticles.BOULDER_DUST.get(), px, py, pz, 1, 0, 0, 0, 0);
             }
         }
 

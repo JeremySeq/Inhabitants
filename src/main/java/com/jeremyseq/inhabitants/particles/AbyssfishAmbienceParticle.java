@@ -1,13 +1,12 @@
-package com.jeremyseq.inhabitants.entities.impaler;
+package com.jeremyseq.inhabitants.particles;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
-public class RageParticle extends TextureSheetParticle {
-
-    protected RageParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+public class AbyssfishAmbienceParticle extends TextureSheetParticle {
+    protected AbyssfishAmbienceParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         pickSprite(sprites);
         hasPhysics = false;
@@ -15,6 +14,12 @@ public class RageParticle extends TextureSheetParticle {
         xd = xSpeed;
         yd = ySpeed;
         zd = zSpeed;
+        this.quadSize *= .5f;
+    }
+
+    @Override
+    public int getLightColor(float pPartialTick) {
+        return 240 | (240 << 16);
     }
 
     @Override public @NotNull ParticleRenderType getRenderType() {
@@ -36,7 +41,7 @@ public class RageParticle extends TextureSheetParticle {
 
         @Override
         public Particle createParticle(@NotNull SimpleParticleType type, @NotNull ClientLevel level, double x, double y, double z, double mx, double my, double mz) {
-            return new RageParticle(level, x, y, z, mx, my, mz, sprites);
+            return new AbyssfishAmbienceParticle(level, x, y, z, mx, my, mz, sprites);
         }
     }
 }

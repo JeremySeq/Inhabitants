@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.entities.impaler;
+package com.jeremyseq.inhabitants.particles;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
