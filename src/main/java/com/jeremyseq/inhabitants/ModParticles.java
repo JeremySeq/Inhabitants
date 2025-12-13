@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants;
 
 import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishAmbienceParticle;
+import com.jeremyseq.inhabitants.entities.apex.ApexStunParticle;
 import com.jeremyseq.inhabitants.entities.impaler.RageParticle;
 import com.jeremyseq.inhabitants.entities.impaler.ScreamParticle;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamPearlAmbienceParticle;
@@ -35,6 +36,10 @@ public class ModParticles {
             PARTICLES.register("warped_clam_pearl_ambience",
                     () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> APEX_STUN =
+            PARTICLES.register("apex_stun",
+                    () -> new SimpleParticleType(false));
+
 
     @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent evt) {
@@ -42,5 +47,6 @@ public class ModParticles {
         evt.registerSpriteSet(ModParticles.IMPALER_RAGE.get(), RageParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.ABYSSFISH_AMBIENCE.get(), AbyssfishAmbienceParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), WarpedClamPearlAmbienceParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.APEX_STUN.get(), ApexStunParticle.Factory::new);
     }
 }
