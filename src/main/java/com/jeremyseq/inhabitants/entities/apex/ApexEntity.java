@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModParticles;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -29,9 +28,15 @@ import java.util.Random;
 public class ApexEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
+    public static final int STUN_PARTICLE_FREQUENCY = 4;
+    public static final float STUN_PARTICLE_ROTATION_SPEED = 0.3f; // radians per STUN_PARTICLE_FREQUENCY ticks
+
     private boolean randomChance = false; // used to trigger a rare idle animation
 
-    private boolean stunParticlesSpawned = false;
+//    private boolean stunParticlesSpawned = false;
+
+    private double stunRotation = 0.0;
+    private boolean wasStunned = false;
 
     public enum State {
         IDLE,       // awake and idling
@@ -79,20 +84,22 @@ public class ApexEntity extends Monster implements GeoEntity {
     public void tick() {
         super.tick();
 
-        if (stunParticlesSpawned && this.getState() != State.STUNNED) {
-            stunParticlesSpawned = false;
+        boolean currentlyStunned = this.getState() == State.STUNNED;
+        if (currentlyStunned != wasStunned) {
+            stunRotation = 0.0;
         }
+        wasStunned = currentlyStunned;
 
-        if (this.getState() == State.STUNNED && !stunParticlesSpawned) {
-            stunParticlesSpawned = true;
+        if (currentlyStunned && this.tickCount % STUN_PARTICLE_FREQUENCY == 0) {
+            stunRotation += STUN_PARTICLE_ROTATION_SPEED;
             // spawn stunned particles in circle
-            double radius = 0.7;
-            int particleCount = 10;
+            double radius = 1.0;
+            int particleCount = 12;
             if (this.level() instanceof ServerLevel serverLevel) {
                 for (int i = 0; i < particleCount; i++) {
-                    double angle = 2 * Math.PI * i / particleCount;
-                    double offsetX = radius * Math.cos(angle) + this.getLookAngle().x() * 2.3;
-                    double offsetZ = radius * Math.sin(angle) + this.getLookAngle().z() * 2.3;
+                    double angle = stunRotation + 2 * Math.PI * i / particleCount;
+                    double offsetX = radius * Math.cos(angle) + this.getLookAngle().x() * 2.25;
+                    double offsetZ = radius * Math.sin(angle) + this.getLookAngle().z() * 2.25;
                     serverLevel.sendParticles(
                             ModParticles.APEX_STUN.get(),
                             this.getX() + offsetX,
@@ -101,7 +108,6 @@ public class ApexEntity extends Monster implements GeoEntity {
                             1, 0,
                             0, 0, 0
                     );
-                    Inhabitants.LOGGER.debug("Spawning stun particle {})", i);
                 }
             }
 

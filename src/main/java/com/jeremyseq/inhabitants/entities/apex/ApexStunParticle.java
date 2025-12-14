@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -8,38 +7,16 @@ import org.jetbrains.annotations.NotNull;
 
 public class ApexStunParticle extends TextureSheetParticle {
 
-    private final SpriteSet sprites;
-    private static final int TOTAL_FRAMES = 2;
-    private static final int ANIMATION_DURATION = 20;
-
     protected ApexStunParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
-        this.sprites = sprites;
         hasPhysics = false;
-        lifetime = 100;
+        lifetime = ApexEntity.STUN_PARTICLE_FREQUENCY;
         xd = xSpeed;
         yd = ySpeed;
         zd = zSpeed;
-        this.quadSize *= 1f;
-        setSpriteFromAge(sprites);
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        // sprite animation
-        float animProgress = ((float) age % (float) ANIMATION_DURATION) / (float) ANIMATION_DURATION;
-        int frame = (int)(animProgress * TOTAL_FRAMES);
-
-        if (frame >= TOTAL_FRAMES) {
-            frame = 0;
-        }
-
-        // +1 because 1st frame is at index 1 not 0
-        this.setSprite(sprites.get(frame+1, TOTAL_FRAMES));
-
-        Inhabitants.LOGGER.debug("ApexStunParticle tick: age=" + age + ", frame=" + frame);
+        this.quadSize *= 0.5f;
+        pickSprite(sprites);
+//        setSprite(sprites.get(level.random));
     }
 
     @Override
