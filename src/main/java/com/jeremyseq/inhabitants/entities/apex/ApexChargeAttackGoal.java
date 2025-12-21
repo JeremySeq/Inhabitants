@@ -1,12 +1,16 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -114,16 +118,19 @@ public class ApexChargeAttackGoal extends Goal {
             // move forward with a fixed velocity each tick
             double vy = mob.getDeltaMovement().y;
             Vec3 motion = new Vec3(this.chargeDir.x * chargeSpeed, vy, this.chargeDir.z * chargeSpeed);
+            mob.setDeltaMovement(motion);
 
-            // hit a block -> stunned
-            if (mob.horizontalCollision || mob.minorHorizontalCollision) {
-                this.stun();
-                return;
-            }
-
+            // update rotation to face charge direction
             this.setApexRot(chargeDir);
 
-            mob.setDeltaMovement(motion);
+            // check blocks in front using an AABB placed ahead of the apex (only check every few ticks for performance)
+            if (mob.tickCount % 10 == 0) {
+                AABB frontBox = mob.getBoundingBox().move(this.chargeDir.scale(chargeSpeed)).inflate(0.5, 0.0, 0.5);
+                if (isAnySolidBlockInAABB(frontBox)) {
+                    this.stun();
+                    return;
+                }
+            }
 
             // hit an entity -> deal damage and stop charge
             List<LivingEntity> list = mob.level().getEntitiesOfClass(LivingEntity.class,
@@ -178,5 +185,29 @@ public class ApexChargeAttackGoal extends Goal {
         this.startedCharging = false;
         mob.setDeltaMovement(Vec3.ZERO);
         mob.setSprinting(false);
+    }
+
+    // Scan integer block positions inside the AABB and return true if any block has a non-empty collision shape
+    private boolean isAnySolidBlockInAABB(AABB box) {
+        int minX = (int)Math.floor(box.minX);
+        int minY = (int)Math.floor(box.minY);
+        int minZ = (int)Math.floor(box.minZ);
+        int maxX = (int)Math.floor(box.maxX);
+        int maxY = (int)Math.floor(box.maxY);
+        int maxZ = (int)Math.floor(box.maxZ);
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockState state = mob.level().getBlockState(pos);
+                    VoxelShape shape = state.getCollisionShape(mob.level(), pos);
+                    if (!shape.isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
