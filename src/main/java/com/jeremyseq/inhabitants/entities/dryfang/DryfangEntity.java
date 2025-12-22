@@ -33,7 +33,6 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class DryfangEntity extends Monster implements GeoEntity {
@@ -87,6 +86,7 @@ public class DryfangEntity extends Monster implements GeoEntity {
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new MeatyPlayerTargetGoal(this, false));
+        this.targetSelector.addGoal(3, new DryfangAttackRivalGoal(this));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Animal.class, false, true));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Zombie.class, false));
     }
@@ -123,22 +123,6 @@ public class DryfangEntity extends Monster implements GeoEntity {
             }
         }
 
-        // set angry state based on target and reset target if dead
-        if (this.getTarget() == null || !this.getTarget().isAlive()) {
-            this.setAngry(false);
-            this.setTarget(null);
-        } else {
-            this.setAngry(true);
-        }
-
-        // reset target if dryfang and is not rival
-        LivingEntity target = this.getTarget();
-        if (target instanceof DryfangEntity targetDryfang) {
-            if (targetDryfang.getPackLeaderId() == this.getPackLeaderId() || targetDryfang.getPackLeaderId() < 0) {
-                this.setTarget(null);
-            }
-        }
-
         // pack formation and behavior
         if (!this.level().isClientSide) {
             if (getPackLeaderEntity() == null) {
@@ -167,22 +151,6 @@ public class DryfangEntity extends Monster implements GeoEntity {
                 if (leader == null || !leader.isAlive() || leader.isRemoved() || leader.distanceToSqr(this) > PACK_RADIUS * PACK_RADIUS) {
                     setPackLeaderId(-1);
                     return;
-                }
-
-                // attack nearest leader who is not your leader
-                List<DryfangEntity> nearbyRivals = this.level().getEntitiesOfClass(
-                        DryfangEntity.class,
-                        this.getBoundingBox().inflate(PACK_RADIUS),
-                        e -> e.getPackLeaderId() != this.getPackLeaderId() && e.getPackLeaderId() >= 0
-                );
-
-                List<DryfangEntity> sorted = nearbyRivals.stream()
-                        .sorted(Comparator.comparingDouble(e -> e.distanceToSqr(this)))
-                        .toList();
-
-                if (!sorted.isEmpty()) {
-                    DryfangEntity targetDryfang = sorted.get(0);
-                    this.setTarget(targetDryfang);
                 }
 
                 // leader recruits new members
