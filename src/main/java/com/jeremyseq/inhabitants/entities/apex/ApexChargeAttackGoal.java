@@ -1,12 +1,12 @@
 package com.jeremyseq.inhabitants.entities.apex;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -88,7 +88,7 @@ public class ApexChargeAttackGoal extends Goal {
             // keep facing target
             mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
-            mob.playSound(SoundEvents.SAND_STEP, 0.5F, 1.0F);
+            mob.playSound(SoundEvents.COW_STEP, 0.5F, 1.0F);
             if (windupTicks == 0) {
                 // start charging
                 startedCharging = true;
@@ -148,12 +148,16 @@ public class ApexChargeAttackGoal extends Goal {
 
                 if (dot > threshold) {
                     mob.doHurtTarget(hitEntity);
-                    ItemStack offhandItem = hitEntity.getItemBySlot(EquipmentSlot.OFFHAND);
 
                     // if holding a shield, damage it upon impact and become stunned
                     if (hitEntity.isBlocking()) {
-                        Inhabitants.LOGGER.debug("Apex hit shield during charge, damaging shield and stunning.");
-                        offhandItem.hurtAndBreak(offhandItem.getMaxDamage(), mob, (e) -> e.broadcastBreakEvent(EquipmentSlot.OFFHAND));
+                        for (InteractionHand hand : InteractionHand.values()) {
+                            ItemStack stack = hitEntity.getItemInHand(hand);
+                            if (stack.getItem() instanceof ShieldItem) {
+                                stack.hurtAndBreak(stack.getMaxDamage(), hitEntity, p -> p.broadcastBreakEvent(hand));
+                                break;
+                            }
+                        }
                         this.stun();
                         return;
                     }
