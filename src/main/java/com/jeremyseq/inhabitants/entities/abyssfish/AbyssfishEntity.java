@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.entities.abyssfish;
 
-import com.jeremyseq.inhabitants.ModParticles;
+import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
