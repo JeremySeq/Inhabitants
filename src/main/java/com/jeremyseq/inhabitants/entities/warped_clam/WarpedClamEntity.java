@@ -187,8 +187,28 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         }
 
         // particles if clam has pearl and is open
-        if (hasPearl() && level().isClientSide && tickCount % 20 == 0 && isOpen()) {
-            spawnCircleAmbientParticles();
+        if (hasPearl() && level().isClientSide && tickCount % 80 == 0 && isOpen()) {
+
+            // approximate pearl center inside the clam
+            Vec3 center = new Vec3(getX(), getY() + getBbHeight()/2, getZ());
+
+            // local axes: forward from look angle, up world-up, right = forward x up
+            Vec3 forward = getLookAngle().normalize();
+            Vec3 up = new Vec3(0, 1, 0);
+            Vec3 right = forward.cross(up).normalize();
+
+            // corner offset: tweak these values to move the particle to the exact corner you want
+            double forwardOffset = 0.1;
+            double upOffset = 0.4;
+            double rightOffset = -0.1;
+
+            Vec3 corner = center
+                    .add(forward.scale(forwardOffset))
+                    .add(right.scale(rightOffset))
+                    .add(up.scale(upOffset));
+
+            level().addParticle(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(),
+                    corner.x, corner.y, corner.z, 0, 0, 0);
         }
 
         // particles if clam has pearl and is closed
