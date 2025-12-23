@@ -186,26 +186,43 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             }
         }
 
-        // particles if clam has pearl
-        if (hasPearl() && level().isClientSide && tickCount % 20 == 0) {
-            double centerX = getX();
-            double centerY = getY() + this.getBbHeight()/2;
-            double centerZ = getZ();
-
-            int particleCount = 12;
-            double speed = 0.05;
-
-            for (int i = 0; i < particleCount; i++) {
-                double angle = (2 * Math.PI / particleCount) * i;
-
-                double dx = Math.cos(angle) * speed;
-                double dy = 0;
-                double dz = Math.sin(angle) * speed;
-
-                level().addParticle(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), centerX, centerY, centerZ, dx, dy, dz);
-            }
+        // particles if clam has pearl and is open
+        if (hasPearl() && level().isClientSide && tickCount % 20 == 0 && isOpen()) {
+            spawnCircleAmbientParticles();
         }
 
+        // particles if clam has pearl and is closed
+        if (hasPearl() && level().isClientSide && tickCount % 10 == 0 && !isOpen()) {
+            spawnFloatingIndicatorParticle();
+        }
+
+    }
+
+    private void spawnCircleAmbientParticles() {
+        double centerX = getX();
+        double centerY = getY() + this.getBbHeight()/2;
+        double centerZ = getZ();
+
+        int particleCount = 12;
+        double speed = 0.05;
+
+        for (int i = 0; i < particleCount; i++) {
+            double angle = (2 * Math.PI / particleCount) * i;
+
+            double dx = Math.cos(angle) * speed;
+            double dy = 0;
+            double dz = Math.sin(angle) * speed;
+
+            level().addParticle(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), centerX, centerY, centerZ, dx, dy, dz);
+        }
+    }
+
+    private void spawnFloatingIndicatorParticle() {
+        double cx = getX() + (random.nextDouble() - 0.5) * 1.2;
+        double cy = getY() + getBbHeight() + (random.nextDouble() * 0.3);
+        double cz = getZ() + (random.nextDouble() - 0.5) * 1.2;
+        level().addParticle(ModParticles.WARPED_CLAM_PEARL_INDICATOR.get(), cx, cy, cz,
+                (random.nextDouble() - 0.5) * 0.01, (random.nextDouble() - 0.1) * 0.02, (random.nextDouble() - 0.5) * 0.01);
     }
 
     private static float directionToYaw(int dir) {

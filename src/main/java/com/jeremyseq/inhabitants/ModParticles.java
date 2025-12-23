@@ -31,6 +31,9 @@ public class ModParticles {
     public static final RegistryObject<SimpleParticleType> WARPED_CLAM_PEARL_AMBIENCE =
             PARTICLES.register("warped_clam_pearl_ambience",
                     () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> WARPED_CLAM_PEARL_INDICATOR =
+            PARTICLES.register("warped_clam_pearl_indicator",
+                    () -> new SimpleParticleType(false));
 
     public static final RegistryObject<SimpleParticleType> BOULDER_DUST =
             PARTICLES.register("boulder_dust",
@@ -43,6 +46,7 @@ public class ModParticles {
         evt.registerSpriteSet(ModParticles.IMPALER_RAGE.get(), RageParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.ABYSSFISH_AMBIENCE.get(), AbyssfishAmbienceParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), WarpedClamPearlAmbienceParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.WARPED_CLAM_PEARL_INDICATOR.get(), WarpedClamPearlIndicatorParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.BOULDER_DUST.get(), BoulderDustParticle.Factory::new);
     }
 }
