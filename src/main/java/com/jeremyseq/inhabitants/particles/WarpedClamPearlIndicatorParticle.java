@@ -6,9 +6,14 @@ import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
 public class WarpedClamPearlIndicatorParticle extends TextureSheetParticle {
+    private final SpriteSet sprites;
+    private static final int TOTAL_FRAMES = 2;
+    private static final int ANIMATION_DURATION = 20;
+
     protected WarpedClamPearlIndicatorParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
-        pickSprite(sprites);
+        setSpriteFromAge(sprites);
+        this.sprites = sprites;
         hasPhysics = false;
         lifetime = 60;
         xd = xSpeed;
@@ -30,6 +35,17 @@ public class WarpedClamPearlIndicatorParticle extends TextureSheetParticle {
     public void tick() {
         super.tick();
         this.alpha = 1.0F - (age / (float) lifetime);
+
+        // sprite animation
+        float animProgress = ((float) age % (float) ANIMATION_DURATION) / (float) ANIMATION_DURATION;
+        int frame = (int)(animProgress * TOTAL_FRAMES);
+
+        if (frame >= TOTAL_FRAMES) {
+            frame = 0;
+        }
+
+        // +1 because 1st frame is at index 1 not 0
+        this.setSprite(sprites.get(frame+1, TOTAL_FRAMES));
     }
 
     public static class Factory implements ParticleProvider<SimpleParticleType> {
