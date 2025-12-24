@@ -188,27 +188,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
 
         // particles if clam has pearl and is open
         if (hasPearl() && level().isClientSide && tickCount % 80 == 0 && isOpen()) {
-
-            // approximate pearl center inside the clam
-            Vec3 center = new Vec3(getX(), getY() + getBbHeight()/2, getZ());
-
-            // local axes: forward from look angle, up world-up, right = forward x up
-            Vec3 forward = getLookAngle().normalize();
-            Vec3 up = new Vec3(0, 1, 0);
-            Vec3 right = forward.cross(up).normalize();
-
-            // corner offset: tweak these values to move the particle to the exact corner you want
-            double forwardOffset = 0.1;
-            double upOffset = 0.4;
-            double rightOffset = -0.1;
-
-            Vec3 corner = center
-                    .add(forward.scale(forwardOffset))
-                    .add(right.scale(rightOffset))
-                    .add(up.scale(upOffset));
-
-            level().addParticle(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(),
-                    corner.x, corner.y, corner.z, 0, 0, 0);
+            spawnPearlAmbientParticle();
         }
 
         // particles if clam has pearl and is closed
@@ -218,23 +198,27 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
 
     }
 
-    private void spawnCircleAmbientParticles() {
-        double centerX = getX();
-        double centerY = getY() + this.getBbHeight()/2;
-        double centerZ = getZ();
+    private void spawnPearlAmbientParticle() {
+        // approximate pearl center inside the clam
+        Vec3 center = new Vec3(getX(), getY() + getBbHeight()/2, getZ());
 
-        int particleCount = 12;
-        double speed = 0.05;
+        // local axes: forward from look angle, up world-up, right = forward x up
+        Vec3 forward = getLookAngle().normalize();
+        Vec3 up = new Vec3(0, 1, 0);
+        Vec3 right = forward.cross(up).normalize();
 
-        for (int i = 0; i < particleCount; i++) {
-            double angle = (2 * Math.PI / particleCount) * i;
+        // corner offset: tweak these values to move the particle to the exact corner you want
+        double forwardOffset = 0.2;
+        double upOffset = 0.3;
+        double rightOffset = -0.15;
 
-            double dx = Math.cos(angle) * speed;
-            double dy = 0;
-            double dz = Math.sin(angle) * speed;
+        Vec3 corner = center
+                .add(forward.scale(forwardOffset))
+                .add(right.scale(rightOffset))
+                .add(up.scale(upOffset));
 
-            level().addParticle(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), centerX, centerY, centerZ, dx, dy, dz);
-        }
+        level().addParticle(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(),
+                corner.x, corner.y, corner.z, 0, 0, 0);
     }
 
     private void spawnFloatingIndicatorParticle() {
@@ -397,7 +381,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         } else {
             // only play close once when transitioning from open to closed
             if (lastOpenState) {
-                controller.setAnimation(RawAnimation.begin().then("Close", Animation.LoopType.HOLD_ON_LAST_FRAME));
+                controller.setAnimation(RawAnimation.begin().then("closing", Animation.LoopType.HOLD_ON_LAST_FRAME));
             }
         }
 
