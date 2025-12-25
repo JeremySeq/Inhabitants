@@ -18,7 +18,7 @@ public class ScreamParticle extends TextureSheetParticle {
         pickSprite(sprites);
         hasPhysics = false;
         lifetime = 20;
-        quadSize = 10;
+        quadSize = 1.25f;
         xd = yd = zd = 0;
     }
 
@@ -69,9 +69,22 @@ public class ScreamParticle extends TextureSheetParticle {
     }
 
     @Override
-    public void tick()
-    {
+    public void tick() {
         super.tick();
+
+        // movement and scale speed per tick
+        double speed = .5;
+        this.quadSize += (float) speed;
+
+        // forward vec from yaw
+        double fx = Mth.cos((float) (yawRad - Math.PI / 2));
+        double fz = Mth.sin((float) (yawRad - Math.PI / 2));
+
+        // move forward
+        this.x += fx * speed;
+        this.z += fz * speed;
+
+        // fade out
         this.alpha = 1.0F - (age / (float) lifetime);
     }
 

@@ -51,7 +51,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
-    private int spiked_client_timer = -1;
+    private int spiked_client_timer = -1; // used for spike particle timing
+    private int scream_client_timer = -1; // used for scream particle timing
 
     private int attackAnimTimer = 0;
 
@@ -111,6 +112,17 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 spiked_client_timer--;
             }
         }
+
+        if (this.level().isClientSide) {
+            if (scream_client_timer == 6) {
+                screamParticles();
+            } else if (scream_client_timer == 1) {
+                screamParticles();
+            }
+            if (scream_client_timer > -1) {
+                scream_client_timer--;
+            }
+        }
     }
 
     @Override
@@ -166,11 +178,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         if (this.level().isClientSide && pKey == SCREAM_TRIGGER) {
             if (this.entityData.get(SCREAM_TRIGGER)) {
                 this.spawnRageParticles();
-                Vec3 pos = new Vec3(getX(), getY() + 0.5, getZ());
-                Vec3 lookAngle = new Vec3(getLookAngle().x, 0, getLookAngle().z).normalize();
-                pos = pos.add(lookAngle.scale(4));
-                float yaw = (float) Math.atan2(lookAngle.z, lookAngle.x);
-                this.level().addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, 0, yaw, 0);
+                this.scream_client_timer = 6;
             }
         }
         if (this.level().isClientSide && pKey == SPIKED) {
@@ -178,6 +186,14 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 spiked_client_timer = 8;
             }
         }
+    }
+
+    private void screamParticles() {
+        Vec3 pos = new Vec3(getX(), getY() + 0.5, getZ());
+        Vec3 lookAngle = new Vec3(getLookAngle().x, 0, getLookAngle().z).normalize();
+        pos = pos.add(lookAngle.scale(4));
+        float yaw = (float) Math.atan2(lookAngle.z, lookAngle.x);
+        this.level().addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, 0, yaw, 0);
     }
 
     private void spawnRageParticles() {
