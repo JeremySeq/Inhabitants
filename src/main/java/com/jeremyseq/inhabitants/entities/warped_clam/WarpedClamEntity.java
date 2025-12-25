@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.entities.warped_clam;
 
-import com.jeremyseq.inhabitants.ModParticles;
+import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.particles.BlockParticleOption;

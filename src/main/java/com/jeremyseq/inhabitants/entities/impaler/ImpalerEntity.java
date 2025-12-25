@@ -1,9 +1,11 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
-import com.jeremyseq.inhabitants.ModParticles;
+import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
+import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -48,6 +50,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> SCREAM_TRIGGER = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
+
+    private int spiked_client_timer = -1;
 
     private int attackAnimTimer = 0;
 
@@ -96,6 +100,16 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         // regenerate health over time
         if (this.getTarget() == null && this.tickCount % 60 == 0 && this.getHealth() < this.getMaxHealth()) {
             this.heal(1.0F);
+        }
+
+        if (this.level().isClientSide) {
+            if (spiked_client_timer == 0) {
+                spiked_client_timer--;
+                ImpalerSpikeRaiseParticle.spawnSpikeBurst((ClientLevel) this.level(), this, 20);
+            }
+            if (spiked_client_timer > -1) {
+                spiked_client_timer--;
+            }
         }
     }
 
@@ -157,6 +171,11 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 pos = pos.add(lookAngle.scale(4));
                 float yaw = (float) Math.atan2(lookAngle.z, lookAngle.x);
                 this.level().addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, 0, yaw, 0);
+            }
+        }
+        if (this.level().isClientSide && pKey == SPIKED) {
+            if (this.entityData.get(SPIKED)) {
+                spiked_client_timer = 8;
             }
         }
     }

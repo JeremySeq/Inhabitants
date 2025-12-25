@@ -1,6 +1,6 @@
-package com.jeremyseq.inhabitants;
+package com.jeremyseq.inhabitants.particles;
 
-import com.jeremyseq.inhabitants.particles.*;
+import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
@@ -39,6 +39,10 @@ public class ModParticles {
             PARTICLES.register("boulder_dust",
                     () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> IMPALER_SPIKE_RAISE =
+            PARTICLES.register("impaler_spike_raise",
+                    () -> new SimpleParticleType(false));
+
 
     @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent evt) {
@@ -48,5 +52,6 @@ public class ModParticles {
         evt.registerSpriteSet(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), WarpedClamPearlAmbienceParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.WARPED_CLAM_PEARL_INDICATOR.get(), WarpedClamPearlIndicatorParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.BOULDER_DUST.get(), BoulderDustParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.IMPALER_SPIKE_RAISE.get(), ImpalerSpikeRaiseParticle.Factory::new);
     }
 }
