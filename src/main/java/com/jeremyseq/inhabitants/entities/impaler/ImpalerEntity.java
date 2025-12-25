@@ -43,7 +43,7 @@ import java.util.Random;
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
-    public static final int THORN_DAMAGE = 6;
+    public static final int THORN_DAMAGE = 3;
     public static final int SCREAM_COOLDOWN = 300;
     public int screamCooldown = 0;
     public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
