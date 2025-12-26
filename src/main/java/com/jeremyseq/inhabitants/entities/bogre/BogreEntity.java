@@ -18,7 +18,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -32,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -69,6 +72,18 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Integer> COOKING_TICKS = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT); // used to time cooking
     public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> DANCING = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+
+    private static final int JUKEBOX_RANGE = 15;
+
+    private enum DancePhase {
+        NONE,
+        START,
+        LOOP,
+        END
+    }
+
+    private DancePhase dancePhase = DancePhase.NONE; // client only
 
     public static float FORGET_RANGE = 25f;
     public static float ROAR_RANGE = 12f;
@@ -97,7 +112,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     private Player droppedFishPlayer = null; // the player that dropped the fish item
     private static final double FISH_REACH_DISTANCE = 3;
     private static final int CHOWDER_TIME_TICKS = 160;
-    private static final int DROP_FISH_OFFSET = 12; // at what time the Bogre should drop the fish item after starting to make chowder
+    private static final int DROP_FISH_OFFSET = 10; // at what time the Bogre should drop the fish item after starting to make chowder
     private int chowderThrowDelay = -1;
 
     // list of players who have tamed the Bogre
@@ -148,6 +163,50 @@ public class BogreEntity extends Monster implements GeoEntity {
 
 
     private <T extends GeoAnimatable> PlayState defaults(AnimationState<T> animationState) {
+
+        if (entityData.get(DANCING) && dancePhase == DancePhase.NONE) {
+            this.dancePhase = DancePhase.START;
+        }
+        if (!entityData.get(DANCING) && dancePhase == DancePhase.LOOP) {
+            this.dancePhase = DancePhase.END;
+        }
+
+        if (this.dancePhase != DancePhase.NONE) {
+            switch (dancePhase) {
+                case START -> {
+                    animationState.getController().setAnimation(
+                            RawAnimation.begin().then("dance start", Animation.LoopType.PLAY_ONCE)
+                    );
+
+                    if (animationState.getController().hasAnimationFinished()) {
+                        dancePhase = DancePhase.LOOP;
+                        animationState.getController().forceAnimationReset();
+                    }
+                    return PlayState.CONTINUE;
+                }
+
+                case LOOP -> {
+                    animationState.getController().setAnimation(
+                            RawAnimation.begin().then("dance", Animation.LoopType.LOOP)
+                    );
+                    return PlayState.CONTINUE;
+                }
+
+                case END -> {
+                    animationState.getController().setAnimation(
+                            RawAnimation.begin().then("dance end", Animation.LoopType.PLAY_ONCE)
+                    );
+
+                    if (animationState.getController().hasAnimationFinished()) {
+                        entityData.set(DANCING, false);
+                        dancePhase = DancePhase.NONE;
+                        animationState.getController().forceAnimationReset();
+                    }
+                    return PlayState.CONTINUE;
+                }
+            }
+        }
+
         if (animationState.isMoving()) {
             if (this.isSprinting()) {
                 animationState.getController().setAnimation(RawAnimation.begin().then("run", Animation.LoopType.LOOP));
@@ -208,6 +267,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public boolean doHurtTarget(@NotNull Entity target) {
         if (!level().isClientSide && this.attackAnimTimer == 0) {
             triggerAnim("attack", "attack");
+            this.playSound(SoundEvents.WARDEN_ATTACK_IMPACT, 1, 1);
             this.attackAnimTimer = ATTACK_DELAY;
         }
         return true;
@@ -215,6 +275,18 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     public void customServerAiStep() {
+
+        if (!isJukeboxPlayingNearby() && entityData.get(DANCING)) {
+            // stop dancing
+            entityData.set(DANCING, false);
+        }
+
+        if (entityData.get(DANCING)) {
+            this.getNavigation().stop();
+            this.setDeltaMovement(Vec3.ZERO);
+            return;
+        }
+
         if (cauldronPos == null || !isValidCauldron(cauldronPos)) {
             Optional<BlockPos> nearestCauldron = BlockPos.betweenClosedStream(blockPosition().offset(-10, -2, -10), blockPosition().offset(10, 2, 10))
                     .map(BlockPos::immutable)
@@ -232,7 +304,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
             if (this.attackAnimTimer == 0) {
-                EntityUtil.shockwave(this, SHOCKWAVE_RADIUS, SHOCKWAVE_DAMAGE, entity -> entity == this);
+                EntityUtil.shockwave(this, SHOCKWAVE_RADIUS, SHOCKWAVE_DAMAGE, entity -> entity == this, false);
             }
         }
 
@@ -248,6 +320,17 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
 
         if (this.state == State.CAUTIOUS) {
+            if (isJukeboxPlayingNearby() && !entityData.get(DANCING)) {
+                // start dancing
+                entityData.set(DANCING, true);
+
+                this.playSound(SoundEvents.WARDEN_LISTENING, 1, 1);
+
+                this.getNavigation().stop();
+                this.setTarget(null);
+                return;
+            }
+
             cautiousAiStep();
         } else if (this.state == State.MAKE_CHOWDER) {
             makeChowderAiStep();
@@ -263,6 +346,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             this.triggerAnim("hurt", "hurt");
         }
         // if attacked by a player, switch to cautious state and set the player as target
+        entityData.set(DANCING, false);
         this.state = State.CAUTIOUS;
         if (pSource.getEntity() instanceof Player player && player.isAlive() && !player.isCreative()) {
             // if the attacker is a player, remove them from tamedPlayers
@@ -331,6 +415,20 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
             this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F); // some kind of cracking/carving sound
         }
+    }
+
+    private boolean isJukeboxPlayingNearby() {
+        BlockPos origin = this.blockPosition();
+
+        return BlockPos.betweenClosedStream(
+                origin.offset(-JUKEBOX_RANGE, -2, -JUKEBOX_RANGE),
+                origin.offset(JUKEBOX_RANGE, 2, JUKEBOX_RANGE)
+        ).anyMatch(pos -> {
+            BlockState state = level().getBlockState(pos);
+            return state.is(Blocks.JUKEBOX)
+                    && state.hasProperty(JukeboxBlock.HAS_RECORD)
+                    && state.getValue(JukeboxBlock.HAS_RECORD);
+        });
     }
 
     @Override
@@ -432,11 +530,12 @@ public class BogreEntity extends Monster implements GeoEntity {
             this.lookAt(EntityAnchorArgument.Anchor.FEET, cauldronPos.getCenter());
             this.lookAt(EntityAnchorArgument.Anchor.EYES, cauldronPos.getCenter());
             // start cooking animation
-            if (getCookingTicks() == 10) {
+            if (getCookingTicks() == DROP_FISH_OFFSET) {
                 triggerAnim("grab", "grab");
             } else if (getCookingTicks() == 25) {
                 entityData.set(COOKING_ANIM, false);
                 entityData.set(COOKING_ANIM, true);
+                this.playSound(SoundEvents.WARDEN_DIG, 1.0F, 1f);
             }
 
             setCookingTicks(getCookingTicks()+1);
@@ -528,6 +627,11 @@ public class BogreEntity extends Monster implements GeoEntity {
                     player.sendSystemMessage(Component.literal("The Bogre roars at you!"));
                     setRoaring(true);
                     warnedPlayers.add(player);
+
+                    // play roar sound
+                    this.level().playSound(null, this.blockPosition(), SoundEvents.WARDEN_ROAR,
+                            SoundSource.HOSTILE, 2.0F, 0.9F + this.level().random.nextFloat() * 0.2F);
+
                     break;
                 }
             }
@@ -637,6 +741,25 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    protected @Nullable SoundEvent getAmbientSound() {
+        return SoundEvents.WARDEN_AMBIENT;
+    }
+
+    @Override
+    protected @NotNull SoundEvent getHurtSound(@NotNull DamageSource pDamageSource) {
+        return SoundEvents.WARDEN_HURT;
+    }
+
+    @Override
+    protected @NotNull SoundEvent getDeathSound() {
+        return SoundEvents.WARDEN_DEATH;
+    }
+
+    protected void playStepSound(@NotNull BlockPos pPos, @NotNull BlockState pState) {
+        this.playSound(SoundEvents.WARDEN_STEP, 1, 1);
+    }
+
+    @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(ROAR_ANIM, false);
@@ -644,6 +767,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(COOKING_TICKS, 0);
         entityData.define(CARVING_ANIM, false);
         entityData.define(ITEM_HELD, ItemStack.EMPTY);
+        entityData.define(DANCING, false);
     }
 
     public boolean isTamedBy(Player player) {
@@ -683,7 +807,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public ItemStack getAnimateItemHeld() {
         if (!this.getItemHeld().isEmpty() && !this.getItemHeld().is(ModItems.FISH_SNOT_CHOWDER.get())) {
             // if the chowder animation is at the drop fish offset, return an empty stack
-            if (this.getCookingTicks() >= DROP_FISH_OFFSET) {
+            if (this.getCookingTicks() >= DROP_FISH_OFFSET+2) {
                 return ItemStack.EMPTY;
             }
         }

@@ -44,12 +44,16 @@ public class EntityUtil {
         level.addFreshEntity(itemEntity);
     }
 
+    public static void shockwave(LivingEntity user, double shockwave_radius, float shockwave_damage, Predicate<LivingEntity> ignore) {
+        shockwave(user, shockwave_radius, shockwave_damage, ignore, true);
+    }
+
     /**
      * Standard shockwave effect that damages and knocks back entities around the user.
      *
      * @param shockwave_damage damage at the center of the shockwave
      */
-    public static void shockwave(LivingEntity user, double shockwave_radius, float shockwave_damage, Predicate<LivingEntity> ignore) {
+    public static void shockwave(LivingEntity user, double shockwave_radius, float shockwave_damage, Predicate<LivingEntity> ignore, boolean playSound) {
         AABB shockwaveArea = new AABB(user.getX() - shockwave_radius, user.getY() - 1, user.getZ() - shockwave_radius,
                 user.getX() + shockwave_radius, user.getY() + 2, user.getZ() + shockwave_radius);
         List<LivingEntity> affectedEntities = user.level().getEntitiesOfClass(LivingEntity.class, shockwaveArea,
@@ -98,7 +102,9 @@ public class EntityUtil {
 
         // add visual and sound effects for the shockwave
         if (user.level() instanceof ServerLevel serverLevel) {
-            user.playSound(SoundEvents.GENERIC_EXPLODE, 1.0f, 1.0f);
+            if (playSound) {
+                user.playSound(SoundEvents.GENERIC_EXPLODE, 1.0f, 1.0f);
+            }
 
             // cloud ring
             for (int i = 0; i < 20; i++) {
