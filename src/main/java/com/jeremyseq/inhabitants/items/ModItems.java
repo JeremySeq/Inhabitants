@@ -26,6 +26,10 @@ public class ModItems {
 
     public static final RegistryObject<Item> FISH_SNOT_CHOWDER = ITEMS.register("fish_snot_chowder",
             FishSnotChowderItem::new);
+    public static final RegistryObject<Item> UNCANNY_POTTAGE = ITEMS.register("uncanny_pottage",
+            UncannyPottageItem::new);
+    public static final RegistryObject<Item> STINKY_BOUILLON = ITEMS.register("stinky_bouillon",
+            StinkyBouillonItem::new);
 
     public static final RegistryObject<Item> BRACER_OF_MIGHT = ITEMS.register("bracer_of_might",
             BracerOfMightItem::new);

@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.BowlFoodItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -13,13 +14,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class FishSnotChowderItem extends Item {
+public class FishSnotChowderItem extends BowlFoodItem {
     public FishSnotChowderItem() {
         super(new Item.Properties().food(
                 new FoodProperties.Builder()
                         .nutrition(10)
                         .saturationMod(0.8f)
-                        .effect(() -> new MobEffectInstance(MobEffects.CONFUSION, 600), 1.0f)
+                        .effect(() -> new MobEffectInstance(MobEffects.CONFUSION, 300), 1.0f)
                         .build()));
     }
 
