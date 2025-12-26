@@ -7,6 +7,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
@@ -23,15 +24,26 @@ public class ModEffectEvents {
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
 
+        // chitin armor immunity effect
         if (entity.getItemBySlot(EquipmentSlot.CHEST).getItem() == ModItems.CHITIN_CHESTPLATE.get() || entity.getItemBySlot(EquipmentSlot.CHEST).getItem() == ModItems.CHITIN_CHESTPLATE_ELYTRA.get()) {
             entity.addEffect(new MobEffectInstance(ModEffects.IMMUNITY.get(), 30, 0, false, false, true));
         }
 
+        // immunity effect logic
         if (entity.hasEffect(ModEffects.IMMUNITY.get())) {
             for (MobEffectInstance effect : new ArrayList<>(entity.getActiveEffects())) {
                 if (!effect.getEffect().equals(ModEffects.IMMUNITY.get())) {
                     entity.removeEffect(effect.getEffect());
                 }
+            }
+        }
+
+        // rotting disguise effect logic
+        if (entity.hasEffect(ModEffects.ROTTING_DISGUISE.get())) {
+            // iterate through nearby entities and make them stop targeting this entity
+            double radius = RottingDisguiseEffect.getEffectRadius();
+            for (Monster monster : entity.level().getEntitiesOfClass(Monster.class, entity.getBoundingBox().inflate(radius), m -> m.getTarget() != null && m.getTarget().equals(entity))) {
+                monster.setTarget(null);
             }
         }
     }
@@ -40,9 +52,18 @@ public class ModEffectEvents {
     public static void onLivingHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntity();
 
+        // immunity effect instant damage negation
         if (entity.hasEffect(ModEffects.IMMUNITY.get())) {
             if (event.getSource().type().equals(DamageTypes.MAGIC) || event.getSource().type().equals(DamageTypes.WITHER) || event.getSource().type().equals(DamageTypes.DRAGON_BREATH) || event.getSource().is(DamageTypes.INDIRECT_MAGIC)) {
                 event.setCanceled(true);
+            }
+        }
+
+        // rotting disguise damage failsafe
+        if (entity.hasEffect(ModEffects.ROTTING_DISGUISE.get())) {
+            if (event.getSource().getEntity() instanceof Monster attacker) {
+                event.setCanceled(true);
+                attacker.setTarget(null);
             }
         }
     }
@@ -51,6 +72,7 @@ public class ModEffectEvents {
     @SubscribeEvent
     public static void onPlaySound(PlaySoundEvent event) {
         Minecraft mc = Minecraft.getInstance();
+        // concussion effect
         if (mc.player != null && mc.player.hasEffect(ModEffects.CONCUSSION.get())) {
             event.setSound(null);
         }

@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.items;
 
+import com.jeremyseq.inhabitants.effects.ModEffects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -21,6 +22,7 @@ public class UncannyPottageItem extends BowlFoodItem {
                         .nutrition(5)
                         .saturationMod(0.6f)
                         .effect(() -> new MobEffectInstance(MobEffects.HUNGER, 300), 1.0f)
+                        .effect(() -> new MobEffectInstance(ModEffects.ROTTING_DISGUISE.get(), 600, 0), 1.0f)
                         .build()));
     }
 
