@@ -14,7 +14,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -108,9 +107,9 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<ItemStack> ITEM_HELD = // if the Bogre has picked up the fish item
             SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.ITEM_STACK);
 
-    private ItemEntity droppedFishItem = null;
-    private Player droppedFishPlayer = null; // the player that dropped the fish item
-    private static final double FISH_REACH_DISTANCE = 3;
+    private ItemEntity droppedIngredientItem = null;
+    private Player droppedIngredientPlayer = null; // the player that dropped the fish item
+    private static final double INGREDIENT_REACH_DISTANCE = 3;
     private static final int CHOWDER_TIME_TICKS = 160;
     private static final int DROP_FISH_OFFSET = 10; // at what time the Bogre should drop the fish item after starting to make chowder
     private int chowderThrowDelay = -1;
@@ -350,9 +349,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.state = State.CAUTIOUS;
         if (pSource.getEntity() instanceof Player player && player.isAlive() && !player.isCreative()) {
             // if the attacker is a player, remove them from tamedPlayers
-            if (tamedPlayers.contains(player.getUUID())) {
-                player.sendSystemMessage(Component.literal("The Bogre does not trust you anymore!"));
-            }
             tamedPlayers.remove(player.getUUID());
             this.setTarget(player);
         }
@@ -448,11 +444,11 @@ public class BogreEntity extends Monster implements GeoEntity {
      * The fish should be droppedFishItem.
      */
     private void makeChowderAiStep() {
-        if (!this.getItemHeld().isEmpty() && this.getItemHeld().is(ModItems.FISH_SNOT_CHOWDER.get())) {
+        if (!this.getItemHeld().isEmpty() && isHoldingChowder()) {
             // chowder is dropped after a short delay during which the bogre turns to the player
-            if (droppedFishPlayer != null) {
+            if (droppedIngredientPlayer != null) {
                 if (chowderThrowDelay == -1) {
-                    this.lookAt(EntityAnchorArgument.Anchor.FEET, droppedFishPlayer.position());
+                    this.lookAt(EntityAnchorArgument.Anchor.FEET, droppedIngredientPlayer.position());
                     chowderThrowDelay = 20; // short delay before throwing chowder
                     return;
                 } else if (chowderThrowDelay > 0) {
@@ -462,7 +458,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 } else if (chowderThrowDelay == 0) {
                     throwHeldItem();
                     this.state = State.CAUTIOUS;
-                    droppedFishPlayer = null;
+                    droppedIngredientPlayer = null;
                     chowderThrowDelay = -1;
                     return;
                 }
@@ -543,28 +539,30 @@ public class BogreEntity extends Monster implements GeoEntity {
                 Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
 
                 // chowder complete
-
-                droppedFishPlayer.sendSystemMessage(Component.literal("The Bogre has made chowder from the fish you dropped!"));
-                if (!tamedPlayers.contains(droppedFishPlayer.getUUID())) {
-                    droppedFishPlayer.sendSystemMessage(Component.literal("You have tamed the Bogre!"));
-                }
                 this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
-                tamedPlayers.add(droppedFishPlayer.getUUID()); // add the player that dropped the fish to the tamed list
-                this.setItemHeld(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()));
+                tamedPlayers.add(droppedIngredientPlayer.getUUID()); // add the player that dropped the ingredient to the tamed list
+
+                if (this.getItemHeld().is(Items.POISONOUS_POTATO)) {
+                    this.setItemHeld(new ItemStack(ModItems.STINKY_BOUILLON.get()));
+                } else if (this.getItemHeld().is(Items.ROTTEN_FLESH) ||  this.getItemHeld().is(Items.SPIDER_EYE)) {
+                    this.setItemHeld(new ItemStack(ModItems.UNCANNY_POTTAGE.get()));
+                } else {
+                    this.setItemHeld(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()));
+                }
                 setCookingTicks(0);
             }
 
             return;
         }
 
-        if (droppedFishItem == null || !droppedFishItem.isAlive()) {
+        if (droppedIngredientItem == null || !droppedIngredientItem.isAlive()) {
             this.state = State.CAUTIOUS;
             return;
         }
 
-        double distance = this.distanceTo(droppedFishItem);
-        if (distance > FISH_REACH_DISTANCE) {
-            BlockPos pos = new BlockPos(droppedFishItem.getBlockX(), droppedFishItem.getBlockY(), droppedFishItem.getBlockZ());
+        double distance = this.distanceTo(droppedIngredientItem);
+        if (distance > INGREDIENT_REACH_DISTANCE) {
+            BlockPos pos = new BlockPos(droppedIngredientItem.getBlockX(), droppedIngredientItem.getBlockY(), droppedIngredientItem.getBlockZ());
             this.moveTo(pos, 1, false);
             return;
         }
@@ -572,18 +570,17 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (this.getItemHeld().isEmpty()) {
             this.triggerAnim("grab", "grab");
             this.getNavigation().stop();
-            ItemStack fishStack = droppedFishItem.getItem();
-            Item fishItem = fishStack.getItem();
+            ItemStack ingredientStack = droppedIngredientItem.getItem();
+            Item ingredientItem = ingredientStack.getItem();
 
-            if (fishStack.getCount() > 1) {
-                fishStack.shrink(1); // remove only one fish
+            if (ingredientStack.getCount() > 1) {
+                ingredientStack.shrink(1); // remove only one ingredient
             } else {
-                droppedFishItem.discard(); // discard the item if it was the last fish
+                droppedIngredientItem.discard(); // discard the item if it was the last one
             }
 
-            Inhabitants.LOGGER.debug("Picked up one fish");
-            this.setItemHeld(new ItemStack(fishItem, 1)); // set the holding fish state
-            droppedFishItem = null; // reset the dropped fish item
+            this.setItemHeld(new ItemStack(ingredientItem, 1)); // set the holding ingredient state
+            droppedIngredientItem = null; // reset the dropped ingredient item
             return;
         }
     }
@@ -624,7 +621,6 @@ public class BogreEntity extends Monster implements GeoEntity {
                     // face player and start roaring
                     roaredPlayer = player;
                     this.lookControl.setLookAt(roaredPlayer);
-                    player.sendSystemMessage(Component.literal("The Bogre roars at you!"));
                     setRoaring(true);
                     warnedPlayers.add(player);
 
@@ -689,16 +685,18 @@ public class BogreEntity extends Monster implements GeoEntity {
                                             || item.getItem().is(Items.TROPICAL_FISH)
                                             || item.getItem().is(Items.PUFFERFISH)
                                             || item.getItem().is(ModItems.RAW_ABYSSFISH.get())
+                                            || item.getItem().is(Items.ROTTEN_FLESH)
+                                            || item.getItem().is(Items.SPIDER_EYE)
+                                            || item.getItem().is(Items.POISONOUS_POTATO)
                                     )
                     );
 
-                    for (ItemEntity fishItem : nearbyItems) {
-                        if (this.hasLineOfSight(fishItem)) {
-                            player.sendSystemMessage(Component.literal("The Bogre notices the fish you dropped..."));
+                    for (ItemEntity ingredient : nearbyItems) {
+                        if (this.hasLineOfSight(ingredient)) {
 
-                            fishItem.setExtendedLifetime();
-                            droppedFishItem = fishItem;
-                            droppedFishPlayer = player; // store the player that dropped the fish
+                            ingredient.setExtendedLifetime();
+                            droppedIngredientItem = ingredient;
+                            droppedIngredientPlayer = player; // store the player that dropped the fish
                             this.state = State.MAKE_CHOWDER; // change state to make chowder
                             return;
                         }
@@ -805,13 +803,19 @@ public class BogreEntity extends Monster implements GeoEntity {
      * Used specifically by the client to determine what to render in the Bogre's hand.
      */
     public ItemStack getAnimateItemHeld() {
-        if (!this.getItemHeld().isEmpty() && !this.getItemHeld().is(ModItems.FISH_SNOT_CHOWDER.get())) {
+        if (!this.getItemHeld().isEmpty() && !isHoldingChowder()) {
             // if the chowder animation is at the drop fish offset, return an empty stack
             if (this.getCookingTicks() >= DROP_FISH_OFFSET+2) {
                 return ItemStack.EMPTY;
             }
         }
         return this.getItemHeld();
+    }
+
+    private boolean isHoldingChowder() {
+        return this.getItemHeld().is(ModItems.FISH_SNOT_CHOWDER.get())
+                || this.getItemHeld().is(ModItems.UNCANNY_POTTAGE.get())
+                || this.getItemHeld().is(ModItems.STINKY_BOUILLON.get());
     }
 
     private void setItemHeld(ItemStack itemHeld) {
