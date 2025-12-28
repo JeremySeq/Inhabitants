@@ -28,6 +28,8 @@ public class ModCreativeModeTabs {
 
                         pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
+                        pOutput.accept(ModItems.UNCANNY_POTTAGE.get());
+                        pOutput.accept(ModItems.STINKY_BOUILLON.get());
                         pOutput.accept(ModItems.BRACER_OF_MIGHT.get());
                         pOutput.accept(ModItems.GIANT_BONE.get());
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());

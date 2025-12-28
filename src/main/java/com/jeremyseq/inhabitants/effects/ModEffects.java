@@ -17,6 +17,9 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> CONCUSSION =
             EFFECTS.register("concussion", ConcussionEffect::new);
 
+    public static final RegistryObject<MobEffect> ROTTING_DISGUISE =
+            EFFECTS.register("rotting_disguise", RottingDisguiseEffect::new);
+
     public static void register(IEventBus bus) {
         EFFECTS.register(bus);
     }
