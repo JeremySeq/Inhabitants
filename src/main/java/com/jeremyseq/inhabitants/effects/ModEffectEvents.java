@@ -7,7 +7,6 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
@@ -37,15 +36,6 @@ public class ModEffectEvents {
                 }
             }
         }
-
-        // rotting disguise effect logic
-        if (entity.hasEffect(ModEffects.ROTTING_DISGUISE.get())) {
-            // iterate through nearby entities and make them stop targeting this entity
-            double radius = RottingDisguiseEffect.getEffectRadius();
-            for (Monster monster : entity.level().getEntitiesOfClass(Monster.class, entity.getBoundingBox().inflate(radius), m -> m.getTarget() != null && m.getTarget().equals(entity))) {
-                monster.setTarget(null);
-            }
-        }
     }
 
     @SubscribeEvent
@@ -56,14 +46,6 @@ public class ModEffectEvents {
         if (entity.hasEffect(ModEffects.IMMUNITY.get())) {
             if (event.getSource().type().equals(DamageTypes.MAGIC) || event.getSource().type().equals(DamageTypes.WITHER) || event.getSource().type().equals(DamageTypes.DRAGON_BREATH) || event.getSource().is(DamageTypes.INDIRECT_MAGIC)) {
                 event.setCanceled(true);
-            }
-        }
-
-        // rotting disguise damage failsafe
-        if (entity.hasEffect(ModEffects.ROTTING_DISGUISE.get())) {
-            if (event.getSource().getEntity() instanceof Monster attacker) {
-                event.setCanceled(true);
-                attacker.setTarget(null);
             }
         }
     }
