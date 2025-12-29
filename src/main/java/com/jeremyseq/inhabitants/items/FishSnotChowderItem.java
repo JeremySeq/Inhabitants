@@ -22,6 +22,7 @@ public class FishSnotChowderItem extends BowlFoodItem {
                 new FoodProperties.Builder()
                         .nutrition(10)
                         .saturationMod(0.8f)
+                        .alwaysEat()
                         .build()));
     }
 

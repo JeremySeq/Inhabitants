@@ -22,6 +22,7 @@ public class StinkyBouillonItem extends BowlFoodItem {
                 new FoodProperties.Builder()
                         .nutrition(6)
                         .saturationMod(0.6f)
+                        .alwaysEat()
                         .build()));
     }
 
