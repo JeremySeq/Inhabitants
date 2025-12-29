@@ -22,24 +22,10 @@ public class MobSpawning {
                 SpawnPlacementRegisterEvent.Operation.REPLACE
         );
         event.register(
-                ModEntities.ABYSSFISH.get(),
-                SpawnPlacements.Type.IN_WATER,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                (type, level, reason, pos, random) -> level.getBlockState(pos).getFluidState().is(FluidTags.WATER) && pos.getY() < 45,
-                SpawnPlacementRegisterEvent.Operation.REPLACE
-        );
-        event.register(
                 ModEntities.IMPALER.get(),
                 SpawnPlacements.Type.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 (type, level, reason, pos, random) -> pos.getY() < 45 && level.getBrightness(LightLayer.BLOCK, pos) < 8,
-                SpawnPlacementRegisterEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.WISHFISH.get(),
-                SpawnPlacements.Type.IN_WATER,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                (type, level, reason, pos, random) -> level.getBlockState(pos).getFluidState().is(FluidTags.WATER) && pos.getY() < 50,
                 SpawnPlacementRegisterEvent.Operation.REPLACE
         );
         event.register(

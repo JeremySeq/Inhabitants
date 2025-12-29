@@ -22,8 +22,6 @@ The following mobs are fully implemented and functional in the game.
 
 ![Warped Clam](images/warped_clam.png)
 
-![Abyssfish](images/pitfish.png)
-
 ![Impaler](images/impaler.png)
 
 ![Gazer](images/gazer.png)

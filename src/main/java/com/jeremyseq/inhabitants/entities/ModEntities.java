@@ -1,8 +1,6 @@
 package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishEntity;
-import com.jeremyseq.inhabitants.entities.abyssfish.AbyssfishRenderer;
 import com.jeremyseq.inhabitants.entities.apex.ApexEntity;
 import com.jeremyseq.inhabitants.entities.apex.ApexRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
@@ -22,8 +20,6 @@ import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
-import com.jeremyseq.inhabitants.entities.wishfish.WishfishEntity;
-import com.jeremyseq.inhabitants.entities.wishfish.WishfishRenderer;
 import com.jeremyseq.inhabitants.entities.zinger.ZingerEntity;
 import com.jeremyseq.inhabitants.entities.zinger.ZingerRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -61,12 +57,6 @@ public class ModEntities {
                             .sized(1.5f, .4f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "warped_clam").toString()));
 
-    public static final RegistryObject<EntityType<AbyssfishEntity>> ABYSSFISH =
-            REGISTRY.register("abyssfish", () -> EntityType.Builder
-                    .of(AbyssfishEntity::new, MobCategory.WATER_AMBIENT)
-                    .sized(0.6f, 0.3f)
-                    .build("abyssfish"));
-
     public static final RegistryObject<EntityType<ImpalerEntity>> IMPALER =
             REGISTRY.register("impaler",
                     () -> EntityType.Builder.of(ImpalerEntity::new, MobCategory.MONSTER)
@@ -96,12 +86,6 @@ public class ModEntities {
                             .updateInterval(1)
                             .fireImmune()
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "gazer").toString()));
-
-    public static final RegistryObject<EntityType<WishfishEntity>> WISHFISH =
-            REGISTRY.register("wishfish", () -> EntityType.Builder
-                    .of(WishfishEntity::new, MobCategory.WATER_AMBIENT)
-                    .sized(0.6f, 2.2f)
-                    .build("wishfish"));
 
     public static final RegistryObject<EntityType<ApexEntity>> APEX =
             REGISTRY.register("apex",
@@ -134,11 +118,9 @@ public class ModEntities {
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
-        event.put(ModEntities.ABYSSFISH.get(), AbyssfishEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
         event.put(ModEntities.ZINGER.get(), ZingerEntity.setAttributes());
         event.put(ModEntities.GAZER.get(), GazerEntity.setAttributes());
-        event.put(ModEntities.WISHFISH.get(), WishfishEntity.setAttributes());
         event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
         event.put(ModEntities.CATCHER.get(), CatcherEntity.setAttributes());
         event.put(ModEntities.BOULDER.get(), BoulderEntity.setAttributes());
@@ -149,12 +131,10 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.BOGRE.get(), BogreRenderer::new);
         EntityRenderers.register(ModEntities.BOGRE_CAULDRON.get(), BogreCauldronRenderer::new);
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
-        EntityRenderers.register(ModEntities.ABYSSFISH.get(), AbyssfishRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
         EntityRenderers.register(ModEntities.ZINGER.get(), ZingerRenderer::new);
         EntityRenderers.register(ModEntities.GAZER.get(), GazerRenderer::new);
-        EntityRenderers.register(ModEntities.WISHFISH.get(), WishfishRenderer::new);
         EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
         EntityRenderers.register(ModEntities.CATCHER.get(), CatcherRenderer::new);
         EntityRenderers.register(ModEntities.WATERBERRY_PROJECTILE.get(), ThrownItemRenderer::new);
