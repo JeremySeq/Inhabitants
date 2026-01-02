@@ -24,6 +24,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -31,11 +32,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -84,12 +88,21 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private DancePhase dancePhase = DancePhase.NONE; // client only
 
-    public static float FORGET_RANGE = 25f;
+    public static float FORGET_RANGE = 20f;
     public static float ROAR_RANGE = 12f;
-    public static float HOSTILE_RANGE = 5f;
-    public static final double MAX_CAULDRON_DIST_SQR = 24*24;
+    public static float HOSTILE_RANGE = 6f;
+    public static final double MAX_CAULDRON_DIST_SQR = 14*14;
 
     public BlockPos cauldronPos = null;
+    public BlockPos entrancePos = null;
+
+
+    // STUCK FAILSAFE FOR MAKE_CHOWDER
+    private Vec3 lastPos = null;
+    private int stuckTicks = 0;
+    private static final int STUCK_TICK_LIMIT = 40; // 2 seconds
+    private static final double MIN_MOVE_SQ = 0.0025; // 0.05 blocks
+
 
     private static final int ROAR_TICKS = 45; // how long a roar animation lasts (server)
 
@@ -130,6 +143,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.setPersistenceRequired();
+        ((GroundPathNavigation) this.getNavigation()).setAvoidSun(false);
     }
 
     public static AttributeSupplier setAttributes() {
@@ -145,6 +159,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.3f, false, 40, true, true));
+        this.goalSelector.addGoal(5, new BogreReturnToCauldronGoal(this, 1.0D));
         this.goalSelector.addGoal(7, new BogreConditionalStrollGoal(this, 1.0D));
     }
 
@@ -297,6 +312,29 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         if (this.cauldronPos == null) {
             this.tamedPlayers.clear(); // clear tamed players if no cauldron is found
+        } else {
+
+            // set entrance pos
+            BogreCauldronEntity bogreCauldron = getCauldronEntity();
+            if (bogreCauldron == null) {
+                this.state = State.CAUTIOUS;
+                return;
+            }
+            Direction direction = bogreCauldron.getDirection();
+            Direction dirLeft = direction.getCounterClockWise(Direction.Axis.Y);
+
+            // offsets for where the bogre should stand relative to cauldron (facing forward)
+            final float forwardDist = 4;
+            final float rightDist = 11;
+
+            Vec3i forwardI = direction.getNormal();
+            Vec3i rightI = dirLeft.getNormal();
+            Vec3 forward = new Vec3(forwardI.getX(), forwardI.getY(), forwardI.getZ()).scale(forwardDist);
+            Vec3 right = new Vec3(rightI.getX(), rightI.getY(), rightI.getZ()).scale(rightDist);
+
+            Vec3 targetCenter = Vec3.atBottomCenterOf(cauldronPos).add(forward).subtract(right);
+
+            this.entrancePos = BlockPos.containing(targetCenter.x, targetCenter.y, targetCenter.z);
         }
 
         // attack animation timer
@@ -348,6 +386,9 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.set(DANCING, false);
         this.state = State.CAUTIOUS;
         if (pSource.getEntity() instanceof Player player && player.isAlive() && !player.isCreative()) {
+            if (!this.getItemHeld().isEmpty()) {
+                this.throwHeldItem();
+            }
             // if the attacker is a player, remove them from tamedPlayers
             tamedPlayers.remove(player.getUUID());
             this.setTarget(player);
@@ -445,6 +486,8 @@ public class BogreEntity extends Monster implements GeoEntity {
      */
     private void makeChowderAiStep() {
         if (!this.getItemHeld().isEmpty() && isHoldingChowder()) {
+            // HOLDING CHOWDER
+
             // chowder is dropped after a short delay during which the bogre turns to the player
             if (droppedIngredientPlayer != null) {
                 if (chowderThrowDelay == -1) {
@@ -470,25 +513,14 @@ public class BogreEntity extends Monster implements GeoEntity {
                 return;
             }
         } else if (!this.getItemHeld().isEmpty()) {
-            if (cauldronPos == null) {
-                this.state = State.CAUTIOUS;
-                return;
-            }
-
-            // find the cauldron entity at the cauldronPos
-            List<BogreCauldronEntity> entities = this.level().getEntitiesOfClass(
-                    BogreCauldronEntity.class,
-                    new AABB(cauldronPos),
-                    entity -> !entity.isRemoved()
-            );
-            if (entities.isEmpty()) {
-                Inhabitants.LOGGER.debug("No Bogre Cauldron found at: {}", cauldronPos);
-                this.state = State.CAUTIOUS;
-                return;
-            }
+            // HOLDING INGREDIENT
 
             // find the target block, which is 3 blocks in front of the cauldron in the direction it is facing
-            BogreCauldronEntity bogreCauldron = entities.get(0);
+            BogreCauldronEntity bogreCauldron = getCauldronEntity();
+            if (bogreCauldron == null) {
+                this.state = State.CAUTIOUS;
+                return;
+            }
             Direction direction = bogreCauldron.getDirection();
             Direction dirLeft = direction.getCounterClockWise(Direction.Axis.Y);
 
@@ -506,6 +538,33 @@ public class BogreEntity extends Monster implements GeoEntity {
             double distSqr = this.distanceToSqr(targetCenter);
 
             PrecisePathNavigation preciseNav = (PrecisePathNavigation) this.getNavigation();
+
+            Vec3 currentPos = this.position();
+
+            if (lastPos != null) {
+                double movedSq = currentPos.distanceToSqr(lastPos);
+
+                if (movedSq < MIN_MOVE_SQ && distSqr > 0.3) {
+                    stuckTicks++;
+                } else {
+                    stuckTicks = 0;
+                }
+            }
+
+            lastPos = currentPos;
+
+            // FAILSAFE: teleport if stuck
+            if (stuckTicks > STUCK_TICK_LIMIT && this.entrancePos != null) {
+                Vec3 tp = Vec3.atCenterOf(this.entrancePos);
+
+                this.setPos(tp.x, tp.y, tp.z);
+                this.getNavigation().stop();
+
+                stuckTicks = 0;
+                pathSet = false;
+
+                return;
+            }
 
             if (!pathSet && distSqr > .3) {
                 // starting path to cauldron
@@ -555,6 +614,8 @@ public class BogreEntity extends Monster implements GeoEntity {
             return;
         }
 
+        // DID NOT YET PICK UP INGREDIENT
+
         if (droppedIngredientItem == null || !droppedIngredientItem.isAlive()) {
             this.state = State.CAUTIOUS;
             return;
@@ -583,6 +644,21 @@ public class BogreEntity extends Monster implements GeoEntity {
             droppedIngredientItem = null; // reset the dropped ingredient item
             return;
         }
+    }
+
+    private BogreCauldronEntity getCauldronEntity() {
+        if (this.cauldronPos == null) return null;
+
+        // find the cauldron entity at the cauldronPos
+        List<BogreCauldronEntity> entities = this.level().getEntitiesOfClass(
+                BogreCauldronEntity.class,
+                new AABB(cauldronPos),
+                entity -> !entity.isRemoved()
+        );
+        if (entities.isEmpty()) {
+            return null;
+        }
+        return entities.get(0);
     }
 
     private void cautiousAiStep() {
@@ -717,6 +793,34 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
     }
 
+    /**
+     * ray trace from bogre's eyes to the cauldron center
+     * returns true if no blocks obstruct the view
+     */
+    public boolean canSeeCauldron() {
+        Vec3 eyePos = this.getEyePosition();
+        Vec3 target = Vec3.atCenterOf(this.cauldronPos);
+
+        HitResult hit = this.level().clip(new ClipContext(
+                eyePos,
+                target,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                this
+        ));
+
+        if (hit.getType() == HitResult.Type.MISS) {
+            return true;
+        }
+
+        if (hit instanceof BlockHitResult bhr) {
+            // allow line of sight if the first block hit is the cauldron itself
+            return bhr.getBlockPos().equals(this.cauldronPos);
+        }
+
+        return false;
+    }
+
     private boolean moveTo(BlockPos pos, double speed, boolean checkCauldronDistance) {
         if (checkCauldronDistance && this.cauldronPos != null && this.cauldronPos.distToCenterSqr(pos.getX(), pos.getY(), pos.getZ()) > MAX_CAULDRON_DIST_SQR) {
             return false;
@@ -824,6 +928,11 @@ public class BogreEntity extends Monster implements GeoEntity {
     @Override
     public float getStepHeight() {
         return 1.5f;
+    }
+
+    @Override
+    public boolean onClimbable() {
+        return false; // not allowed to climb (vines or ladders)
     }
 
     @Override
