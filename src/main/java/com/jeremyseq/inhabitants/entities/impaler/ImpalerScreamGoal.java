@@ -25,7 +25,7 @@ public class ImpalerScreamGoal extends Goal {
     @Override
     public boolean canUse() {
         return mob.getTarget() != null && mob.screamCooldown == 0
-                && mob.getTarget().distanceToSqr(mob) <= 25;
+                && mob.getTarget().distanceToSqr(mob) <= 36 && mob.getTarget().distanceToSqr(mob) >= 16;
     }
 
     @Override
