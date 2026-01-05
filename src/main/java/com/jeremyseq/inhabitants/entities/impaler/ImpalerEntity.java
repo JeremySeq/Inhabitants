@@ -82,7 +82,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         this.goalSelector.addGoal(2, new FleeSunGoal(this, 1.0D));
         this.goalSelector.addGoal(3, new ImpalerRageGoal(this));
         this.goalSelector.addGoal(4, new ImpalerScreamGoal(this));
-        this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 2));
+        this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 3));
         this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(7, new BreakTorchGoal(this, 1));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));

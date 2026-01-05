@@ -27,6 +27,11 @@ public class ScreamParticle extends TextureSheetParticle {
     }
 
     @Override
+    public int getLightColor(float partialTick) {
+        return 220 | (220 << 16);
+    }
+
+    @Override
     public void render(VertexConsumer buf, Camera cam, float pt) {
         Vec3 camPos = cam.getPosition();
         float cx = (float)(x - camPos.x());

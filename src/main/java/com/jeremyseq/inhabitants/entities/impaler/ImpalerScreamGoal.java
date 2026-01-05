@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -49,6 +50,10 @@ public class ImpalerScreamGoal extends Goal {
     @Override
     public void tick() {
         screamTimer++;
+
+        // make sure not moving during scream
+        mob.getNavigation().stop();
+        mob.setDeltaMovement(Vec3.ZERO);
 
         if (screamTimer == 6) {
             // trigger client stuff
