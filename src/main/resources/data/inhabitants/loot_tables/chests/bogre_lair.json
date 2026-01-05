@@ -110,14 +110,6 @@
         },
         {
           "type": "item",
-          "name": "minecraft:blaze_rod",
-          "functions": [
-            { "function": "minecraft:set_count", "count": { "min": 2, "max": 5 } }
-          ],
-          "weight": 4
-        },
-        {
-          "type": "item",
           "name": "inhabitants:chitin_upgrade_smithing_template",
           "functions": [
             { "function": "minecraft:set_count", "count": { "min": 1, "max": 1 } }
