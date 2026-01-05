@@ -221,6 +221,11 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
+        // immune to stalactite + stalagmite damage
+        if (source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.STALAGMITE)) {
+            return false;
+        }
+
         boolean result = super.hurt(source, amount);
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
