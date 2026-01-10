@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
 import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
@@ -10,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -214,6 +216,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public boolean doHurtTarget(@NotNull Entity target) {
         if (!level().isClientSide) {
             triggerAnim("attack", "bite");
+            this.playSound(ModSoundEvents.IMPALER_ATTACK.get(), 1, 1);
             this.attackAnimTimer = 10;
         }
         return true;
@@ -326,6 +329,21 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         } else {
             entityData.set(TEXTURE, getBiomeTextureType());
         }
+    }
+
+    @Override
+    protected @NotNull SoundEvent getDeathSound() {
+        return ModSoundEvents.IMPALER_DEATH.get();
+    }
+
+    @Override
+    protected @NotNull SoundEvent getHurtSound(@NotNull DamageSource pDamageSource) {
+        return ModSoundEvents.IMPALER_HURT.get();
+    }
+
+    @Override
+    protected @Nullable SoundEvent getAmbientSound() {
+        return ModSoundEvents.IMPALER_IDLE.get();
     }
 
     @Override

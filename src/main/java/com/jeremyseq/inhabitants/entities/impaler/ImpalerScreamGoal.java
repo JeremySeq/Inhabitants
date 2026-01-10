@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -50,6 +51,7 @@ public class ImpalerScreamGoal extends Goal {
             mob.lookAt(EntityAnchorArgument.Anchor.FEET, mob.getTarget().getPosition(0));
         }
         mob.triggerAnim("scream", "scream");
+        mob.playSound(ModSoundEvents.IMPALER_SCREAM.get(), 1.0F, 1.0F);
     }
 
     @Override

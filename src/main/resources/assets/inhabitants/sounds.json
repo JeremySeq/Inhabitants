@@ -151,5 +151,145 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
+  },
+
+
+  "impaler.attack": {
+    "subtitle": "sounds.inhabitants.impaler.impaler_attack",
+    "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_attack_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_attack_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_attack_3",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_attack_4",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_attack_5",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "impaler.death": {
+    "subtitle": "sounds.inhabitants.impaler.impaler_death",
+    "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_death_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_death_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_death_3",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "impaler.hurt": {
+    "subtitle": "sounds.inhabitants.impaler.impaler_hurt",
+    "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_hurt_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_hurt_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_hurt_3",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_hurt_4",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_hurt_5",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "impaler.idle": {
+    "subtitle": "sounds.inhabitants.impaler.impaler_idle",
+    "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_idle_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_idle_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_idle_3",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_idle_4",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_idle_5",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "impaler.scream": {
+    "subtitle": "sounds.inhabitants.impaler.impaler_scream",
+    "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_scream_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_scream_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_scream_3",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "impaler.spikes": {
+    "subtitle": "sounds.inhabitants.impaler.impaler_spikes",
+    "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_spikes_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_spikes_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:impaler/impaler_spikes_3",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
   }
 }

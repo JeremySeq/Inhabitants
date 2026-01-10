@@ -23,6 +23,13 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> BOGRE_IDLE = registerSoundEvent("bogre.idle");
     public static final RegistryObject<SoundEvent> BOGRE_ROAR = registerSoundEvent("bogre.roar");
 
+    public static final RegistryObject<SoundEvent> IMPALER_ATTACK = registerSoundEvent("impaler.attack");
+    public static final RegistryObject<SoundEvent> IMPALER_DEATH = registerSoundEvent("impaler.death");
+    public static final RegistryObject<SoundEvent> IMPALER_HURT = registerSoundEvent("impaler.hurt");
+    public static final RegistryObject<SoundEvent> IMPALER_IDLE = registerSoundEvent("impaler.idle");
+    public static final RegistryObject<SoundEvent> IMPALER_SCREAM = registerSoundEvent("impaler.scream");
+    public static final RegistryObject<SoundEvent> IMPALER_SPIKES = registerSoundEvent("impaler.spikes");
+
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));
     }
