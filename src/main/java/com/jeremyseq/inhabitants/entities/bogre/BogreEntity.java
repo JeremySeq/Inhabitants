@@ -858,7 +858,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     protected void playStepSound(@NotNull BlockPos pPos, @NotNull BlockState pState) {
-        this.playSound(SoundEvents.WARDEN_STEP, 1, 1);
+        this.playSound(pState.getSoundType().getStepSound(), this.isSprinting() ? 2f : 1.25f, 0.9f);
     }
 
     @Override

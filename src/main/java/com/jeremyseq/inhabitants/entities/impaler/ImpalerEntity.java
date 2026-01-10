@@ -7,6 +7,7 @@ import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -28,6 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -344,6 +346,11 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     protected @Nullable SoundEvent getAmbientSound() {
         return ModSoundEvents.IMPALER_IDLE.get();
+    }
+
+    @Override
+    protected void playStepSound(@NotNull BlockPos pPos, BlockState pState) {
+        this.playSound(pState.getSoundType().getStepSound(), this.isSprinting() ? .75f : .15f, 1.0F);
     }
 
     @Override
