@@ -1,8 +1,8 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
 import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
-import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
@@ -117,10 +117,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
 
         if (this.level().isClientSide) {
-            if (scream_client_timer == 6) {
-                screamParticles();
-            } else if (scream_client_timer == 1) {
-                screamParticles();
+            if (scream_client_timer == 6 || scream_client_timer == 1) {
+                EntityUtil.screamParticles((ClientLevel) this.level(), new Vec3(getX(), getY() + 0.5, getZ()), this.getLookAngle());
             }
             if (scream_client_timer > -1) {
                 scream_client_timer--;
@@ -188,14 +186,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 spiked_client_timer = 8;
             }
         }
-    }
-
-    private void screamParticles() {
-        Vec3 pos = new Vec3(getX(), getY() + 0.5, getZ());
-        Vec3 lookAngle = new Vec3(getLookAngle().x, 0, getLookAngle().z).normalize();
-        pos = pos.add(lookAngle.scale(4));
-        float yaw = (float) Math.atan2(lookAngle.z, lookAngle.x);
-        this.level().addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, 0, yaw, 0);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.goals.CooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -110,7 +111,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private static final int ROAR_TICKS = 45; // how long a roar animation lasts (server)
 
-    private int roaringTick = 0;
+    private int roaringTick = 0; // used on both client and server separately
     private Player roaredPlayer = null; // the player that the Bogre is currently roaring at
     private final List<Player> warnedPlayers = new ArrayList<>();
 
@@ -255,7 +256,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (isRoaring()) {
             animationState.getController().setAnimation(RawAnimation.begin().then("roar", Animation.LoopType.PLAY_ONCE));
             if (animationState.getController().hasAnimationFinished()) {
-                setRoaring(false);
                 animationState.getController().forceAnimationReset();
             }
             return PlayState.CONTINUE;
@@ -378,6 +378,26 @@ public class BogreEntity extends Monster implements GeoEntity {
         } else if (this.state == State.CARVE_BONE) {
             carveBoneAiStep();
         }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.level().isClientSide) {
+            if (this.isRoaring()) {
+                if (roaringTick == 10 || roaringTick == 15) {
+                    EntityUtil.screamParticles((ClientLevel) this.level(), new Vec3(getX(), getY() + 0.5, getZ()), this.getLookAngle(), .5f);
+                }
+
+                roaringTick++;
+            } else {
+                roaringTick = 0;
+            }
+        }
+    }
+
+    public int getRoaringTick() {
+        return roaringTick;
     }
 
     @Override
@@ -735,7 +755,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 }
             }
         } else {
-            this.lookControl.setLookAt(roaredPlayer);
+            this.lookAt(EntityAnchorArgument.Anchor.EYES, roaredPlayer.position());
             roaringTick++;
             if (roaringTick >= ROAR_TICKS) {
                 setRoaring(false);

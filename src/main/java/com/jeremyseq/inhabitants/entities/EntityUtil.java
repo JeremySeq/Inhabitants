@@ -1,5 +1,7 @@
 package com.jeremyseq.inhabitants.entities;
 
+import com.jeremyseq.inhabitants.particles.ModParticles;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -147,4 +149,14 @@ public class EntityUtil {
         }
     }
 
+    public static void screamParticles(ClientLevel level, Vec3 pos, Vec3 lookAngle) {
+        screamParticles(level, pos, lookAngle, 1.0F);
+    }
+
+    public static void screamParticles(ClientLevel level, Vec3 pos, Vec3 lookAngle, double screamSpeed) {
+        lookAngle = new Vec3(lookAngle.x, 0, lookAngle.z).normalize();
+        pos = pos.add(lookAngle.scale(4));
+        float yaw = (float) Math.atan2(lookAngle.z, lookAngle.x);
+        level.addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, screamSpeed, yaw, 0);
+    }
 }

@@ -10,11 +10,13 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class ScreamParticle extends TextureSheetParticle {
+    private final double screamSpeed;
     private final double yawRad;
 
-    protected ScreamParticle(ClientLevel level, double x, double y, double z, SpriteSet sprites, double yawRad) {
+    protected ScreamParticle(ClientLevel level, double x, double y, double z, SpriteSet sprites, double screamSpeed, double yawRad) {
         super(level, x, y, z);
         this.yawRad = yawRad + Math.PI / 2;
+        this.screamSpeed = screamSpeed;
         pickSprite(sprites);
         hasPhysics = false;
         lifetime = 20;
@@ -78,7 +80,7 @@ public class ScreamParticle extends TextureSheetParticle {
         super.tick();
 
         // movement and scale speed per tick
-        double speed = .5;
+        double speed = .5 * screamSpeed;
         this.quadSize += (float) speed;
 
         // forward vec from yaw
@@ -101,11 +103,12 @@ public class ScreamParticle extends TextureSheetParticle {
 
         /**
          * Uses `my` (ySpeed) as yaw angle to rotate the particle.
+         * @param mx scream speed
          * @param my yaw angle in radians
          */
         @Override
         public Particle createParticle(@NotNull SimpleParticleType type, @NotNull ClientLevel level, double x, double y, double z, double mx, double my, double mz) {
-            return new ScreamParticle(level, x, y, z, sprites, my);
+            return new ScreamParticle(level, x, y, z, sprites, mx, my);
         }
     }
 }

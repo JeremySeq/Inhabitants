@@ -21,6 +21,7 @@ public class BogreReturnToCauldronGoal extends Goal {
         if (bogre.cauldronPos == null) return false;
         if (bogre.state != BogreEntity.State.CAUTIOUS) return false;
         if (bogre.getTarget() != null) return false;
+        if (bogre.isRoaring()) return false;
 
         return !this.bogre.canSeeCauldron() || bogre.cauldronPos.distToCenterSqr(bogre.position())
                 > BogreEntity.MAX_CAULDRON_DIST_SQR;
@@ -31,6 +32,7 @@ public class BogreReturnToCauldronGoal extends Goal {
         if (bogre.cauldronPos == null) return false;
         if (bogre.state != BogreEntity.State.CAUTIOUS) return false;
         if (bogre.getTarget() != null) return false;
+        if (bogre.isRoaring()) return false;
 
         return bogre.cauldronPos.distToCenterSqr(bogre.position())
                 > 16;
