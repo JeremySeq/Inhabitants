@@ -22,6 +22,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -33,6 +35,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SuspiciousStewItem;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -602,13 +605,36 @@ public class BogreEntity extends Monster implements GeoEntity {
                 this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
                 tamedPlayers.add(droppedIngredientPlayer.getUUID()); // add the player that dropped the ingredient to the tamed list
 
-                if (this.getItemHeld().is(Items.POISONOUS_POTATO)) {
-                    this.setItemHeld(new ItemStack(ModItems.STINKY_BOUILLON.get()));
-                } else if (this.getItemHeld().is(Items.ROTTEN_FLESH) ||  this.getItemHeld().is(Items.SPIDER_EYE)) {
-                    this.setItemHeld(new ItemStack(ModItems.UNCANNY_POTTAGE.get()));
+                // 30% chance of suspicious stew with random effects
+                if (this.level().random.nextFloat() < 0.3f) {
+                    ItemStack stew = new ItemStack(Items.SUSPICIOUS_STEW);
+                    MobEffectInstance[] effects = new MobEffectInstance[] {
+                            new MobEffectInstance(MobEffects.SATURATION, 7),
+                            new MobEffectInstance(MobEffects.NIGHT_VISION, 80),
+                            new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 80),
+                            new MobEffectInstance(MobEffects.BLINDNESS, 160),
+                            new MobEffectInstance(MobEffects.WEAKNESS, 180),
+                            new MobEffectInstance(MobEffects.REGENERATION, 160),
+                            new MobEffectInstance(MobEffects.JUMP, 80),
+                            new MobEffectInstance(MobEffects.POISON, 240),
+                            new MobEffectInstance(MobEffects.WITHER, 160)
+                    };
+
+                    MobEffectInstance chosen =
+                            effects[this.level().random.nextInt(effects.length)];
+                    SuspiciousStewItem.saveMobEffect(stew, chosen.getEffect(), chosen.getDuration());
+
+                    this.setItemHeld(stew);
                 } else {
-                    this.setItemHeld(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()));
+                    if (this.getItemHeld().is(Items.POISONOUS_POTATO)) {
+                        this.setItemHeld(new ItemStack(ModItems.STINKY_BOUILLON.get()));
+                    } else if (this.getItemHeld().is(Items.ROTTEN_FLESH) ||  this.getItemHeld().is(Items.SPIDER_EYE)) {
+                        this.setItemHeld(new ItemStack(ModItems.UNCANNY_POTTAGE.get()));
+                    } else {
+                        this.setItemHeld(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()));
+                    }
                 }
+
                 setCookingTicks(0);
             }
 
@@ -919,7 +945,8 @@ public class BogreEntity extends Monster implements GeoEntity {
     private boolean isHoldingChowder() {
         return this.getItemHeld().is(ModItems.FISH_SNOT_CHOWDER.get())
                 || this.getItemHeld().is(ModItems.UNCANNY_POTTAGE.get())
-                || this.getItemHeld().is(ModItems.STINKY_BOUILLON.get());
+                || this.getItemHeld().is(ModItems.STINKY_BOUILLON.get())
+                || this.getItemHeld().is(Items.SUSPICIOUS_STEW);
     }
 
     private void setItemHeld(ItemStack itemHeld) {
