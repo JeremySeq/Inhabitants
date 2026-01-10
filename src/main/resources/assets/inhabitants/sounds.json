@@ -46,5 +46,110 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
+  },
+
+
+  "bogre.attack": {
+    "subtitle": "sounds.inhabitants.bogre.bogre_attack",
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/bogre_attack_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_attack_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_attack_3",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_attack_4",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.death": {
+    "subtitle": "sounds.inhabitants.bogre.bogre_death",
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/bogre_death_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_death_2",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.hurt": {
+    "subtitle": "sounds.inhabitants.bogre.bogre_hurt",
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/bogre_hurt_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_hurt_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_hurt_3",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_hurt_4",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.idle": {
+    "subtitle": "sounds.inhabitants.bogre.bogre_idle",
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/bogre_idle_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_idle_2",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_idle_3",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_idle_4",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_idle_5",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.roar": {
+    "subtitle": "sounds.inhabitants.bogre.bogre_roar",
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/bogre_roar_1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/bogre_roar_2",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
   }
 }

@@ -17,6 +17,12 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> WARPED_CLAM_CLOSED_DAMAGE = registerSoundEvent("warped_clam.closed_damage");
     public static final RegistryObject<SoundEvent> WARPED_CLAM_OPENED_DAMAGE = registerSoundEvent("warped_clam.opened_damage");
 
+    public static final RegistryObject<SoundEvent> BOGRE_ATTACK = registerSoundEvent("bogre.attack");
+    public static final RegistryObject<SoundEvent> BOGRE_DEATH = registerSoundEvent("bogre.death");
+    public static final RegistryObject<SoundEvent> BOGRE_HURT = registerSoundEvent("bogre.hurt");
+    public static final RegistryObject<SoundEvent> BOGRE_IDLE = registerSoundEvent("bogre.idle");
+    public static final RegistryObject<SoundEvent> BOGRE_ROAR = registerSoundEvent("bogre.roar");
+
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));
     }

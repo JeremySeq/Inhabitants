@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
@@ -281,7 +282,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public boolean doHurtTarget(@NotNull Entity target) {
         if (!level().isClientSide && this.attackAnimTimer == 0) {
             triggerAnim("attack", "attack");
-            this.playSound(SoundEvents.WARDEN_ATTACK_IMPACT, 1, 1);
+            this.playSound(ModSoundEvents.BOGRE_ATTACK.get(), 1, 1);
             this.attackAnimTimer = ATTACK_DELAY;
         }
         return true;
@@ -701,7 +702,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                     warnedPlayers.add(player);
 
                     // play roar sound
-                    this.level().playSound(null, this.blockPosition(), SoundEvents.WARDEN_ROAR,
+                    this.level().playSound(null, this.blockPosition(), ModSoundEvents.BOGRE_ROAR.get(),
                             SoundSource.HOSTILE, 2.0F, 0.9F + this.level().random.nextFloat() * 0.2F);
 
                     break;
@@ -843,17 +844,17 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     protected @Nullable SoundEvent getAmbientSound() {
-        return SoundEvents.WARDEN_AMBIENT;
+        return ModSoundEvents.BOGRE_IDLE.get();
     }
 
     @Override
     protected @NotNull SoundEvent getHurtSound(@NotNull DamageSource pDamageSource) {
-        return SoundEvents.WARDEN_HURT;
+        return ModSoundEvents.BOGRE_HURT.get();
     }
 
     @Override
     protected @NotNull SoundEvent getDeathSound() {
-        return SoundEvents.WARDEN_DEATH;
+        return ModSoundEvents.BOGRE_DEATH.get();
     }
 
     protected void playStepSound(@NotNull BlockPos pPos, @NotNull BlockState pState) {
@@ -922,6 +923,8 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     private void setItemHeld(ItemStack itemHeld) {
+        // play pickup sound
+        this.playSound(SoundEvents.ITEM_PICKUP, 1, 1);
         this.entityData.set(ITEM_HELD, itemHeld);
     }
 
