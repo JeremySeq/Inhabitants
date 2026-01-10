@@ -78,10 +78,23 @@
   "advancement.inhabitants.ate_fish_snot_chowder.title": "Is this even edible?",
   "advancement.inhabitants.ate_fish_snot_chowder.description": "Eat fish-snot chowder.",
 
-  "sounds.inhabitants.warped_clam.closing": "Warped Clam closes",
-  "sounds.inhabitants.warped_clam.opening": "Warped Clam opens",
-  "sounds.inhabitants.warped_clam.closed_damage": "Warped Clam clanks",
-  "sounds.inhabitants.warped_clam.opened_damage": "Warped Clam hurts",
+  "subtitles.inhabitants.warped_clam.closing": "Warped Clam closes",
+  "subtitles.inhabitants.warped_clam.opening": "Warped Clam opens",
+  "subtitles.inhabitants.warped_clam.closed_damage": "Warped Clam clanks",
+  "subtitles.inhabitants.warped_clam.opened_damage": "Warped Clam hurts",
+
+  "subtitles.inhabitants.bogre.attack": "Bogre attacks",
+  "subtitles.inhabitants.bogre.death": "Bogre dies",
+  "subtitles.inhabitants.bogre.hurt": "Bogre hurts",
+  "subtitles.inhabitants.bogre.idle": "Bogre grunts",
+  "subtitles.inhabitants.bogre.roar": "Bogre roars",
+
+  "subtitles.inhabitants.impaler.attack": "Impaler bites",
+  "subtitles.inhabitants.impaler.death": "Impaler dies",
+  "subtitles.inhabitants.impaler.hurt": "Impaler hurts",
+  "subtitles.inhabitants.impaler.idle": "Impaler cackles",
+  "subtitles.inhabitants.impaler.scream": "Impaler screams",
+  "subtitles.inhabitants.impaler.spikes": "Impaler activates spikes",
 
   "item.inhabitants.chitin_chestplate.tooltip": "Grants immunity",
   "upgrade.chitin.applies_to": "Shield",
