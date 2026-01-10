@@ -2,7 +2,9 @@ package com.jeremyseq.inhabitants.networking;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class ModNetworking {
@@ -15,6 +17,14 @@ public class ModNetworking {
     );
 
     private static int packetId = 0;
+
+    public static <T> void sendToServer(T message) {
+        CHANNEL.sendToServer(message);
+    }
+
+    public static <T> void sendToPlayer(T message, ServerPlayer player) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message);
+    }
 
     public static void register() {
         // Client → Server
@@ -47,6 +57,13 @@ public class ModNetworking {
                 GazerCameraPacketS2C::encode,
                 GazerCameraPacketS2C::decode,
                 GazerCameraPacketS2C::handle
+        );
+        CHANNEL.registerMessage(
+                packetId++,
+                ScreenShakePacketS2C.class,
+                ScreenShakePacketS2C::encode,
+                ScreenShakePacketS2C::decode,
+                ScreenShakePacketS2C::handle
         );
     }
 }

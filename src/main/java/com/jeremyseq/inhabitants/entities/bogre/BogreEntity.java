@@ -7,6 +7,8 @@ import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.goals.CooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.networking.ModNetworking;
+import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
@@ -19,6 +21,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -761,6 +764,10 @@ public class BogreEntity extends Monster implements GeoEntity {
                 setRoaring(false);
                 roaredPlayer = null; // reset the roared player
                 roaringTick = 0;
+            }
+            if (roaringTick == 10) {
+                // screen shake effect for the player
+                ModNetworking.sendToPlayer(new ScreenShakePacketS2C(80), (ServerPlayer) roaredPlayer);
             }
         }
 
