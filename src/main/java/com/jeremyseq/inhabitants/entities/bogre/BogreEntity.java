@@ -368,8 +368,6 @@ public class BogreEntity extends Monster implements GeoEntity {
                 // start dancing
                 entityData.set(DANCING, true);
 
-                this.playSound(SoundEvents.WARDEN_LISTENING, 1, 1);
-
                 this.getNavigation().stop();
                 this.setTarget(null);
                 return;
@@ -617,7 +615,6 @@ public class BogreEntity extends Monster implements GeoEntity {
             } else if (getCookingTicks() == 25) {
                 entityData.set(COOKING_ANIM, false);
                 entityData.set(COOKING_ANIM, true);
-                this.playSound(SoundEvents.WARDEN_DIG, 1.0F, 1f);
             }
 
             setCookingTicks(getCookingTicks()+1);
