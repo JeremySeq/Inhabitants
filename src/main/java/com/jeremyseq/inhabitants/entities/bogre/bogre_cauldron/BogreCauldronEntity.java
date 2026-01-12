@@ -1,10 +1,14 @@
 package com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -30,6 +34,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
 
     private boolean placedBlock = false;
     private float health;
+    private static final EntityDataAccessor<Boolean> COOKING = SynchedEntityData.defineId(BogreCauldronEntity.class, EntityDataSerializers.BOOLEAN);
 
     public BogreCauldronEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -173,11 +178,6 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
 
                 // Particle: same as lava pop
                 level().addParticle(ParticleTypes.LAVA, px, py, pz, vx, vy, vz);
-
-                // light smoke above
-                if (level().random.nextBoolean()) {
-                    level().addParticle(ParticleTypes.SMOKE, px, py + 0.1, pz, 0, 0.01, 0);
-                }
             }
 
 
@@ -185,16 +185,32 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
             double pz = z - 1 + level().random.nextDouble() * 2.0;
             double py = y + 1.5;
 
-            level().addParticle(ParticleTypes.EFFECT, px, py, pz, 0, 0.05, 0);
+
+
+            if (this.entityData.get(COOKING)) {
+                // more bubbles when cooking + effect particles
+                level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
+                level().addParticle(ParticleTypes.EFFECT, px, py, pz, 0, 0.05, 0);
+            } else {
+                // infrequent bubbles when not cooking
+                if (level().random.nextFloat() < 0.3f) {
+                    level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
+                }
+            }
 
             level().playLocalSound(px, py, pz, SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS, 0.4f, 0.8f + level().random.nextFloat() * 0.4f, false);
 
         }
     }
 
+    public void setCooking(boolean cooking) {
+        this.entityData.set(COOKING, cooking);
+        Inhabitants.LOGGER.debug("BogreCauldronEntity: setCooking to " + cooking);
+    }
+
     @Override
     protected void defineSynchedData() {
-
+        entityData.define(COOKING, false);
     }
 
     @Override

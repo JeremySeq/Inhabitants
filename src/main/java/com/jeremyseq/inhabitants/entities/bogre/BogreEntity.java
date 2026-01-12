@@ -615,6 +615,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             } else if (getCookingTicks() == 25) {
                 entityData.set(COOKING_ANIM, false);
                 entityData.set(COOKING_ANIM, true);
+                bogreCauldron.setCooking(true);
             }
 
             setCookingTicks(getCookingTicks()+1);
@@ -624,6 +625,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 // chowder complete
                 this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
                 tamedPlayers.add(droppedIngredientPlayer.getUUID()); // add the player that dropped the ingredient to the tamed list
+                bogreCauldron.setCooking(false);
 
                 // 30% chance of suspicious stew with random effects
                 if (this.level().random.nextFloat() < 0.3f) {
