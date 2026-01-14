@@ -19,12 +19,16 @@ public class ImpalerSpikeProjectile extends AbstractArrow implements GeoAnimatab
 
     public ImpalerSpikeProjectile(EntityType<? extends ImpalerSpikeProjectile> type, Level level) {
         super(type, level);
+
+        this.setBaseDamage(4.0D);
+        this.setKnockback(3);
+        this.setCritArrow(true);
     }
 
     public ImpalerSpikeProjectile(EntityType<? extends AbstractArrow> type, LivingEntity shooter, Level world) {
         super(type, shooter, world);
 
-        this.setBaseDamage(8.0D);
+        this.setBaseDamage(4.0D);
         this.setKnockback(3);
         this.setCritArrow(true);
     }
