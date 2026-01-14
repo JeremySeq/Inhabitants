@@ -246,6 +246,8 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             }
 
             item.hurtAndBreak(3, player, (p) -> p.broadcastBreakEvent(hand));
+            level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                    SoundEvents.MUD_BREAK, this.getSoundSource(), 1.0f, 1.0f);
             if (!level().isClientSide) {
                 this.discard();
                 ItemStack clamItem = new ItemStack(ModItems.WARPED_CLAM_ITEM.get());
