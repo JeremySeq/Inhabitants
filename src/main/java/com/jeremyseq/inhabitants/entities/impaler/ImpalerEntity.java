@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
@@ -54,7 +55,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
-    private int spiked_client_timer = -1; // used for spike particle timing
+    private static final int SPIKE_ANIM_DURATION = 30;
+    private int spiked_client_timer = -1; // used for spike particle timing, counts up
     private int scream_client_timer = -1; // used for scream particle timing
 
     private int attackAnimTimer = 0;
@@ -106,13 +108,22 @@ public class ImpalerEntity extends Monster implements GeoEntity {
             this.heal(1.0F);
         }
 
+
+        // handle spike anim timer (client + server)
+        if (spiked_client_timer >= SPIKE_ANIM_DURATION) {
+            spiked_client_timer = -1;
+        } else if (spiked_client_timer > -1) {
+            spiked_client_timer++;
+        }
+
         if (this.level().isClientSide) {
-            if (spiked_client_timer == 0) {
-                spiked_client_timer--;
+            if (spiked_client_timer == 13) {
                 ImpalerSpikeRaiseParticle.spawnSpikeBurst((ClientLevel) this.level(), this, 20);
             }
-            if (spiked_client_timer > -1) {
-                spiked_client_timer--;
+        }
+        if (!this.level().isClientSide) {
+            if (spiked_client_timer == 9) {
+                this.playSound(ModSoundEvents.IMPALER_SPIKES.get(), 1, 1);
             }
         }
 
@@ -181,9 +192,10 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                 this.scream_client_timer = 6;
             }
         }
-        if (this.level().isClientSide && pKey == SPIKED) {
+        if (pKey == SPIKED) {
             if (this.entityData.get(SPIKED)) {
-                spiked_client_timer = 8;
+                Inhabitants.LOGGER.debug("triggered timer");
+                spiked_client_timer = 0;
             }
         }
     }

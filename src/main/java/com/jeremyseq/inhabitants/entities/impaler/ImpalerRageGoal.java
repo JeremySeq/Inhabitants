@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.world.entity.ai.goal.Goal;
 
@@ -33,7 +32,6 @@ public class ImpalerRageGoal extends Goal {
             mob.lookAt(EntityAnchorArgument.Anchor.FEET, mob.getTarget().getPosition(0));
         }
         mob.triggerAnim("rage", "rage");
-        mob.playSound(ModSoundEvents.IMPALER_SPIKES.get(), 1, 1);
     }
 
     @Override
