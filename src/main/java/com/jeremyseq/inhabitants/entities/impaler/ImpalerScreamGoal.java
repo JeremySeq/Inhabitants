@@ -7,8 +7,6 @@ import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.FallingBlockEntity;
@@ -72,9 +70,7 @@ public class ImpalerScreamGoal extends Goal {
             mob.getEntityData().set(ImpalerEntity.SCREAM_TRIGGER, false);
             mob.getEntityData().set(ImpalerEntity.SCREAM_TRIGGER, true);
 
-            EntityUtil.shockwave(mob, 10, 10, entity -> entity instanceof ImpalerEntity);
-            mob.level().playSound(null, mob.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 10f, 0.9F);
-            // give nearby players the concussion effect
+            EntityUtil.shockwave(mob, 10, 10, entity -> entity instanceof ImpalerEntity);// give nearby players the concussion effect
             double radius = 15.0D;
             List<Player> players = mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(radius));
             for (Player player : players) {
