@@ -4,6 +4,7 @@ import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class WarpedClamItem extends Item {
     public WarpedClamItem(Properties pProperties) {
-        super(pProperties);
+        super(pProperties.stacksTo(1));
     }
 
     @Override
@@ -46,6 +47,8 @@ public class WarpedClamItem extends Item {
             }
 
             level.addFreshEntity(clam);
+
+            level.playSound(null, x, y, z, SoundEvents.MUD_PLACE, clam.getSoundSource(), 1.0f, 1.0f);
 
             if (player != null && !player.getAbilities().instabuild) {
                 itemStack.shrink(1);
