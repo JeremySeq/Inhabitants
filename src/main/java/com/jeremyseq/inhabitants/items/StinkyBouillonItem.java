@@ -1,7 +1,5 @@
 package com.jeremyseq.inhabitants.items;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -10,15 +8,12 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BowlFoodItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class StinkyBouillonItem extends BowlFoodItem {
     public StinkyBouillonItem() {
-        super(new Item.Properties().food(
+        super(new Item.Properties().stacksTo(1).food(
                 new FoodProperties.Builder()
                         .nutrition(6)
                         .saturationMod(0.6f)
@@ -42,10 +37,5 @@ public class StinkyBouillonItem extends BowlFoodItem {
         }
 
         return super.finishUsingItem(pStack, pLevel, pEntityLiving);
-    }
-
-    @Override
-    public void appendHoverText(@NotNull ItemStack stack, Level level, List<Component> tooltip, @NotNull TooltipFlag flag) {
-        tooltip.add(Component.literal("A pungent broth that cleanses the body.").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     }
 }
