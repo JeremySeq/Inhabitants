@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.BlockPos;
@@ -185,15 +184,15 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
             double pz = z - 1 + level().random.nextDouble() * 2.0;
             double py = y + 1.5;
 
-
-
             if (this.entityData.get(COOKING)) {
                 // more bubbles when cooking + effect particles
-                level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
-                level().addParticle(ParticleTypes.EFFECT, px, py, pz, 0, 0.05, 0);
+                if (level().random.nextFloat() < 0.5f) {
+                    level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
+                    level().addParticle(ParticleTypes.EFFECT, px, py, pz, 0, 0.05, 0);
+                }
             } else {
                 // infrequent bubbles when not cooking
-                if (level().random.nextFloat() < 0.3f) {
+                if (level().random.nextFloat() < 0.5f) {
                     level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
                 }
             }
@@ -205,7 +204,6 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
 
     public void setCooking(boolean cooking) {
         this.entityData.set(COOKING, cooking);
-        Inhabitants.LOGGER.debug("BogreCauldronEntity: setCooking to " + cooking);
     }
 
     @Override
