@@ -20,6 +20,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -155,6 +156,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
             AABB topBox = getBoundingBox().move(0, 0.4, 0); // slightly above the clam
             List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, topBox);
             entities.remove(this);
+            entities.removeIf(e -> e instanceof EnderMan);
 
             if (!entities.isEmpty()) {
                 entityData.set(FLING_ANIM, false);
@@ -311,7 +313,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         AABB box = getBoundingBox().move(0, 0.4, 0);
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, box);
         for (LivingEntity entity : entities) {
-            if (entity == this) {
+            if (entity == this || entity instanceof EnderMan) {
                 continue;
             }
             if (entity.onGround()) {
