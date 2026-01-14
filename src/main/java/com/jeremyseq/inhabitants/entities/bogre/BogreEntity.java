@@ -999,7 +999,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     @Override
     protected void dropCustomDeathLoot(@NotNull DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
-        this.spawnAtLocation(new ItemStack(ModItems.BRACER_OF_MIGHT.get()));
+        this.spawnAtLocation(new ItemStack(ModItems.GIANT_BONE.get()));
     }
 
     @Override

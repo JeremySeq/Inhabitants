@@ -6,10 +6,7 @@ import com.jeremyseq.inhabitants.items.armor.ModArmorMaterials;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -30,9 +27,6 @@ public class ModItems {
             UncannyPottageItem::new);
     public static final RegistryObject<Item> STINKY_BOUILLON = ITEMS.register("stinky_bouillon",
             StinkyBouillonItem::new);
-
-    public static final RegistryObject<Item> BRACER_OF_MIGHT = ITEMS.register("bracer_of_might",
-            BracerOfMightItem::new);
 
     public static final RegistryObject<Item> DEAD_BOGRE_ICON = ITEMS.register("dead_bogre_icon",
             () -> new Item(new Item.Properties().stacksTo(1)));
