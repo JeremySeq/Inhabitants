@@ -23,5 +23,3 @@ The following mobs are fully implemented and functional in the game.
 ![Warped Clam](images/warped_clam.png)
 
 ![Impaler](images/impaler.png)
-
-![Beloceros](images/beloceros.png)

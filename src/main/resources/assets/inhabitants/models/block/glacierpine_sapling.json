@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cross",
-  "textures": {
-    "cross": "inhabitants:block/glacierpine_sapling"
-  }
-}

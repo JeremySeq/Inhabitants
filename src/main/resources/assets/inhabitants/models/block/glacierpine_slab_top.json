@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "inhabitants:block/glacierpine_planks",
-    "side": "inhabitants:block/glacierpine_planks",
-    "top": "inhabitants:block/glacierpine_planks"
-  }
-}

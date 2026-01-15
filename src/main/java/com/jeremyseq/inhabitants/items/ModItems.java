@@ -37,15 +37,6 @@ public class ModItems {
     public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
             () -> new Item(new Item.Properties()));
 
-    public static final RegistryObject<Item> APEX_SPAWN_EGG = ITEMS.register("apex_spawn_egg",
-            () -> new ForgeSpawnEggItem(ModEntities.APEX, 0x6C7D8D, 0x79F0F4, new Item.Properties()));
-
-    public static final RegistryObject<Item> APEX_HORN = ITEMS.register("apex_horn",
-            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
-
-    public static final RegistryObject<Item> CORNUCOPIA = ITEMS.register("cornucopia",
-            () -> new Cornucopia(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
-
     public static final RegistryObject<Item> BOULDER_SPAWN_EGG = ITEMS.register("boulder_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.BOULDER, 0x636363, 0xBDBDBD, new Item.Properties()));
 

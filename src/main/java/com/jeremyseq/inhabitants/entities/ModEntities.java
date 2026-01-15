@@ -1,8 +1,6 @@
 package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import com.jeremyseq.inhabitants.entities.apex.ApexEntity;
-import com.jeremyseq.inhabitants.entities.apex.ApexRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
@@ -64,12 +62,6 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
 
-    public static final RegistryObject<EntityType<ApexEntity>> APEX =
-            REGISTRY.register("apex",
-                    () -> EntityType.Builder.of(ApexEntity::new, MobCategory.MONSTER)
-                            .sized(2.25f, 2.3f)
-                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "apex").toString()));
-
     public static final RegistryObject<EntityType<BoulderEntity>> BOULDER =
             REGISTRY.register("boulder",
                     () -> EntityType.Builder.of(BoulderEntity::new, MobCategory.MONSTER)
@@ -81,7 +73,6 @@ public class ModEntities {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
-        event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
         event.put(ModEntities.BOULDER.get(), BoulderEntity.setAttributes());
     }
 
@@ -92,7 +83,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
-        EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
         EntityRenderers.register(ModEntities.BOULDER.get(), BoulderRenderer::new);
     }
 }
