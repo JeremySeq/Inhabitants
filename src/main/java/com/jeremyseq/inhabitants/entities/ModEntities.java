@@ -12,8 +12,6 @@ import com.jeremyseq.inhabitants.entities.boulder.BoulderRenderer;
 import com.jeremyseq.inhabitants.entities.catcher.CatcherEntity;
 import com.jeremyseq.inhabitants.entities.catcher.CatcherRenderer;
 import com.jeremyseq.inhabitants.entities.catcher.WaterberryProjectile;
-import com.jeremyseq.inhabitants.entities.gazer.GazerEntity;
-import com.jeremyseq.inhabitants.entities.gazer.GazerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
@@ -70,15 +68,6 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
 
-    public static final RegistryObject<EntityType<GazerEntity>> GAZER =
-            REGISTRY.register("gazer",
-                    () -> EntityType.Builder.of(GazerEntity::new, MobCategory.CREATURE)
-                            .sized(.5f, .5f)
-                            .clientTrackingRange(256)
-                            .updateInterval(1)
-                            .fireImmune()
-                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "gazer").toString()));
-
     public static final RegistryObject<EntityType<ApexEntity>> APEX =
             REGISTRY.register("apex",
                     () -> EntityType.Builder.of(ApexEntity::new, MobCategory.MONSTER)
@@ -111,7 +100,6 @@ public class ModEntities {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
-        event.put(ModEntities.GAZER.get(), GazerEntity.setAttributes());
         event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
         event.put(ModEntities.CATCHER.get(), CatcherEntity.setAttributes());
         event.put(ModEntities.BOULDER.get(), BoulderEntity.setAttributes());
@@ -124,7 +112,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
-        EntityRenderers.register(ModEntities.GAZER.get(), GazerRenderer::new);
         EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
         EntityRenderers.register(ModEntities.CATCHER.get(), CatcherRenderer::new);
         EntityRenderers.register(ModEntities.WATERBERRY_PROJECTILE.get(), ThrownItemRenderer::new);

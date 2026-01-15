@@ -43,9 +43,6 @@ public class ModItems {
     public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
             () -> new Item(new Item.Properties()));
 
-    public static final RegistryObject<Item> GAZER_POD = ITEMS.register("gazer_pod_item",
-            () -> new GazerPodItem(new Item.Properties().stacksTo(1)));
-
     public static final RegistryObject<Item> APEX_SPAWN_EGG = ITEMS.register("apex_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.APEX, 0x6C7D8D, 0x79F0F4, new Item.Properties()));
 
@@ -54,9 +51,6 @@ public class ModItems {
 
     public static final RegistryObject<Item> CORNUCOPIA = ITEMS.register("cornucopia",
             () -> new Cornucopia(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
-
-    public static final RegistryObject<Item> GAZER_SPAWN_EGG = ITEMS.register("gazer_spawn_egg",
-            () -> new ForgeSpawnEggItem(ModEntities.GAZER, 0x8F0B48, 0xE1778D, new Item.Properties()));
 
     public static final RegistryObject<Item> WATERBERRY =
             ITEMS.register("waterberry", () -> new WaterberryItem(

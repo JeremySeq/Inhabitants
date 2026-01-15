@@ -19,7 +19,7 @@ public class ModKeyBindings {
 
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
-        event.register(INHABITANTS_KEY);
+//        event.register(INHABITANTS_KEY);
     }
 }
     

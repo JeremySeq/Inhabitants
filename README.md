@@ -24,8 +24,6 @@ The following mobs are fully implemented and functional in the game.
 
 ![Impaler](images/impaler.png)
 
-![Gazer](images/gazer.png)
-
 ![Beloceros](images/beloceros.png)
 
 ![Catcher](images/catcher.png)

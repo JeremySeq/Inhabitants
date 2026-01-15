@@ -2,7 +2,6 @@ package com.jeremyseq.inhabitants.blocks.entity;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
-import com.jeremyseq.inhabitants.blocks.entity.client.GazerPodBlockRenderer;
 import com.jeremyseq.inhabitants.blocks.entity.client.ScrollBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -19,11 +18,6 @@ public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Inhabitants.MODID);
 
-    public static final RegistryObject<BlockEntityType<GazerPodBlockEntity>> GAZER_POD_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("gazer_pod_block_entity",
-                    () -> BlockEntityType.Builder.of(GazerPodBlockEntity::new,
-                            ModBlocks.GAZER_POD_BLOCK.get()).build(null));
-
     public static final RegistryObject<BlockEntityType<ScrollBlockEntity>> SCROLL_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("scroll_block_entity",
                     () -> BlockEntityType.Builder.of(ScrollBlockEntity::new,
@@ -35,7 +29,6 @@ public class ModBlockEntities {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        BlockEntityRenderers.register(ModBlockEntities.GAZER_POD_BLOCK_ENTITY.get(), GazerPodBlockRenderer::new);
         BlockEntityRenderers.register(ModBlockEntities.SCROLL_BLOCK_ENTITY.get(), ScrollBlockRenderer::new);
     }
 }

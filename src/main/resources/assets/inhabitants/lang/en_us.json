@@ -4,7 +4,6 @@
   "entity.inhabitants.warped_clam": "Warped Clam",
   "entity.inhabitants.impaler": "Impaler",
   "entity.inhabitants.apex": "Beloceros",
-  "entity.inhabitants.gazer": "Gazer",
   "entity.inhabitants.catcher": "Catcher",
   "entity.inhabitants.boulder": "Boulder",
 
@@ -18,8 +17,6 @@
   "item.inhabitants.warped_clam": "Warped Clam",
   "item.inhabitants.impaler_spawn_egg": "Impaler Spawn Egg",
   "item.inhabitants.impaler_spike": "Impaler Spike",
-  "item.inhabitants.gazer_pod_item": "Gazer Pod",
-  "item.inhabitants.gazer_spawn_egg": "Gazer Spawn Egg",
   "item.inhabitants.apex_spawn_egg": "Beloceros Spawn Egg",
   "item.inhabitants.apex_horn": "Beloceros Horn",
   "item.inhabitants.cornucopia": "Cornucopia",
@@ -34,7 +31,6 @@
   "item.inhabitants.scroll_medium": "Medium Scroll",
   "item.inhabitants.scroll_large": "Large Scroll",
 
-  "block.inhabitants.gazer_pod_block": "Gazer Bud",
   "block.inhabitants.waterberry_bush": "Waterberry Bush",
 
   "block.inhabitants.ice_bricks": "Ice Bricks",

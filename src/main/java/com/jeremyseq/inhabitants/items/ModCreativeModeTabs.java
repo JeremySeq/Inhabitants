@@ -23,8 +23,6 @@ public class ModCreativeModeTabs {
                     .withLabelColor(new Color(0x2C7866).getRGB())
                     .title(Component.translatable("creativetab.inhabitants_tab"))
                     .displayItems((pParameters, pOutput) -> {
-                        ItemStack gazer_pod = new ItemStack(ModItems.GAZER_POD.get());
-                        gazer_pod.getOrCreateTag().putBoolean("HasGazer", true);
 
                         pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
@@ -34,8 +32,6 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
-                        pOutput.accept(gazer_pod);
-                        pOutput.accept(ModItems.GAZER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.APEX_SPAWN_EGG.get());
                         pOutput.accept(ModItems.APEX_HORN.get());
                         pOutput.accept(ModItems.CORNUCOPIA.get());

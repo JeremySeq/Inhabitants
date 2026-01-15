@@ -28,36 +28,8 @@ public class ModNetworking {
 
     public static void register() {
         // Client → Server
-        CHANNEL.registerMessage(
-                packetId++,
-                GazerControlPacketC2S.class,
-                GazerControlPacketC2S::encode,
-                GazerControlPacketC2S::decode,
-                GazerControlPacketC2S::handle
-        );
-        CHANNEL.registerMessage(
-                packetId++,
-                GazerStartControlC2S.class,
-                GazerStartControlC2S::encode,
-                GazerStartControlC2S::decode,
-                GazerStartControlC2S::handle
-        );
-        CHANNEL.registerMessage(
-                packetId++,
-                GazerStopControlC2S.class,
-                GazerStopControlC2S::encode,
-                GazerStopControlC2S::decode,
-                GazerStopControlC2S::handle
-        );
 
         // Server → Client
-        CHANNEL.registerMessage(
-                packetId++,
-                GazerCameraPacketS2C.class,
-                GazerCameraPacketS2C::encode,
-                GazerCameraPacketS2C::decode,
-                GazerCameraPacketS2C::handle
-        );
         CHANNEL.registerMessage(
                 packetId++,
                 ScreenShakePacketS2C.class,

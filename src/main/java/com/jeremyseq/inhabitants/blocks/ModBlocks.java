@@ -27,10 +27,6 @@ public class ModBlocks
             "invisible_cauldron_block",
             () -> new InvisibleCauldronBlock(Block.Properties.of().noLootTable().strength(-1.0F, 3600000.0F).noOcclusion())
     );
-    public static final RegistryObject<Block> GAZER_POD_BLOCK = registerBlock(
-            "gazer_pod_block",
-            () -> new GazerPodBlock(Block.Properties.copy(Blocks.NETHERRACK).requiresCorrectToolForDrops().noOcclusion())
-    );
 
     public static final RegistryObject<Block> CHISELED_ICE = BLOCKS.register("chiseled_ice",
             () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.ICE).friction(0.989F)
