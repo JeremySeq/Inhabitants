@@ -101,7 +101,6 @@ public class Inhabitants
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_TRAPDOOR.get(), RenderType.cutout());
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_SAPLING.get(), RenderType.cutout());
                 ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLACIERPINE_LEAVES.get(), RenderType.cutoutMipped());
-                ItemBlockRenderTypes.setRenderLayer(ModBlocks.WATERBERRY_BLOCK.get(), RenderType.cutout());
             });
 
             ItemProperties.register(Items.CROSSBOW, ResourceLocation.fromNamespaceAndPath(MODID,"spike_loaded"), (stack, level, entity, seed) -> {
@@ -112,11 +111,6 @@ public class Inhabitants
                 }
                 return 0.0F;
             });
-
-            ItemProperties.register(ModItems.CHITIN_SHIELD.get(), ResourceLocation.fromNamespaceAndPath(MODID, "blocking"),
-                    (stack, level, entity, seed) ->
-                            (entity != null && entity.isUsingItem() && entity.getUseItem() == stack) ? 1.0F : 0.0F
-            );
         }
     }
 }

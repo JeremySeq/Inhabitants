@@ -14,9 +14,6 @@ public class ModLootModifiers {
 
     public static final RegistryObject<Codec<ReplaceWithItemLootModifier>> REPLACE_ITEM = LOOT_MODIFIERS.register("replace_item_loot_modifier", () -> ReplaceWithItemLootModifier.CODEC);
 
-    public static final RegistryObject<Codec<AddChitinTemplateModifier>> ADD_CHITIN_TEMPLATE =
-            LOOT_MODIFIERS.register("add_chitin_template", () -> AddChitinTemplateModifier.CODEC);
-
     public static void register(IEventBus bus) {
         LOOT_MODIFIERS.register(bus);
     }

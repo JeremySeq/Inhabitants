@@ -1,9 +1,7 @@
 package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
@@ -26,15 +24,6 @@ public class MobSpawning {
                 SpawnPlacements.Type.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 (type, level, reason, pos, random) -> pos.getY() < 45 && level.getBrightness(LightLayer.BLOCK, pos) < 8,
-                SpawnPlacementRegisterEvent.Operation.REPLACE
-        );
-        event.register(
-                ModEntities.CATCHER.get(),
-                SpawnPlacements.Type.ON_GROUND,
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                (type, level, reason, pos, random) ->
-                        Monster.checkAnyLightMonsterSpawnRules(type, level, reason, pos, random)
-                                && pos.getY() > level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ()) - 15,
                 SpawnPlacementRegisterEvent.Operation.REPLACE
         );
 

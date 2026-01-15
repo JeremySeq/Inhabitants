@@ -164,15 +164,6 @@ public class ModBlocks
     public static final RegistryObject<Item> GLACIERPINE_TRAPDOOR_ITEM =
             registerBlockItem("glacierpine_trapdoor", GLACIERPINE_TRAPDOOR);
 
-    public static final RegistryObject<Block> WATERBERRY_BLOCK = BLOCKS.register("waterberry_bush",
-            () -> new WaterberryBushBlock(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT)
-                    .noCollission()
-                    .randomTicks()
-                    .instabreak()
-                    .sound(SoundType.GRASS)));
-    public static final RegistryObject<Item> WATERBERRY_BUSH_ITEM =
-            registerBlockItem("waterberry_bush", WATERBERRY_BLOCK);
-
     public static final RegistryObject<Block> ANCIENT_STONE_PILLAR = BLOCKS.register("ancient_stone_pillar",
             () -> new AncientStonePillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE)));
     public static final RegistryObject<Item> ANCIENT_STONE_PILLAR_ITEM =

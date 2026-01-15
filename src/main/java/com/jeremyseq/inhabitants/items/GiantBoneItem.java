@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.items;
 
-import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -21,7 +20,7 @@ public class GiantBoneItem extends SwordItem {
     @Override
     public void inventoryTick(@NotNull ItemStack stack, Level level, @NotNull Entity entity, int slot, boolean selected) {
         if (level.isClientSide || !(entity instanceof Player player)) return;
-        if (selected && !player.hasEffect(MobEffects.DAMAGE_BOOST) && !player.hasEffect(ModEffects.IMMUNITY.get())) {
+        if (selected && !player.hasEffect(MobEffects.DAMAGE_BOOST)) {
             MobEffectInstance current = player.getEffect(MobEffects.MOVEMENT_SLOWDOWN);
             if (current == null || current.getAmplifier() < 1 || current.getDuration() <= 10) {
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 1, true, false, true));

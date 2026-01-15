@@ -2,18 +2,12 @@ package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
-import com.jeremyseq.inhabitants.items.armor.ModArmorMaterials;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-
-import java.util.List;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Inhabitants.MODID);
@@ -51,41 +45,6 @@ public class ModItems {
 
     public static final RegistryObject<Item> CORNUCOPIA = ITEMS.register("cornucopia",
             () -> new Cornucopia(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
-
-    public static final RegistryObject<Item> WATERBERRY =
-            ITEMS.register("waterberry", () -> new WaterberryItem(
-                    new Item.Properties().stacksTo(16)
-            ));
-
-    public static final RegistryObject<Item> CATCHER_SPAWN_EGG = ITEMS.register("catcher_spawn_egg",
-            () -> new ForgeSpawnEggItem(ModEntities.CATCHER, 0x664E80, 0xA46D3C, new Item.Properties()));
-
-    public static final RegistryObject<Item> CHITIN_CHESTPLATE = ITEMS.register("chitin_chestplate",
-            () -> new ChitinChestplateItem(ModArmorMaterials.CHITIN, ArmorItem.Type.CHESTPLATE,
-                    new Item.Properties().stacksTo(1)));
-
-    public static final RegistryObject<Item> CHITIN_CHESTPLATE_ELYTRA = ITEMS.register("chitin_chestplate_elytra",
-            ChitinChestplateElytraItem::new);
-
-    public static final RegistryObject<Item> CHITIN_SHIELD = ITEMS.register("chitin_shield",
-            () -> new ShieldItem(new Item.Properties().durability(750)));
-
-    public static final RegistryObject<Item> CHITIN_UPGRADE_SMITHING_TEMPLATE = ITEMS.register(
-            "chitin_upgrade_smithing_template",
-            () -> new SmithingTemplateItem(
-                    Component.translatable("upgrade.chitin.applies_to").withStyle(ChatFormatting.BLUE),
-                    Component.translatable("upgrade.chitin.ingredients").withStyle(ChatFormatting.BLUE),
-                    Component.translatable("upgrade.chitin.title").withStyle(ChatFormatting.GRAY),
-                    Component.translatable("upgrade.chitin.base_slot_description"),
-                    Component.translatable("upgrade.chitin.additions_slot_description"),
-                    List.of(ResourceLocation.fromNamespaceAndPath("inhabitants", "item/empty_shield_slot")),
-                    List.of(ResourceLocation.fromNamespaceAndPath("inhabitants", "item/empty_chitin_slot"))
-            )
-    );
-
-
-    public static final RegistryObject<Item> CHITIN = ITEMS.register("chitin",
-            () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> BOULDER_SPAWN_EGG = ITEMS.register("boulder_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.BOULDER, 0x636363, 0xBDBDBD, new Item.Properties()));

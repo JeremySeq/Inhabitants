@@ -11,9 +11,6 @@ public class ModEffects {
     public static final DeferredRegister<MobEffect> EFFECTS =
             DeferredRegister.create(Registries.MOB_EFFECT, Inhabitants.MODID);
 
-    public static final RegistryObject<MobEffect> IMMUNITY =
-            EFFECTS.register("immunity", ImmunityEffect::new);
-
     public static final RegistryObject<MobEffect> CONCUSSION =
             EFFECTS.register("concussion", ConcussionEffect::new);
 

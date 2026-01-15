@@ -9,9 +9,6 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
 import com.jeremyseq.inhabitants.entities.boulder.BoulderEntity;
 import com.jeremyseq.inhabitants.entities.boulder.BoulderRenderer;
-import com.jeremyseq.inhabitants.entities.catcher.CatcherEntity;
-import com.jeremyseq.inhabitants.entities.catcher.CatcherRenderer;
-import com.jeremyseq.inhabitants.entities.catcher.WaterberryProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
@@ -19,7 +16,6 @@ import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -74,21 +70,6 @@ public class ModEntities {
                             .sized(2.25f, 2.3f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "apex").toString()));
 
-    public static final RegistryObject<EntityType<CatcherEntity>> CATCHER =
-            REGISTRY.register("catcher",
-                    () -> EntityType.Builder.of(CatcherEntity::new, MobCategory.MONSTER)
-                            .sized(2.2f, 1.4f)
-                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "catcher").toString()));
-
-    public static final RegistryObject<EntityType<WaterberryProjectile>> WATERBERRY_PROJECTILE =
-            REGISTRY.register("waterberry_projectile", () ->
-                    EntityType.Builder.<WaterberryProjectile>of(WaterberryProjectile::new, MobCategory.MISC)
-                            .sized(0.25F, 0.25F)
-                            .clientTrackingRange(4)
-                            .updateInterval(10)
-                            .build("waterberry_projectile")
-            );
-
     public static final RegistryObject<EntityType<BoulderEntity>> BOULDER =
             REGISTRY.register("boulder",
                     () -> EntityType.Builder.of(BoulderEntity::new, MobCategory.MONSTER)
@@ -101,7 +82,6 @@ public class ModEntities {
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
         event.put(ModEntities.APEX.get(), ApexEntity.setAttributes());
-        event.put(ModEntities.CATCHER.get(), CatcherEntity.setAttributes());
         event.put(ModEntities.BOULDER.get(), BoulderEntity.setAttributes());
     }
 
@@ -113,8 +93,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
         EntityRenderers.register(ModEntities.APEX.get(), ApexRenderer::new);
-        EntityRenderers.register(ModEntities.CATCHER.get(), CatcherRenderer::new);
-        EntityRenderers.register(ModEntities.WATERBERRY_PROJECTILE.get(), ThrownItemRenderer::new);
         EntityRenderers.register(ModEntities.BOULDER.get(), BoulderRenderer::new);
     }
 }

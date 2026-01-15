@@ -4,7 +4,6 @@
   "entity.inhabitants.warped_clam": "Warped Clam",
   "entity.inhabitants.impaler": "Impaler",
   "entity.inhabitants.apex": "Beloceros",
-  "entity.inhabitants.catcher": "Catcher",
   "entity.inhabitants.boulder": "Boulder",
 
   "creativetab.inhabitants_tab": "Inhabitants",
@@ -20,18 +19,10 @@
   "item.inhabitants.apex_spawn_egg": "Beloceros Spawn Egg",
   "item.inhabitants.apex_horn": "Beloceros Horn",
   "item.inhabitants.cornucopia": "Cornucopia",
-  "item.inhabitants.catcher_spawn_egg": "Catcher Spawn Egg",
-  "item.inhabitants.waterberry": "Waterberry",
-  "item.inhabitants.chitin": "Chitin",
-  "item.inhabitants.chitin_chestplate": "Chitin Chestplate",
-  "item.inhabitants.chitin_shield": "Chitin Shield",
-  "item.inhabitants.chitin_chestplate_elytra": "Chitin Chestplate with Elytra",
   "item.inhabitants.boulder_spawn_egg": "Boulder Spawn Egg",
   "item.inhabitants.scroll_small": "Small Scroll",
   "item.inhabitants.scroll_medium": "Medium Scroll",
   "item.inhabitants.scroll_large": "Large Scroll",
-
-  "block.inhabitants.waterberry_bush": "Waterberry Bush",
 
   "block.inhabitants.ice_bricks": "Ice Bricks",
   "block.inhabitants.chiseled_ice": "Chiseled Ice",
@@ -58,13 +49,7 @@
   "block.inhabitants.glacierpine_trapdoor": "Glacierpine Trapdoor",
 
   "effect.inhabitants.concussion": "Concussion",
-  "effect.inhabitants.immunity": "Immunity",
   "effect.inhabitants.rotting_disguise": "Rotting Disguise",
-
-  "item.minecraft.tipped_arrow.effect.immunity": "Tipped Arrow of Immunity",
-  "item.minecraft.potion.effect.immunity": "Potion of Immunity",
-  "item.minecraft.splash_potion.effect.immunity": "Splash Potion of Immunity",
-  "item.minecraft.lingering_potion.effect.immunity": "Lingering Potion of Immunity",
 
   "advancement.inhabitants.david_and_goliath.title": "David and Goliath",
   "advancement.inhabitants.david_and_goliath.description": "Defeat the mighty Bogre.",
@@ -88,13 +73,6 @@
   "subtitles.inhabitants.impaler.idle": "Impaler cackles",
   "subtitles.inhabitants.impaler.scream": "Impaler screams",
   "subtitles.inhabitants.impaler.spikes": "Impaler activates spikes",
-
-  "item.inhabitants.chitin_chestplate.tooltip": "Grants immunity",
-  "upgrade.chitin.applies_to": "Shield",
-  "upgrade.chitin.title": "Chitin Upgrade",
-  "upgrade.chitin.ingredients": "Chitin",
-  "upgrade.chitin.base_slot_description": "Add shield",
-  "upgrade.chitin.additions_slot_description": "Add chitin",
 
   "key.categories.inhabitants": "Inhabitants",
   "key.inhabitants_key": "Inhabitants Special Ability"

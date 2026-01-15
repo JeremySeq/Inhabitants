@@ -55,14 +55,6 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.GLACIERPINE_BUTTON_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_DOOR_ITEM.get());
                         pOutput.accept(ModBlocks.GLACIERPINE_TRAPDOOR_ITEM.get());
-                        pOutput.accept(ModBlocks.WATERBERRY_BUSH_ITEM.get());
-                        pOutput.accept(ModItems.WATERBERRY.get());
-                        pOutput.accept(ModItems.CATCHER_SPAWN_EGG.get());
-                        pOutput.accept(ModItems.CHITIN.get());
-                        pOutput.accept(ModItems.CHITIN_CHESTPLATE.get());
-                        pOutput.accept(ModItems.CHITIN_CHESTPLATE_ELYTRA.get());
-                        pOutput.accept(ModItems.CHITIN_UPGRADE_SMITHING_TEMPLATE.get());
-                        pOutput.accept(ModItems.CHITIN_SHIELD.get());
                         pOutput.accept(ModItems.BOULDER_SPAWN_EGG.get());
                         pOutput.accept(ModBlocks.ANCIENT_STONE_ITEM.get());
                         pOutput.accept(ModBlocks.ANCIENT_STONE_PILLAR_ITEM.get());

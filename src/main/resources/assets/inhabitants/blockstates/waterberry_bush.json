@@ -1,7 +1,0 @@
-{
-  "variants": {
-    "fake=true": { "model": "inhabitants:block/waterberry_bush_fake" },
-    "fake=false": { "model": "inhabitants:block/waterberry_bush" }
-  },
-  "render_type": "minecraft:cutout"
-}
