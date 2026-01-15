@@ -43,9 +43,6 @@ public class ModItems {
     public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
             () -> new Item(new Item.Properties()));
 
-    public static final RegistryObject<Item> ANCIENT_FLUTE = ITEMS.register("ancient_flute",
-            () -> new AncientFluteItem(new Item.Properties().stacksTo(1)));
-
     public static final RegistryObject<Item> GAZER_POD = ITEMS.register("gazer_pod_item",
             () -> new GazerPodItem(new Item.Properties().stacksTo(1)));
 
