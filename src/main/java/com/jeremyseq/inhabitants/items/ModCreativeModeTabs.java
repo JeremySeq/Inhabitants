@@ -1,7 +1,6 @@
 package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -30,12 +29,6 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
-                        pOutput.accept(ModItems.BOULDER_SPAWN_EGG.get());
-                        pOutput.accept(ModBlocks.ANCIENT_STONE_ITEM.get());
-                        pOutput.accept(ModBlocks.ANCIENT_STONE_PILLAR_ITEM.get());
-                        pOutput.accept(ModBlocks.SCROLL_SMALL.get());
-                        pOutput.accept(ModBlocks.SCROLL_MEDIUM.get());
-                        pOutput.accept(ModBlocks.SCROLL_LARGE.get());
                     })
                     .build());
 

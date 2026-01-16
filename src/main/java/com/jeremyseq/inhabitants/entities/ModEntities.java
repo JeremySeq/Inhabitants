@@ -5,8 +5,6 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
-import com.jeremyseq.inhabitants.entities.boulder.BoulderEntity;
-import com.jeremyseq.inhabitants.entities.boulder.BoulderRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
@@ -62,18 +60,11 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
 
-    public static final RegistryObject<EntityType<BoulderEntity>> BOULDER =
-            REGISTRY.register("boulder",
-                    () -> EntityType.Builder.of(BoulderEntity::new, MobCategory.MONSTER)
-                            .sized(.9f, 1.6f)
-                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "boulder").toString()));
-
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
-        event.put(ModEntities.BOULDER.get(), BoulderEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -83,6 +74,5 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
-        EntityRenderers.register(ModEntities.BOULDER.get(), BoulderRenderer::new);
     }
 }

@@ -37,9 +37,6 @@ public class ModItems {
     public static final RegistryObject<Item> IMPALER_SPIKE = ITEMS.register("impaler_spike",
             () -> new Item(new Item.Properties()));
 
-    public static final RegistryObject<Item> BOULDER_SPAWN_EGG = ITEMS.register("boulder_spawn_egg",
-            () -> new ForgeSpawnEggItem(ModEntities.BOULDER, 0x636363, 0xBDBDBD, new Item.Properties()));
-
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

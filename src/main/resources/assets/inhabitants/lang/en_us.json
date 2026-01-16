@@ -3,7 +3,6 @@
   "entity.inhabitants.bogre_cauldron": "Bogre Cauldron",
   "entity.inhabitants.warped_clam": "Warped Clam",
   "entity.inhabitants.impaler": "Impaler",
-  "entity.inhabitants.boulder": "Boulder",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -15,13 +14,6 @@
   "item.inhabitants.warped_clam": "Warped Clam",
   "item.inhabitants.impaler_spawn_egg": "Impaler Spawn Egg",
   "item.inhabitants.impaler_spike": "Impaler Spike",
-  "item.inhabitants.boulder_spawn_egg": "Boulder Spawn Egg",
-  "item.inhabitants.scroll_small": "Small Scroll",
-  "item.inhabitants.scroll_medium": "Medium Scroll",
-  "item.inhabitants.scroll_large": "Large Scroll",
-
-  "block.inhabitants.ancient_stone": "Ancient Stone",
-  "block.inhabitants.ancient_stone_pillar": "Ancient Stone Pillar",
 
   "effect.inhabitants.concussion": "Concussion",
   "effect.inhabitants.rotting_disguise": "Rotting Disguise",
