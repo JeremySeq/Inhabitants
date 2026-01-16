@@ -407,16 +407,20 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
         }
-        // if attacked by a player, switch to cautious state and set the player as target
+        // if attacked, switch to cautious state and set the attacker as target
         entityData.set(DANCING, false);
         this.state = State.CAUTIOUS;
-        if (pSource.getEntity() instanceof Player player && player.isAlive() && !player.isCreative()) {
+        if (pSource.getEntity() instanceof LivingEntity entity) {
             if (!this.getItemHeld().isEmpty()) {
                 this.throwHeldItem();
             }
+
             // if the attacker is a player, remove them from tamedPlayers
-            tamedPlayers.remove(player.getUUID());
-            this.setTarget(player);
+            if (pSource.getEntity() instanceof Player player) {
+                tamedPlayers.remove(player.getUUID());
+            }
+
+            this.setTarget(entity);
         }
         return result;
     }
