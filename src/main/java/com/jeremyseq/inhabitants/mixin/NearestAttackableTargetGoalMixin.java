@@ -2,8 +2,10 @@ package com.jeremyseq.inhabitants.mixin;
 
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,7 +25,7 @@ public abstract class NearestAttackableTargetGoalMixin {
     private void inhabitants$ignorePlayersWithEffect(CallbackInfo ci) {
         if (this.target instanceof Player player) {
 
-            var mob = ((TargetGoalAccessor) this).inhabitants$getMob();
+            Mob mob = ((TargetGoal) (Object) this).mob;
 
             // undead only
             if (mob.getMobType() != MobType.UNDEAD) {

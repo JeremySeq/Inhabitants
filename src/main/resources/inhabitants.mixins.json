@@ -5,8 +5,7 @@
   "refmap": "inhabitants.refmap.json",
   "mixins": [
     "CrossbowItemMixin",
-    "NearestAttackableTargetGoalMixin",
-    "TargetGoalAccessor"
+    "NearestAttackableTargetGoalMixin"
   ],
   "client": [
   ],
