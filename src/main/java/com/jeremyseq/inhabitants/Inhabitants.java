@@ -10,6 +10,7 @@ import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
+import com.jeremyseq.inhabitants.paintings.ModPaintings;
 import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.potions.ModPotions;
 import com.mojang.logging.LogUtils;
@@ -56,6 +57,7 @@ public class Inhabitants
         ModLootModifiers.register(modEventBus);
         ModSoundEvents.register(modEventBus);
         ModNetworking.register();
+        ModPaintings.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 

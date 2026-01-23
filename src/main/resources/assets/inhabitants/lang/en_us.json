@@ -42,5 +42,10 @@
   "subtitles.inhabitants.impaler.spikes": "Impaler activates spikes",
 
   "key.categories.inhabitants": "Inhabitants",
-  "key.inhabitants_key": "Inhabitants Special Ability"
+  "key.inhabitants_key": "Inhabitants Special Ability",
+
+  "painting.inhabitants.bonk.title": "Bonk",
+  "painting.inhabitants.bonk.author": "Catalyst",
+  "painting.inhabitants.my_precious.title": "My Precious",
+  "painting.inhabitants.my_precious.author": "Catalyst"
 }
