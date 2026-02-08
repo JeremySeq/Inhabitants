@@ -14,7 +14,7 @@ public class UncannyPottageItem extends BowlFoodItem {
                         .nutrition(5)
                         .saturationMod(0.6f)
                         .effect(() -> new MobEffectInstance(MobEffects.HUNGER, 300), 1.0f)
-                        .effect(() -> new MobEffectInstance(ModEffects.ROTTING_DISGUISE.get(), 600, 0), 1.0f)
+                        .effect(() -> new MobEffectInstance(ModEffects.MONSTER_DISGUISE.get(), 600, 0), 1.0f)
                         .alwaysEat()
                         .build()));
     }

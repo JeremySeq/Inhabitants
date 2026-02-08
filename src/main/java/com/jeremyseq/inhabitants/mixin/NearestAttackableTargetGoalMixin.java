@@ -32,7 +32,7 @@ public abstract class NearestAttackableTargetGoalMixin {
                 return;
             }
 
-            if (player.hasEffect(ModEffects.ROTTING_DISGUISE.get())) {
+            if (player.hasEffect(ModEffects.MONSTER_DISGUISE.get())) {
                 this.target = null;
             }
         }
