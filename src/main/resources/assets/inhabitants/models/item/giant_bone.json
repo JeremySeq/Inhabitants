@@ -1,21 +1,6 @@
 {
   "parent": "item/handheld",
-  "loader": "forge:separate_transforms",
   "textures": {
-    "layer0": "inhabitants:item/giant_bone_gui"
-  },
-  "base": {
-    "parent": "inhabitants:item/giant_bone_handheld"
-  },
-  "perspectives": {
-    "gui": {
-      "parent": "inhabitants:item/giant_bone_gui"
-    },
-    "fixed": {
-      "parent": "inhabitants:item/giant_bone_gui"
-    },
-    "ground": {
-      "parent": "inhabitants:item/giant_bone_gui"
-    }
+    "layer0": "inhabitants:item/giant_bone"
   }
 }
