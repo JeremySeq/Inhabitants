@@ -29,6 +29,7 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> IMPALER_IDLE = registerSoundEvent("impaler.idle");
     public static final RegistryObject<SoundEvent> IMPALER_SCREAM = registerSoundEvent("impaler.scream");
     public static final RegistryObject<SoundEvent> IMPALER_SPIKES = registerSoundEvent("impaler.spikes");
+    public static final RegistryObject<SoundEvent> IMPALER_CONCUSSION = registerSoundEvent("impaler.concussion");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));

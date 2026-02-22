@@ -74,7 +74,7 @@ public class ImpalerScreamGoal extends Goal {
             double radius = 15.0D;
             List<Player> players = mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(radius));
             for (Player player : players) {
-                player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 200, 0));
+                player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 240, 0));
             }
 
             // make pointed dripstone attached to ceilings fall

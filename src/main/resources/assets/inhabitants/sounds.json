@@ -319,5 +319,16 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
+  },
+  "impaler.concussion": {
+    "subtitle": "subtitles.inhabitants.impaler.concussion",
+    "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_concussion",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
   }
 }

@@ -8,6 +8,7 @@
     "NearestAttackableTargetGoalMixin"
   ],
   "client": [
+    "SubtitleOverlayMixin"
   ],
   "minVersion": "0.8"
 }
