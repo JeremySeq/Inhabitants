@@ -9,9 +9,15 @@ A Minecraft mod that adds new fictional fauna.
 So far, 8 mobs are planned, each with unique behaviors and interactions.
 
 ## Credits
-- [@JeremySeq](https://jeremyseq.dev/): lead coder
+**Team**
+- [@JeremySeq](https://www.curseforge.com/members/jeremyseq/projects): lead coder
 - [@Catalyst](https://x.com/Catalyst2000251): artist, animator, and designer
 - [@mattseq](https://www.curseforge.com/members/mattseq/projects): coder
+
+**Contributors**
+
+- [@Cucuber](https://x.com/Cucuber_321): creator of the "Enderman's Last Day" painting
+- Fungal: concept art assistance
 
 ## Completed Mobs
 
