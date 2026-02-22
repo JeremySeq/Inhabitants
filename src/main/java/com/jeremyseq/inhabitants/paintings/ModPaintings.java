@@ -11,9 +11,6 @@ public class ModPaintings {
     public static final DeferredRegister<PaintingVariant> PAINTINGS =
             DeferredRegister.create(ForgeRegistries.PAINTING_VARIANTS, Inhabitants.MODID);
 
-    public static final RegistryObject<PaintingVariant> BONK =
-            PAINTINGS.register("bonk", () -> new PaintingVariant(64, 48));
-
     public static final RegistryObject<PaintingVariant> MY_PRECIOUS =
             PAINTINGS.register("my_precious", () -> new PaintingVariant(48, 48));
 
