@@ -22,7 +22,7 @@ public class ModItems {
     public static final RegistryObject<Item> STINKY_BOUILLON = ITEMS.register("stinky_bouillon",
             StinkyBouillonItem::new);
 
-    public static final RegistryObject<Item> DEAD_BOGRE_ICON = ITEMS.register("dead_bogre_icon",
+    public static final RegistryObject<Item> CREATIVE_TAB = ITEMS.register("creative_tab",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> BOGRE_SPAWN_EGG = ITEMS.register("bogre_spawn_egg",
