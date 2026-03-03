@@ -81,6 +81,10 @@
     "subtitle": "subtitles.inhabitants.bogre.attack",
     "sounds": [
       {
+        "name": "inhabitants:bogre/bogre_attack_0",
+        "weight": 1
+      },
+      {
         "name": "inhabitants:bogre/bogre_attack_1",
         "weight": 1
       },
@@ -91,10 +95,6 @@
       {
         "name": "inhabitants:bogre/bogre_attack_3",
         "weight": 1
-      },
-      {
-        "name": "inhabitants:bogre/bogre_attack_4",
-        "weight": 1
       }
     ],
     "volume": 1.0,
@@ -104,11 +104,11 @@
     "subtitle": "subtitles.inhabitants.bogre.death",
     "sounds": [
       {
-        "name": "inhabitants:bogre/bogre_death_1",
+        "name": "inhabitants:bogre/bogre_death_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_death_2",
+        "name": "inhabitants:bogre/bogre_death_1",
         "weight": 1
       }
     ],
@@ -118,6 +118,10 @@
   "bogre.hurt": {
     "subtitle": "subtitles.inhabitants.bogre.hurt",
     "sounds": [
+      {
+        "name": "inhabitants:bogre/bogre_hurt_0",
+        "weight": 1
+      },
       {
         "name": "inhabitants:bogre/bogre_hurt_1",
         "weight": 1
@@ -129,10 +133,6 @@
       {
         "name": "inhabitants:bogre/bogre_hurt_3",
         "weight": 1
-      },
-      {
-        "name": "inhabitants:bogre/bogre_hurt_4",
-        "weight": 1
       }
     ],
     "volume": 1.0,
@@ -141,6 +141,10 @@
   "bogre.idle": {
     "subtitle": "subtitles.inhabitants.bogre.idle",
     "sounds": [
+      {
+        "name": "inhabitants:bogre/bogre_idle_0",
+        "weight": 1
+      },
       {
         "name": "inhabitants:bogre/bogre_idle_1",
         "weight": 1
@@ -156,10 +160,6 @@
       {
         "name": "inhabitants:bogre/bogre_idle_4",
         "weight": 1
-      },
-      {
-        "name": "inhabitants:bogre/bogre_idle_5",
-        "weight": 1
       }
     ],
     "volume": 1.0,
@@ -169,11 +169,11 @@
     "subtitle": "subtitles.inhabitants.bogre.roar",
     "sounds": [
       {
-        "name": "inhabitants:bogre/bogre_roar_1",
+        "name": "inhabitants:bogre/bogre_roar_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_roar_2",
+        "name": "inhabitants:bogre/bogre_roar_1",
         "weight": 1
       }
     ],
