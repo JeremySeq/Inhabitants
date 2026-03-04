@@ -186,23 +186,15 @@
     "subtitle": "subtitles.inhabitants.impaler.attack",
     "sounds": [
       {
+        "name": "inhabitants:impaler/impaler_attack_0",
+        "weight": 1
+      },
+      {
         "name": "inhabitants:impaler/impaler_attack_1",
         "weight": 1
       },
       {
         "name": "inhabitants:impaler/impaler_attack_2",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_attack_3",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_attack_4",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_attack_5",
         "weight": 1
       }
     ],
@@ -213,15 +205,7 @@
     "subtitle": "subtitles.inhabitants.impaler.death",
     "sounds": [
       {
-        "name": "inhabitants:impaler/impaler_death_1",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_death_2",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_death_3",
+        "name": "inhabitants:impaler/impaler_death_0",
         "weight": 1
       }
     ],
@@ -232,23 +216,15 @@
     "subtitle": "subtitles.inhabitants.impaler.hurt",
     "sounds": [
       {
+        "name": "inhabitants:impaler/impaler_hurt_0",
+        "weight": 1
+      },
+      {
         "name": "inhabitants:impaler/impaler_hurt_1",
         "weight": 1
       },
       {
         "name": "inhabitants:impaler/impaler_hurt_2",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_hurt_3",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_hurt_4",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_hurt_5",
         "weight": 1
       }
     ],
@@ -258,6 +234,10 @@
   "impaler.idle": {
     "subtitle": "subtitles.inhabitants.impaler.idle",
     "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_idle_0",
+        "weight": 1
+      },
       {
         "name": "inhabitants:impaler/impaler_idle_1",
         "weight": 1
@@ -269,14 +249,6 @@
       {
         "name": "inhabitants:impaler/impaler_idle_3",
         "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_idle_4",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_idle_5",
-        "weight": 1
       }
     ],
     "volume": 1.0,
@@ -286,15 +258,15 @@
     "subtitle": "subtitles.inhabitants.impaler.scream",
     "sounds": [
       {
+        "name": "inhabitants:impaler/impaler_scream_0",
+        "weight": 1
+      },
+      {
         "name": "inhabitants:impaler/impaler_scream_1",
         "weight": 1
       },
       {
         "name": "inhabitants:impaler/impaler_scream_2",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:impaler/impaler_scream_3",
         "weight": 1
       }
     ],
@@ -304,6 +276,10 @@
   "impaler.spikes": {
     "subtitle": "subtitles.inhabitants.impaler.spikes",
     "sounds": [
+      {
+        "name": "inhabitants:impaler/impaler_spikes_0",
+        "weight": 1
+      },
       {
         "name": "inhabitants:impaler/impaler_spikes_1",
         "weight": 1
