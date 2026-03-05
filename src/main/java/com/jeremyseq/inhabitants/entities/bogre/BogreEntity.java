@@ -36,10 +36,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SuspiciousStewItem;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -68,7 +65,8 @@ public class BogreEntity extends Monster implements GeoEntity {
     public enum State {
         CAUTIOUS,
         MAKE_CHOWDER,
-        CARVE_BONE
+        CARVE_BONE,
+        MAKE_DISC
     }
 
     boolean pathSet = false;
@@ -119,10 +117,10 @@ public class BogreEntity extends Monster implements GeoEntity {
     private final List<Player> warnedPlayers = new ArrayList<>();
 
     // CARVE_BONE
-    private static final int BONE_CARVE_TIME_TICKS = 160; // time it takes to carve a bone
-    private static final int BONE_CARVE_DESTROY_BONES_TICKS = 130; // when to destroy the bone blocks
-    private int boneCarveTicks = 0; // counts down while carving a bone
-    private List<BlockPos> boneBlockPositions; // the positions of the bone blocks to carve
+    private static final int CARVE_TIME_TICKS = 160; // time it takes to carve a bone
+    private static final int CARVE_DESTROY_TICKS = 130; // when to destroy the bone blocks
+    private int carveTicks = 0; // counts down while carving a bone
+    private List<BlockPos> carvePositions; // the positions of the bone blocks to carve
 
     // MAKE CHOWDER
     public static final EntityDataAccessor<ItemStack> ITEM_HELD = // if the Bogre has picked up the fish item
@@ -378,6 +376,8 @@ public class BogreEntity extends Monster implements GeoEntity {
             makeChowderAiStep();
         } else if (this.state == State.CARVE_BONE) {
             carveBoneAiStep();
+        } else if (this.state == State.MAKE_DISC) {
+            carveDiscAiStep();
         }
     }
 
@@ -430,14 +430,14 @@ public class BogreEntity extends Monster implements GeoEntity {
      * This is a placeholder method for future implementation.
      */
     private void carveBoneAiStep() {
-        if (boneBlockPositions == null || boneBlockPositions.size() < 3) {
+        if (carvePositions == null || carvePositions.size() < 3) {
             this.state = State.CAUTIOUS; // revert to cautious state if not enough bone blocks found
             return;
         }
 
         // ensure the bone blocks are still valid, if they haven't been removed
-        if (this.boneCarveTicks < BONE_CARVE_DESTROY_BONES_TICKS) {
-            for (BlockPos pos : boneBlockPositions) {
+        if (this.carveTicks < CARVE_DESTROY_TICKS) {
+            for (BlockPos pos : carvePositions) {
                 BlockState state = this.level().getBlockState(pos);
                 if (!state.is(Blocks.BONE_BLOCK)) {
                     Inhabitants.LOGGER.debug("Bogre found invalid bone block at: {}", pos);
@@ -448,7 +448,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
 
         // move to the carving site
-        BlockPos center = getAveragePosition(boneBlockPositions);
+        BlockPos center = getAveragePosition(carvePositions);
         double distance = this.distanceToSqr(center.getX() + 0.5, center.getY(), center.getZ() + 0.5);
         distance = Math.sqrt(distance);
         if (distance > 2.5) {
@@ -460,26 +460,74 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.getNavigation().stop();
         this.lookAt(EntityAnchorArgument.Anchor.FEET, Vec3.atCenterOf(center));
         this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3.atCenterOf(center));
-        if (boneCarveTicks == 0) {
+        if (carveTicks == 0) {
             entityData.set(CARVING_ANIM, false);
             entityData.set(CARVING_ANIM, true);
         }
-        boneCarveTicks++;
-        if (boneCarveTicks >= BONE_CARVE_TIME_TICKS + 40) {
+        carveTicks++;
+        if (carveTicks >= CARVE_TIME_TICKS + 40) {
             this.state = State.CAUTIOUS;
-            boneCarveTicks = 0;
-        } else if (boneCarveTicks == BONE_CARVE_TIME_TICKS) {
+            carveTicks = 0;
+        } else if (carveTicks == CARVE_TIME_TICKS) {
             Inhabitants.LOGGER.debug("BONE CARVING COMPLETE!");
             this.triggerAnim("grab", "grab");
             EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.GIANT_BONE.get()), .3f, 0.3f);
-        } else if (boneCarveTicks == BONE_CARVE_DESTROY_BONES_TICKS) {
+        } else if (carveTicks == CARVE_DESTROY_TICKS) {
             // remove the bone blocks
-            for (BlockPos pos : boneBlockPositions) {
+            for (BlockPos pos : carvePositions) {
                 if (this.level().getBlockState(pos).is(Blocks.BONE_BLOCK)) {
                     this.level().destroyBlock(pos, false); // remove block without drops
                 }
             }
             this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F); // some kind of cracking/carving sound
+        }
+    }
+
+    /**
+     * The Bogre makes a disc from a broken disc.
+     * Goofy ahh code that is very similar to `carveBoneAiStep()`
+     */
+    private void carveDiscAiStep() {
+
+        // move to the disc site
+        BlockPos center = carvePositions.get(0);
+        ItemEntity nearestBrokenDisc = this.findBrokenDisc((int) ROAR_RANGE);
+        if (carveTicks < CARVE_DESTROY_TICKS && (nearestBrokenDisc == null || nearestBrokenDisc.blockPosition() != center)) {
+            this.state = State.CAUTIOUS;
+            return;
+        }
+
+        if (nearestBrokenDisc != null) {
+            double distance = this.distanceTo(nearestBrokenDisc);
+            if (distance > 2.5) {
+                PrecisePathNavigation preciseNav = (PrecisePathNavigation) this.getNavigation();
+                preciseNav.preciseMoveTo(nearestBrokenDisc.position(), 1.0D);
+                return;
+            }
+        }
+
+        this.navigation.stop();
+        this.setDeltaMovement(0, 0, 0);
+        this.lookAt(EntityAnchorArgument.Anchor.FEET, Vec3.atCenterOf(center));
+        this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3.atCenterOf(center));
+        if (carveTicks == 0) {
+            entityData.set(CARVING_ANIM, false);
+            entityData.set(CARVING_ANIM, true);
+        }
+        carveTicks++;
+        if (carveTicks >= CARVE_TIME_TICKS + 40) {
+            this.state = State.CAUTIOUS;
+            carveTicks = 0;
+        } else if (carveTicks == CARVE_DESTROY_TICKS) {
+            // replace the broken disc with a new disc item
+            assert nearestBrokenDisc != null; // should only be null after disc is removed and CarveTicks > CARVE_DESTROY_TICKS
+            if (nearestBrokenDisc.isAlive()) {
+                Vec3 position = nearestBrokenDisc.position();
+                nearestBrokenDisc.discard();
+                ItemEntity newDisc = new ItemEntity(this.level(), position.x, position.y, position.z, new ItemStack(ModItems.MUSIC_DISC_BOGRE.get()));
+                this.level().addFreshEntity(newDisc);
+                this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F);
+            }
         }
     }
 
@@ -843,11 +891,36 @@ public class BogreEntity extends Monster implements GeoEntity {
             if (findNearbyTrustedPlayer(getAveragePosition(boneBlockPositions), 5) != null) {
                 // if a trusted player is nearby, carve the bone blocks
                 Inhabitants.LOGGER.debug("Found bone blocks to carve: {}", boneBlockPositions);
-                this.boneBlockPositions = boneBlockPositions; // store the positions for carving
+                this.carvePositions = boneBlockPositions; // store the positions for carving
                 this.state = State.CARVE_BONE; // change state to carve bone
                 return;
             }
         }
+
+        // check for broken disc to make Bogre disc
+        ItemEntity disc = findBrokenDisc((int) ROAR_RANGE);
+        if (disc != null) {
+            if (findNearbyTrustedPlayer(disc.blockPosition(), 5) != null) {
+                this.carvePositions = List.of(disc.blockPosition());
+                this.state = State.MAKE_DISC; // change state to make disc
+                return;
+            }
+        }
+    }
+
+    /**
+     * Find the nearest broken disc item entity within range.
+     */
+    private ItemEntity findBrokenDisc(int range) {
+        BlockPos origin = this.blockPosition();
+        AABB searchBox = new AABB(origin).inflate(range);
+        List<ItemEntity> discs = this.level().getEntitiesOfClass(
+                ItemEntity.class,
+                searchBox,
+                item -> item.isAlive() && item.getItem().getItem().equals(Items.MUSIC_DISC_11)
+        );
+        if (discs.isEmpty()) return null;
+        return discs.get(0);
     }
 
     /**
