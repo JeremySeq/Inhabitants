@@ -306,5 +306,14 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
+  },
+
+  "disc.bogre": {
+    "sounds": [
+      {
+        "name": "inhabitants:disc/bogre",
+        "stream": true
+      }
+    ]
   }
 }
