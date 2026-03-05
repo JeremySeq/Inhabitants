@@ -9,8 +9,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.awt.*;
-
 public class ModCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Inhabitants.MODID);
@@ -28,6 +26,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
+                        pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
                     })
                     .build());
 

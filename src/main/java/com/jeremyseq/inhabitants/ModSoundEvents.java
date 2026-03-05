@@ -31,6 +31,8 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> IMPALER_SPIKES = registerSoundEvent("impaler.spikes");
     public static final RegistryObject<SoundEvent> IMPALER_CONCUSSION = registerSoundEvent("impaler.concussion");
 
+    public static final RegistryObject<SoundEvent> BOGRE_SONG = registerSoundEvent("disc.bogre");
+
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));
     }
