@@ -37,5 +37,12 @@ public class ModNetworking {
                 ScreenShakePacketS2C::decode,
                 ScreenShakePacketS2C::handle
         );
+        CHANNEL.registerMessage(
+                packetId++,
+                ShockwaveParticlePacketS2C.class,
+                ShockwaveParticlePacketS2C::encode,
+                ShockwaveParticlePacketS2C::decode,
+                ShockwaveParticlePacketS2C::handle
+        );
     }
 }

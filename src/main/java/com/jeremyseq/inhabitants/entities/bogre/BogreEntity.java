@@ -21,6 +21,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -143,8 +144,8 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private boolean randomChance = false; // used to trigger a rare idle animation
 
-    private static final double SHOCKWAVE_RADIUS = 7;
-    private static final float SHOCKWAVE_DAMAGE = 32f; // damage at the center of the shockwave
+    private static final float SHOCKWAVE_RADIUS = 9;
+    private static final float SHOCKWAVE_DAMAGE = 28f; // damage at the center of the shockwave
 
     public BogreEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -346,7 +347,8 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
             if (this.attackAnimTimer == 0) {
-                EntityUtil.shockwave(this, SHOCKWAVE_RADIUS, SHOCKWAVE_DAMAGE, entity -> entity == this, false);
+                // trigger shockwave
+                ShockwaveManager.addShockwave((ServerLevel) this.level(), this.position(), SHOCKWAVE_DAMAGE, SHOCKWAVE_RADIUS, 40, this);
             }
         }
 
@@ -809,16 +811,25 @@ public class BogreEntity extends Monster implements GeoEntity {
                 }
             }
         } else {
-            this.lookAt(EntityAnchorArgument.Anchor.EYES, roaredPlayer.position());
-            roaringTick++;
-            if (roaringTick >= ROAR_TICKS) {
+            if (roaredPlayer != null && roaredPlayer.isAlive()) {
+                this.lookAt(EntityAnchorArgument.Anchor.EYES, roaredPlayer.position());
+                roaringTick++;
+                if (roaringTick >= ROAR_TICKS) {
+                    setRoaring(false);
+                    roaredPlayer = null; // reset the roared player
+                    roaringTick = 0;
+                }
+                if (roaringTick == 10) {
+                    // screen shake effect for the player
+                    ModNetworking.sendToPlayer(new ScreenShakePacketS2C(80), (ServerPlayer) roaredPlayer);
+
+                    // roar effect particles
+                    Vec3 mouthPos = new Vec3(getX(), getY() + 2.5, getZ()).add(getLookAngle().scale(3));
+                    RoarEffectManager.addRoar((ServerLevel) level(), mouthPos, getLookAngle(), 45, 0.4);
+                }
+            } else {
                 setRoaring(false);
-                roaredPlayer = null; // reset the roared player
                 roaringTick = 0;
-            }
-            if (roaringTick == 10) {
-                // screen shake effect for the player
-                ModNetworking.sendToPlayer(new ScreenShakePacketS2C(80), (ServerPlayer) roaredPlayer);
             }
         }
 
