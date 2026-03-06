@@ -8,7 +8,6 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.Node;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
@@ -168,17 +167,7 @@ public class CooldownMeleeAttackGoal extends Goal {
 
         // handle overshooting a path node
         if (this.overshootFix) {
-            Path currentPath = this.mob.getNavigation().getPath();
-            if (currentPath != null && !currentPath.isDone()) {
-                int nextNodeIndex = currentPath.getNextNodeIndex();
-                if (nextNodeIndex < currentPath.getNodeCount()) {
-                    Vec3 nextNodePos = currentPath.getNode(nextNodeIndex).asVec3();
-                    double distToNext = this.mob.position().distanceToSqr(nextNodePos);
-                    if (distToNext > 8) {
-                        currentPath.advance();
-                    }
-                }
-            }
+            PathfindingOvershootFix.overshootFix(this.mob);
         }
 
         this.ticksUntilNextAttack = Math.max(this.ticksUntilNextAttack - 1, 0);
