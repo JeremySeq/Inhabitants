@@ -13,19 +13,18 @@ public class PathfindingOvershootFix {
         Path currentPath = mob.getNavigation().getPath();
         if (currentPath != null && !currentPath.isDone()) {
             int nextNodeIndex = currentPath.getNextNodeIndex();
-            if (nextNodeIndex < currentPath.getNodeCount()) {
-                Vec3 nextNodePos = currentPath.getNode(nextNodeIndex).asVec3();
-                double distToNext = mob.position().distanceToSqr(nextNodePos);
+            if (nextNodeIndex > 0 && nextNodeIndex < currentPath.getNodeCount()) {
                 Vec3 mobPos = mob.position();
-                Vec3 mobVelocity = mob.getDeltaMovement();
-                Vec3 toNode = nextNodePos.subtract(mobPos).normalize();
+                Vec3 currentNodePos = currentPath.getNode(nextNodeIndex - 1).asVec3();
 
-                double dot = mobVelocity.normalize().dot(toNode);
-                // dot > 0 = moving toward the node
-                // dot < 0 = moving away from the node (overshot)
+                Vec3 toCurrentNode2D = new Vec3(currentNodePos.x - mobPos.x, 0, currentNodePos.z - mobPos.z);
+                Vec3 velocity2D = new Vec3(mob.getDeltaMovement().x, 0, mob.getDeltaMovement().z);
 
-                if (dot < 0 && distToNext > 2) {
-                    currentPath.advance(); // we passed it, skip ahead
+                double dot = velocity2D.normalize().dot(toCurrentNode2D.normalize());
+                double distFromCurrent = toCurrentNode2D.length();
+
+                if (dot < 0 && distFromCurrent > .3) {
+                    currentPath.advance();
                 }
             }
         }
