@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
@@ -129,6 +130,14 @@ public class ShockwaveManager {
 
                         float falloffDamage = (float) (this.damage * (1.0 - Math.min(distance / radius, 1.0)));
                         entity.hurt(entity.damageSources().mobAttack(owner != null ? owner : entity), falloffDamage);
+
+                        // disable shield if player is shielding
+                        if (entity instanceof ServerPlayer player) {
+                            if (player.isUsingItem() && player.getUseItem().getItem() == Items.SHIELD) {
+                                player.getCooldowns().addCooldown(Items.SHIELD, 100);
+                                player.stopUsingItem();
+                            }
+                        }
                     }
                 }
             }
