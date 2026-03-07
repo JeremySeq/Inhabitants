@@ -180,6 +180,8 @@ public class BogreEntity extends Monster implements GeoEntity {
                 .triggerableAnim("grab", RawAnimation.begin().then("grab", Animation.LoopType.PLAY_ONCE)));
         controllerRegistrar.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
                 .triggerableAnim("attack", RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE)));
+        controllerRegistrar.add(new AnimationController<>(this, "roar", 0, state -> PlayState.STOP)
+                .triggerableAnim("roar", RawAnimation.begin().then("roar", Animation.LoopType.PLAY_ONCE)));
     }
 
 
@@ -255,14 +257,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
-        if (isRoaring()) {
-            animationState.getController().setAnimation(RawAnimation.begin().then("roar", Animation.LoopType.PLAY_ONCE));
-            if (animationState.getController().hasAnimationFinished()) {
-                animationState.getController().forceAnimationReset();
-            }
-            return PlayState.CONTINUE;
-        }
-
         if (entityData.get(COOKING_ANIM)) {
             animationState.getController().setAnimation(RawAnimation.begin().then("cooking", Animation.LoopType.PLAY_ONCE));
             if (animationState.getController().hasAnimationFinished()) {
@@ -765,29 +759,9 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     private void cautiousAiStep() {
-        if (this.getTarget() != null) {
-            if (this.distanceTo(this.getTarget()) > FORGET_RANGE) {
-                this.setTarget(null);
-            }
-        }
-
-        if (this.getTarget() == null) {
-            List<Player> withinHostileRange = this.level().getEntitiesOfClass(Player.class,
-                    getBoundingBox().inflate(HOSTILE_RANGE), Predicate.not(Player::isSpectator));
-
-            // sort players by distance to the Bogre, closest to farthest
-            withinHostileRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
-            for (Player player : withinHostileRange) {
-                if (!this.isTamedBy(player) && player.distanceTo(this) <= HOSTILE_RANGE && this.hasLineOfSight(player)
-                        && !player.isCreative() && !player.isSpectator()) {
-                    this.setTarget(player);
-                    break;
-                }
-            }
-        }
-
         // search for players within ROAR_RANGE
         if (!isRoaring()) {
+            roaringTick = 0;
             List<Player> withinRoarRange = this.level().getEntitiesOfClass(Player.class,
                     getBoundingBox().inflate(ROAR_RANGE), Predicate.not(Player::isSpectator));
 
@@ -801,6 +775,9 @@ public class BogreEntity extends Monster implements GeoEntity {
                     roaredPlayer = player;
                     this.lookControl.setLookAt(roaredPlayer);
                     setRoaring(true);
+
+                    triggerAnim("roar", "roar");
+
                     warnedPlayers.add(player);
 
                     // play roar sound
@@ -830,16 +807,14 @@ public class BogreEntity extends Monster implements GeoEntity {
             } else {
                 setRoaring(false);
                 roaringTick = 0;
+                roaredPlayer = null;
             }
         }
-
-        // prune warnedPlayers list
-        warnedPlayers.removeIf(player -> player.distanceTo(this) > FORGET_RANGE);
-
 
         // if roaring, keep looking at the roared player
         if (isRoaring() && roaredPlayer != null) {
             this.lookControl.setLookAt(roaredPlayer, 30.0F, 30.0F);
+            return;
         } else {
             // otherwise look at the nearest player within FORGET_RANGE
             List<Player> nearbyPlayers = this.level().getEntitiesOfClass(Player.class,
@@ -854,6 +829,30 @@ public class BogreEntity extends Monster implements GeoEntity {
                 }
             }
         }
+
+        if (this.getTarget() != null) {
+            if (this.distanceTo(this.getTarget()) > FORGET_RANGE) {
+                this.setTarget(null);
+            }
+        }
+
+        if (this.getTarget() == null) {
+            List<Player> withinHostileRange = this.level().getEntitiesOfClass(Player.class,
+                    getBoundingBox().inflate(HOSTILE_RANGE), Predicate.not(Player::isSpectator));
+
+            // sort players by distance to the Bogre, closest to farthest
+            withinHostileRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
+            for (Player player : withinHostileRange) {
+                if (!this.isTamedBy(player) && player.distanceTo(this) <= HOSTILE_RANGE && this.hasLineOfSight(player)
+                        && !player.isCreative() && !player.isSpectator()) {
+                    this.setTarget(player);
+                    break;
+                }
+            }
+        }
+
+        // prune warnedPlayers list
+        warnedPlayers.removeIf(player -> player.distanceTo(this) > FORGET_RANGE);
 
         if (this.cauldronPos == null || !this.isValidCauldron(this.cauldronPos)) {
             // if no cauldron is assigned, don't attempt to make chowder or carve bone
