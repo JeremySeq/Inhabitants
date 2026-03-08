@@ -97,7 +97,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     public static float FORGET_RANGE = 20f;
     public static float ROAR_RANGE = 12f;
-    public static float HOSTILE_RANGE = 6f;
+    public static float HOSTILE_RANGE = 10f;
     public static final double MAX_CAULDRON_DIST_SQR = 14*14;
 
     public BlockPos cauldronPos = null;
@@ -828,12 +828,13 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         if (this.getTarget() == null) {
             List<Player> withinHostileRange = this.level().getEntitiesOfClass(Player.class,
-                    getBoundingBox().inflate(HOSTILE_RANGE), Predicate.not(Player::isSpectator));
+                    AABB.ofSize(position(), HOSTILE_RANGE * 2, HOSTILE_RANGE * 2, HOSTILE_RANGE * 2),
+                    p -> !p.isSpectator() && distanceToSqr(p) <= HOSTILE_RANGE * HOSTILE_RANGE);
 
             // sort players by distance to the Bogre, closest to farthest
             withinHostileRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
             for (Player player : withinHostileRange) {
-                if (!this.isTamedBy(player) && player.distanceTo(this) <= HOSTILE_RANGE && this.hasLineOfSight(player)
+                if (!this.isTamedBy(player) && this.hasLineOfSight(player)
                         && !player.isCreative() && !player.isSpectator()) {
                     this.setTarget(player);
                     break;
@@ -851,35 +852,34 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         // detect fish dropped by non-hostile players
         List<Player> possibleFishDroppers = this.level().getEntitiesOfClass(Player.class,
-                getBoundingBox().inflate(FORGET_RANGE), Predicate.not(Player::isSpectator));
+                AABB.ofSize(position(), FORGET_RANGE * 2, FORGET_RANGE * 2, FORGET_RANGE * 2),
+                p -> !p.isSpectator() && distanceToSqr(p) <= FORGET_RANGE * FORGET_RANGE);
 
         for (Player player : possibleFishDroppers) {
             float distance = player.distanceTo(this);
-            if (distance <= FORGET_RANGE) {
-                if (distance > HOSTILE_RANGE || this.isTamedBy(player) || player.isCreative()) {
-                    // get nearby item entities (fish on ground)
-                    List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class,
-                            player.getBoundingBox().inflate(4), // check small radius around player
-                            item -> item.isAlive() &&
-                                    (item.getItem().is(Items.COD)
-                                            || item.getItem().is(Items.SALMON)
-                                            || item.getItem().is(Items.TROPICAL_FISH)
-                                            || item.getItem().is(Items.PUFFERFISH)
-                                            || item.getItem().is(Items.ROTTEN_FLESH)
-                                            || item.getItem().is(Items.SPIDER_EYE)
-                                            || item.getItem().is(Items.POISONOUS_POTATO)
-                                    )
-                    );
+            if (distance > HOSTILE_RANGE || this.isTamedBy(player) || player.isCreative()) {
+                // get nearby item entities (fish on ground)
+                List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class,
+                        player.getBoundingBox().inflate(4), // check small radius around player
+                        item -> item.isAlive() &&
+                                (item.getItem().is(Items.COD)
+                                        || item.getItem().is(Items.SALMON)
+                                        || item.getItem().is(Items.TROPICAL_FISH)
+                                        || item.getItem().is(Items.PUFFERFISH)
+                                        || item.getItem().is(Items.ROTTEN_FLESH)
+                                        || item.getItem().is(Items.SPIDER_EYE)
+                                        || item.getItem().is(Items.POISONOUS_POTATO)
+                                )
+                );
 
-                    for (ItemEntity ingredient : nearbyItems) {
-                        if (this.hasLineOfSight(ingredient)) {
+                for (ItemEntity ingredient : nearbyItems) {
+                    if (this.hasLineOfSight(ingredient)) {
 
-                            ingredient.setExtendedLifetime();
-                            droppedIngredientItem = ingredient;
-                            droppedIngredientPlayer = player; // store the player that dropped the fish
-                            this.state = State.MAKE_CHOWDER; // change state to make chowder
-                            return;
-                        }
+                        ingredient.setExtendedLifetime();
+                        droppedIngredientItem = ingredient;
+                        droppedIngredientPlayer = player; // store the player that dropped the fish
+                        this.state = State.MAKE_CHOWDER; // change state to make chowder
+                        return;
                     }
                 }
             }
