@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
@@ -194,7 +193,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
         if (pKey == SPIKED) {
             if (this.entityData.get(SPIKED)) {
-                Inhabitants.LOGGER.debug("triggered timer");
                 spiked_client_timer = 0;
             }
         }
