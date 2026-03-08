@@ -41,7 +41,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.JukeboxBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -170,9 +171,9 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "defaults_controller", 0, this::defaults).transitionLength(3));
         controllerRegistrar.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
                 .triggerableAnim("hurt", RawAnimation.begin().then("taking_damage", Animation.LoopType.PLAY_ONCE)));
+        controllerRegistrar.add(new AnimationController<>(this, "defaults_controller", 0, this::defaults).transitionLength(3));
         controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
         controllerRegistrar.add(new AnimationController<>(this, "grab", 0, state -> PlayState.STOP)
                 .triggerableAnim("grab", RawAnimation.begin().then("grab", Animation.LoopType.PLAY_ONCE)));
@@ -525,9 +526,10 @@ public class BogreEntity extends Monster implements GeoEntity {
                 origin.offset(JUKEBOX_RANGE, 2, JUKEBOX_RANGE)
         ).anyMatch(pos -> {
             BlockState state = level().getBlockState(pos);
+            BlockEntity blockEntity = level().getBlockEntity(pos);
             return state.is(Blocks.JUKEBOX)
-                    && state.hasProperty(JukeboxBlock.HAS_RECORD)
-                    && state.getValue(JukeboxBlock.HAS_RECORD);
+                    && blockEntity instanceof JukeboxBlockEntity jukeboxblockentity
+                    && jukeboxblockentity.isRecordPlaying();
         });
     }
 
