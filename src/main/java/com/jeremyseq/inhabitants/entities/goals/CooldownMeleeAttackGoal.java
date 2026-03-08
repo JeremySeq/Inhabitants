@@ -80,7 +80,6 @@ public class CooldownMeleeAttackGoal extends Goal {
     public boolean canContinueToUse() {
         LivingEntity target = this.mob.getTarget();
         if (target == null || !target.isAlive()) return false;
-        if (!this.followTargetEvenIfNotSeen) return !this.mob.getNavigation().isDone();
         if (!this.mob.isWithinRestriction(target.blockPosition())) return false;
         return !(target instanceof Player player) || (!player.isSpectator() && !player.isCreative());
     }
