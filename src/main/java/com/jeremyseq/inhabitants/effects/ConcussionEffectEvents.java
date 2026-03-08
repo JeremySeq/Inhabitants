@@ -3,7 +3,6 @@ package com.jeremyseq.inhabitants.effects;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
@@ -13,7 +12,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
@@ -21,18 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID, value = Dist.CLIENT)
 public class ConcussionEffectEvents {
-
-    /**
-     * When the concussion effect is applied to the player, play a concussion sound.
-     */
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public static void addEffect(MobEffectEvent.Added addEffectEvent) {
-        if (addEffectEvent.getEffectInstance().getEffect() == ModEffects.CONCUSSION.get()) {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(ModSoundEvents.IMPALER_CONCUSSION.get(), 1.0f));
-        }
-    }
-
     /**
      * When sounds are played, if the player has the concussion effect, reduce their volume and pitch.
      */
@@ -45,6 +31,9 @@ public class ConcussionEffectEvents {
 
             SoundInstance original = event.getSound();
             if (original == null) return;
+            if (original.getLocation().equals(ModSoundEvents.IMPALER_CONCUSSION.get().getLocation())) {
+                return;
+            }
 
             event.setSound(new ConcussionSoundInstance(original));
         }

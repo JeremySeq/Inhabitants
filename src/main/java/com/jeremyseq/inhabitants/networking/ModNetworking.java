@@ -44,5 +44,12 @@ public class ModNetworking {
                 ShockwaveParticlePacketS2C::decode,
                 ShockwaveParticlePacketS2C::handle
         );
+        CHANNEL.registerMessage(
+                packetId++,
+                TinnitusPacketS2C.class,
+                TinnitusPacketS2C::encode,
+                TinnitusPacketS2C::decode,
+                TinnitusPacketS2C::handle
+        );
     }
 }

@@ -3,10 +3,13 @@ package com.jeremyseq.inhabitants.entities.impaler;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
+import com.jeremyseq.inhabitants.networking.ModNetworking;
+import com.jeremyseq.inhabitants.networking.TinnitusPacketS2C;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.FallingBlockEntity;
@@ -75,6 +78,7 @@ public class ImpalerScreamGoal extends Goal {
             List<Player> players = mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(radius));
             for (Player player : players) {
                 player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 240, 0));
+                ModNetworking.sendToPlayer(new TinnitusPacketS2C(), (ServerPlayer) player);
             }
 
             // make pointed dripstone attached to ceilings fall
