@@ -79,12 +79,13 @@ public class ImpalerScreamGoal extends Goal {
 
             // make pointed dripstone attached to ceilings fall
             double dripRadius = 15.0D;
+            double dripHeight = 20.0D;
             int maxToDrop = 20;
             int dropped = 0;
             int r = (int) Math.ceil(dripRadius);
             for (int dx = -r; dx <= r && dropped < maxToDrop; dx++) {
                 for (int dz = -r; dz <= r && dropped < maxToDrop; dz++) {
-                    for (int dy = 1; dy <= 8 && dropped < maxToDrop; dy++) { // check up to 8 blocks above the mob
+                    for (int dy = 1; dy <= dripHeight && dropped < maxToDrop; dy++) {
                         var pos = mob.blockPosition().offset(dx, dy, dz);
                         var state = mob.level().getBlockState(pos);
                         // only stalactites
