@@ -182,6 +182,7 @@
   },
 
 
+
   "impaler.attack": {
     "subtitle": "subtitles.inhabitants.impaler.attack",
     "sounds": [
@@ -301,6 +302,18 @@
     "sounds": [
       {
         "name": "inhabitants:impaler/impaler_concussion",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+
+  "shockwave": {
+    "subtitle": "subtitles.inhabitants.shockwave",
+    "sounds": [
+      {
+        "name": "inhabitants:shockwave",
         "weight": 1
       }
     ],

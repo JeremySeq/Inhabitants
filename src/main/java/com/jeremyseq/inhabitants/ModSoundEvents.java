@@ -22,7 +22,7 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> BOGRE_HURT = registerSoundEvent("bogre.hurt");
     public static final RegistryObject<SoundEvent> BOGRE_IDLE = registerSoundEvent("bogre.idle");
     public static final RegistryObject<SoundEvent> BOGRE_ROAR = registerSoundEvent("bogre.roar");
-    public static final RegistryObject<SoundEvent> BOGRE_SHOCKWAVE = registerSoundEvent("bogre.shockwave");
+    public static final RegistryObject<SoundEvent> SHOCKWAVE = registerSoundEvent("shockwave");
 
     public static final RegistryObject<SoundEvent> IMPALER_ATTACK = registerSoundEvent("impaler.attack");
     public static final RegistryObject<SoundEvent> IMPALER_DEATH = registerSoundEvent("impaler.death");

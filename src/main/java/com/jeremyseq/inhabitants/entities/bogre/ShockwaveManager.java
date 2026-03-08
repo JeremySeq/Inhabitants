@@ -38,9 +38,9 @@ public class ShockwaveManager {
     public static void addShockwave(ServerLevel level, Vec3 center, float damage, float radius, int lifetime, LivingEntity owner) {
         activeShockwaves.add(new ActiveShockwave(level, center, damage, radius, lifetime, owner));
 
-        level.playSound(null, center.x, center.y, center.z, ModSoundEvents.BOGRE_SHOCKWAVE.get(), SoundSource.HOSTILE, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
+        level.playSound(null, center.x, center.y, center.z, ModSoundEvents.SHOCKWAVE.get(), SoundSource.HOSTILE, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
         
-        level.sendParticles(ParticleTypes.EXPLOSION, center.x, center.y + 1.0, center.z, 2, 0.5D, 0.5D, 0.5D, 0.0D);
+        level.sendParticles(ParticleTypes.EXPLOSION, center.x, center.y, center.z, 2, 0.5D, 0.5D, 0.5D, 0.0D);
 
         Vec3 shockwavePos = new Vec3(center.x, center.y + 0.1, center.z);
         // send shockwave particles to players within 30 blocks
@@ -108,7 +108,7 @@ public class ShockwaveManager {
             List<LivingEntity> nearbyEntities = level.getEntitiesOfClass(LivingEntity.class, searchBox);
 
             for (LivingEntity entity : nearbyEntities) {
-                if (hitEntities.contains(entity) || entity instanceof BogreEntity) {
+                if (hitEntities.contains(entity) || entity == owner) {
                     continue;
                 }
                 
