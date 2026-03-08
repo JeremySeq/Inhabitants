@@ -12,7 +12,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraftforge.common.ToolActions;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -135,12 +134,12 @@ public class ShockwaveManager {
                         float falloffDamage = (float) (this.damage * (1.0 - Math.min(distance / radius, 1.0)));
                         entity.hurt(entity.damageSources().mobAttack(owner != null ? owner : entity), falloffDamage);
 
-                        // stop blocking for 1 second if using a shield
+                        // stop blocking for 5 seconds if using a shield
                         if (entity instanceof ServerPlayer player && player.isBlocking()) {
                             ItemStack stack = player.getUseItem();
                             if (stack.canPerformAction(ToolActions.SHIELD_BLOCK)) {
                                 player.stopUsingItem();
-                                player.getCooldowns().addCooldown(stack.getItem(), 20);
+                                player.getCooldowns().addCooldown(stack.getItem(), 100);
                             }
                         }
                     }

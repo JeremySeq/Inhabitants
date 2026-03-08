@@ -13,8 +13,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ShieldItem;
 import net.minecraftforge.common.ToolActions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -90,11 +88,11 @@ public class EntityUtil {
                     int shieldDamage = (int) Math.max(30, damage*3);
                     damageShield(player, shieldDamage);
 
-                    // stop blocking for 1 second if using a shield
+                    // stop blocking for 5 seconds if using a shield
                     ItemStack shieldStack = player.getUseItem();
                     if (shieldStack.canPerformAction(ToolActions.SHIELD_BLOCK)) {
                         player.stopUsingItem();
-                        player.getCooldowns().addCooldown(shieldStack.getItem(), 20);
+                        player.getCooldowns().addCooldown(shieldStack.getItem(), 100);
                     }
 
                     player.level().playSound(null, player.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F + player.getRandom().nextFloat() * 0.2F);
