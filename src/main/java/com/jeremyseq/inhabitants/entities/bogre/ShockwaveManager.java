@@ -11,7 +11,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.common.ToolActions;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
@@ -123,19 +125,22 @@ public class ShockwaveManager {
                     
                     double distance = Math.sqrt(distanceSq);
                     if (distance > 0.1) {
-                        double strength = (radius - distance) / radius;
-                        entity.knockback(strength * 3.0, -deltaX / distance, -deltaZ / distance);
+                        double strength = Math.max(0, (radius - distance) / radius); // prevents negative knockback
+                        if (strength > 0) {
+                            entity.knockback(strength * 3.0, -deltaX / distance, -deltaZ / distance);
+                        }
                         
                         // apply damage based on distance from center
 
                         float falloffDamage = (float) (this.damage * (1.0 - Math.min(distance / radius, 1.0)));
                         entity.hurt(entity.damageSources().mobAttack(owner != null ? owner : entity), falloffDamage);
 
-                        // disable shield if player is shielding
-                        if (entity instanceof ServerPlayer player) {
-                            if (player.isUsingItem() && player.getUseItem().getItem() == Items.SHIELD) {
-                                player.getCooldowns().addCooldown(Items.SHIELD, 100);
+                        // stop blocking for 1 second if using a shield
+                        if (entity instanceof ServerPlayer player && player.isBlocking()) {
+                            ItemStack stack = player.getUseItem();
+                            if (stack.canPerformAction(ToolActions.SHIELD_BLOCK)) {
                                 player.stopUsingItem();
+                                player.getCooldowns().addCooldown(stack.getItem(), 20);
                             }
                         }
                     }

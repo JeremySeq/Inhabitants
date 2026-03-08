@@ -13,7 +13,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShieldItem;
+import net.minecraftforge.common.ToolActions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -88,8 +90,12 @@ public class EntityUtil {
                     int shieldDamage = (int) Math.max(30, damage*3);
                     damageShield(player, shieldDamage);
 
-                    // disable the shield
-                    player.disableShield(true);
+                    // stop blocking for 1 second if using a shield
+                    ItemStack shieldStack = player.getUseItem();
+                    if (shieldStack.canPerformAction(ToolActions.SHIELD_BLOCK)) {
+                        player.stopUsingItem();
+                        player.getCooldowns().addCooldown(shieldStack.getItem(), 20);
+                    }
 
                     player.level().playSound(null, player.blockPosition(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F + player.getRandom().nextFloat() * 0.2F);
                 }
@@ -142,7 +148,7 @@ public class EntityUtil {
     public static void damageShield(Player player, int amount) {
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack stack = player.getItemInHand(hand);
-            if (stack.getItem() instanceof ShieldItem) {
+            if (stack.canPerformAction(ToolActions.SHIELD_BLOCK)) {
                 stack.hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(hand));
                 break;
             }
