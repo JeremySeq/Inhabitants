@@ -150,7 +150,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     public static AttributeSupplier setAttributes() {
         return Monster.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 400.0F)
+                .add(Attributes.MAX_HEALTH, 300.0F)
                 .add(Attributes.ATTACK_DAMAGE, 30F)
                 .add(Attributes.ATTACK_SPEED, .5)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
