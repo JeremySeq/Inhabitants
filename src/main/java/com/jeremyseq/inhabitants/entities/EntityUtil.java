@@ -70,14 +70,17 @@ public class EntityUtil {
                     continue;
                 }
             }
-            double dx = user.getX() - affected.getX();
-            double dz = user.getZ() - affected.getZ();
-            double distance = Math.sqrt(dx * dx + dz * dz);
+
+            double distanceSq = affected.distanceToSqr(user.getX(), affected.getY(), user.getZ());
+            double dx = affected.getX() - user.getX();
+            double dz = affected.getZ() - user.getZ();
+            double distance = Math.sqrt(distanceSq);
             if (distance > shockwave_radius) {
                 continue;
             }
             if (distance > 0.1) {
-                affected.knockback(shockwave_radius, dx / distance, dz / distance);
+                double strength = (shockwave_radius - distance) / shockwave_radius;
+                affected.knockback(strength * 20, -dx / distance, -dz / distance);
 
                 // do damage, falling off based on distance
                 // this has a max damage of shockwave_damage at the center and falls off to 0 at the edge
