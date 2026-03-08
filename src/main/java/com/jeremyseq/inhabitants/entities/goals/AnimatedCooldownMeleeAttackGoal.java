@@ -5,6 +5,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import software.bernie.geckolib.animatable.GeoEntity;
 
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
+
 /**
  * Extends CooldownMeleeAttackGoal to include an attack animation phase
  * where the mob cannot move or turn for a given duration.
@@ -18,11 +21,14 @@ public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
     private final int animationDuration;
     private final int attackHitTick;
     private final GeoEntity geckomob;
+    private final Consumer<LivingEntity> onAttackStart;
     private int animationTicks = -1;
     private boolean hitDone = false;
 
     private int startFreezeTick;
     private int endFreezeTick;
+
+    private boolean isAreaAttack = false;
 
     public <T extends PathfinderMob & GeoEntity> AnimatedCooldownMeleeAttackGoal(
             T mob,
@@ -40,11 +46,42 @@ public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
         this.animationDuration = animationDurationTicks;
         this.attackHitTick = attackHitTick;
         this.geckomob = mob;
+        this.onAttackStart = null;
+    }
+
+    public <T extends PathfinderMob & GeoEntity> AnimatedCooldownMeleeAttackGoal(
+            T mob,
+            double speedModifier,
+            boolean followTargetEvenIfNotSeen,
+            int attackIntervalTicks,
+            boolean setSprinting,
+            boolean overshootFix,
+            String controllerName,
+            String animationName,
+            int animationDurationTicks,
+            int attackHitTick,
+            @Nullable Consumer<LivingEntity> onAttackStart) {
+
+        super(mob, speedModifier, followTargetEvenIfNotSeen, attackIntervalTicks, setSprinting, overshootFix);
+        this.controllerName = controllerName;
+        this.animationName = animationName;
+        this.animationDuration = animationDurationTicks;
+        this.attackHitTick = attackHitTick;
+        this.geckomob = mob;
+        this.onAttackStart = onAttackStart;
     }
 
     public AnimatedCooldownMeleeAttackGoal setFreezeMovement(int startTick, int endTick) {
         this.startFreezeTick = startTick;
         this.endFreezeTick = endTick;
+        return this;
+    }
+
+    /**
+     * @param isAreaAttack if true, the attack will call doHurtTarget regardless of distance
+     */
+    public AnimatedCooldownMeleeAttackGoal setAreaAttack(boolean isAreaAttack) {
+        this.isAreaAttack = isAreaAttack;
         return this;
     }
 
@@ -63,7 +100,7 @@ public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
                 LivingEntity target = this.mob.getTarget();
                 if (target != null && target.isAlive()) {
                     double distSq = this.mob.distanceToSqr(target);
-                    if (distSq <= this.mob.getMeleeAttackRangeSqr(target)) {
+                    if (isAreaAttack || distSq <= this.mob.getMeleeAttackRangeSqr(target)) {
                         this.mob.swing(InteractionHand.MAIN_HAND);
                         this.mob.doHurtTarget(target);
                     }
@@ -90,6 +127,11 @@ public class AnimatedCooldownMeleeAttackGoal extends CooldownMeleeAttackGoal {
             this.animationTicks = 0;
             this.hitDone = false;
             this.mob.getNavigation().stop();
+
+            // call the attack start callback if provided
+            if (this.onAttackStart != null) {
+                this.onAttackStart.accept(target);
+            }
 
             this.geckomob.stopTriggeredAnimation(controllerName, animationName);
             this.geckomob.triggerAnim(controllerName, animationName);

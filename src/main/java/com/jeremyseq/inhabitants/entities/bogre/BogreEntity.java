@@ -5,7 +5,7 @@ import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
-import com.jeremyseq.inhabitants.entities.goals.CooldownMeleeAttackGoal;
+import com.jeremyseq.inhabitants.entities.goals.AnimatedCooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
@@ -137,11 +137,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     // list of players who have tamed the Bogre
     private final Set<UUID> tamedPlayers = new HashSet<>();
 
-
-    // ATTACK
-    private static final int ATTACK_DELAY = 19; // ticks before the shockwave is triggered after the attack animation starts
-    private int attackAnimTimer = 0;
-
     private boolean randomChance = false; // used to trigger a rare idle animation
 
     private static final float SHOCKWAVE_RADIUS = 9;
@@ -165,7 +160,10 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(4, new CooldownMeleeAttackGoal(this, 1.3f, false, 40, true, true));
+        this.goalSelector.addGoal(4, new AnimatedCooldownMeleeAttackGoal(this, 1.3f,
+                false, 50, true, true,
+                "attack", "attack", 25, 18, this::onAttackStart)
+                .setAreaAttack(true));
         this.goalSelector.addGoal(5, new BogreReturnToCauldronGoal(this, 1.0D));
         this.goalSelector.addGoal(7, new BogreConditionalStrollGoal(this, 1.0D));
     }
@@ -279,12 +277,13 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean doHurtTarget(@NotNull Entity target) {
-        if (!level().isClientSide && this.attackAnimTimer == 0) {
-            triggerAnim("attack", "attack");
-            this.playSound(ModSoundEvents.BOGRE_ATTACK.get(), 1, 1);
-            this.attackAnimTimer = ATTACK_DELAY;
-        }
+        // trigger shockwave
+        ShockwaveManager.addShockwave((ServerLevel) this.level(), this.position(), SHOCKWAVE_DAMAGE, SHOCKWAVE_RADIUS, 40, this);
         return true;
+    }
+
+    private void onAttackStart(LivingEntity target) {
+        this.playSound(ModSoundEvents.BOGRE_ATTACK.get(), 1, 1);
     }
 
     @Override
@@ -335,15 +334,6 @@ public class BogreEntity extends Monster implements GeoEntity {
             Vec3 targetCenter = Vec3.atBottomCenterOf(cauldronPos).add(forward).subtract(right);
 
             this.entrancePos = BlockPos.containing(targetCenter.x, targetCenter.y, targetCenter.z);
-        }
-
-        // attack animation timer
-        if (this.attackAnimTimer > 0) {
-            this.attackAnimTimer--;
-            if (this.attackAnimTimer == 0) {
-                // trigger shockwave
-                ShockwaveManager.addShockwave((ServerLevel) this.level(), this.position(), SHOCKWAVE_DAMAGE, SHOCKWAVE_RADIUS, 40, this);
-            }
         }
 
         if (this.getTarget() != null) {
