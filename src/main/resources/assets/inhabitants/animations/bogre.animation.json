@@ -9021,6 +9021,26 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"4.0": {
+					"effect": "hammer_sound"
+				},
+				"4.4167": {
+					"effect": "hammer_sound"
+				},
+				"4.8333": {
+					"effect": "hammer_sound"
+				},
+				"5.4583": {
+					"effect": "hammer_sound"
+				},
+				"5.8333": {
+					"effect": "hammer_sound"
+				},
+				"6.1667": {
+					"effect": "hammer_sound"
+				}
 			}
 		}
 	},

@@ -56,7 +56,9 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.keyframe.event.SoundKeyframeEvent;
 import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.ClientUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -176,7 +178,8 @@ public class BogreEntity extends Monster implements GeoEntity {
         controllerRegistrar.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
                 .triggerableAnim("hurt", RawAnimation.begin().then("taking_damage", Animation.LoopType.PLAY_ONCE)));
         controllerRegistrar.add(new AnimationController<>(this, "defaults_controller", 0, this::defaults).transitionLength(3));
-        controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
+        controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate)
+                .setSoundKeyframeHandler(this::soundKeyframeHandler));
         controllerRegistrar.add(new AnimationController<>(this, "grab", 0, state -> PlayState.STOP)
                 .triggerableAnim("grab", RawAnimation.begin().then("grab", Animation.LoopType.PLAY_ONCE)));
         controllerRegistrar.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
@@ -277,6 +280,15 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
         return PlayState.CONTINUE;
     }
+
+    private void soundKeyframeHandler(SoundKeyframeEvent<BogreEntity> event) {
+        if (event.getKeyframeData().getSound().equals("hammer_sound")) {
+            Player player = ClientUtils.getClientPlayer();
+            if (player != null)
+                player.playSound(SoundEvents.ANVIL_LAND, .5f, 0.8F + new Random().nextFloat() * 0.4F);
+        }
+    }
+
 
     @Override
     public boolean doHurtTarget(@NotNull Entity target) {
