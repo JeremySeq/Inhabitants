@@ -76,8 +76,6 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     boolean pathSet = false;
 
-    public State state = State.CAUTIOUS;
-
     /**
      * On client side, this is used to start the roar animation and is set to false immediately after starting.
      * On server side, this is used to determine if the Bogre is currently roaring and is set to false after ROAR_TICKS
@@ -87,6 +85,8 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> COOKING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CARVING_ANIM = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> DANCING = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
+
+    public static final EntityDataAccessor<Integer> AI_STATE = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT);
 
     private static final int JUKEBOX_RANGE = 15;
 
@@ -284,8 +284,13 @@ public class BogreEntity extends Monster implements GeoEntity {
     private void soundKeyframeHandler(SoundKeyframeEvent<BogreEntity> event) {
         if (event.getKeyframeData().getSound().equals("hammer_sound")) {
             Player player = ClientUtils.getClientPlayer();
-            if (player != null)
-                player.playSound(SoundEvents.ANVIL_LAND, .5f, 0.8F + new Random().nextFloat() * 0.4F);
+            if (player != null) {
+                if (this.getAIState() == State.CARVE_BONE) {
+                    player.playSound(SoundEvents.BONE_BLOCK_HIT, 1f, 0.8F + new Random().nextFloat() * 0.4F);
+                } else {
+                    player.playSound(SoundEvents.ANVIL_LAND, .5f, 0.8F + new Random().nextFloat() * 0.4F);
+                }
+            }
         }
     }
 
@@ -331,7 +336,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             // set entrance pos
             BogreCauldronEntity bogreCauldron = getCauldronEntity();
             if (bogreCauldron == null) {
-                this.state = State.CAUTIOUS;
+                this.setAIState(State.CAUTIOUS);
                 return;
             }
             Direction direction = bogreCauldron.getDirection();
@@ -362,7 +367,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
         }
 
-        if (this.state == State.CAUTIOUS) {
+        if (this.getAIState() == State.CAUTIOUS) {
             if (isJukeboxPlayingNearby() && !entityData.get(DANCING)) {
                 // start dancing
                 entityData.set(DANCING, true);
@@ -373,11 +378,11 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
 
             cautiousAiStep();
-        } else if (this.state == State.MAKE_CHOWDER) {
+        } else if (this.getAIState() == State.MAKE_CHOWDER) {
             makeChowderAiStep();
-        } else if (this.state == State.CARVE_BONE) {
+        } else if (this.getAIState() == State.CARVE_BONE) {
             carveBoneAiStep();
-        } else if (this.state == State.MAKE_DISC) {
+        } else if (this.getAIState() == State.MAKE_DISC) {
             carveDiscAiStep();
         }
     }
@@ -410,7 +415,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
         // if attacked, switch to cautious state and set the attacker as target
         entityData.set(DANCING, false);
-        this.state = State.CAUTIOUS;
+        this.setAIState(State.CAUTIOUS);
         if (pSource.getEntity() instanceof LivingEntity entity) {
             if (!this.getItemHeld().isEmpty()) {
                 this.throwHeldItem();
@@ -432,7 +437,7 @@ public class BogreEntity extends Monster implements GeoEntity {
      */
     private void carveBoneAiStep() {
         if (carvePositions == null || carvePositions.size() < 3) {
-            this.state = State.CAUTIOUS; // revert to cautious state if not enough bone blocks found
+            this.setAIState(State.CAUTIOUS); // revert to cautious state if not enough bone blocks found
             return;
         }
 
@@ -442,7 +447,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 BlockState state = this.level().getBlockState(pos);
                 if (!state.is(Blocks.BONE_BLOCK)) {
                     Inhabitants.LOGGER.debug("Bogre found invalid bone block at: {}", pos);
-                    this.state = State.CAUTIOUS; // revert to cautious state if any block is not a bone block
+                    this.setAIState(State.CAUTIOUS); // revert to cautious state if any block is not a bone block
                     return;
                 }
             }
@@ -467,7 +472,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
         carveTicks++;
         if (carveTicks >= CARVE_TIME_TICKS + 40) {
-            this.state = State.CAUTIOUS;
+            this.setAIState(State.CAUTIOUS);
             carveTicks = 0;
         } else if (carveTicks == CARVE_TIME_TICKS) {
             Inhabitants.LOGGER.debug("BONE CARVING COMPLETE!");
@@ -494,7 +499,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         BlockPos center = carvePositions.get(0);
         ItemEntity nearestBrokenDisc = this.findBrokenDisc((int) ROAR_RANGE);
         if (carveTicks < CARVE_DESTROY_TICKS && (nearestBrokenDisc == null || nearestBrokenDisc.blockPosition() != center)) {
-            this.state = State.CAUTIOUS;
+            this.setAIState(State.CAUTIOUS);
             return;
         }
 
@@ -517,7 +522,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
         carveTicks++;
         if (carveTicks >= CARVE_TIME_TICKS + 40) {
-            this.state = State.CAUTIOUS;
+            this.setAIState(State.CAUTIOUS);
             carveTicks = 0;
         } else if (carveTicks == CARVE_DESTROY_TICKS) {
             // replace the broken disc with a new disc item
@@ -579,7 +584,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                     return;
                 } else if (chowderThrowDelay == 0) {
                     throwHeldItem();
-                    this.state = State.CAUTIOUS;
+                    this.setAIState(State.CAUTIOUS);
                     droppedIngredientPlayer = null;
                     chowderThrowDelay = -1;
                     return;
@@ -587,7 +592,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             } else {
                 // fallback if no player
                 throwHeldItem();
-                this.state = State.CAUTIOUS;
+                this.setAIState(State.CAUTIOUS);
                 chowderThrowDelay = -1;
                 return;
             }
@@ -597,7 +602,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             // find the target block, which is 3 blocks in front of the cauldron in the direction it is facing
             BogreCauldronEntity bogreCauldron = getCauldronEntity();
             if (bogreCauldron == null) {
-                this.state = State.CAUTIOUS;
+                this.setAIState(State.CAUTIOUS);
                 return;
             }
             Direction direction = bogreCauldron.getDirection();
@@ -720,7 +725,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         // DID NOT YET PICK UP INGREDIENT
 
         if (droppedIngredientItem == null || !droppedIngredientItem.isAlive()) {
-            this.state = State.CAUTIOUS;
+            this.setAIState(State.CAUTIOUS);
             return;
         }
 
@@ -894,7 +899,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                         ingredient.setExtendedLifetime();
                         droppedIngredientItem = ingredient;
                         droppedIngredientPlayer = player; // store the player that dropped the fish
-                        this.state = State.MAKE_CHOWDER; // change state to make chowder
+                        this.setAIState(State.MAKE_CHOWDER); // change state to make chowder
                         return;
                     }
                 }
@@ -908,7 +913,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 // if a trusted player is nearby, carve the bone blocks
                 Inhabitants.LOGGER.debug("Found bone blocks to carve: {}", boneBlockPositions);
                 this.carvePositions = boneBlockPositions; // store the positions for carving
-                this.state = State.CARVE_BONE; // change state to carve bone
+                this.setAIState(State.CARVE_BONE); // change state to carve bone
                 return;
             }
         }
@@ -918,7 +923,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         if (disc != null) {
             if (findNearbyTrustedPlayer(disc.blockPosition(), 5) != null) {
                 this.carvePositions = List.of(disc.blockPosition());
-                this.state = State.MAKE_DISC; // change state to make disc
+                this.setAIState(State.MAKE_DISC); // change state to make disc
                 return;
             }
         }
@@ -1015,6 +1020,22 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(CARVING_ANIM, false);
         entityData.define(ITEM_HELD, ItemStack.EMPTY);
         entityData.define(DANCING, false);
+        entityData.define(AI_STATE, 0);
+    }
+
+    /**
+     * Works on client and server.
+     */
+    public State getAIState() {
+        int state = entityData.get(AI_STATE);
+        return State.values()[state];
+    }
+
+    /**
+     * Only call this in server-side code, the client does not have authority to change the server AI state.
+     */
+    public void setAIState(State state) {
+        entityData.set(AI_STATE, state.ordinal());
     }
 
     public boolean isTamedBy(Player player) {

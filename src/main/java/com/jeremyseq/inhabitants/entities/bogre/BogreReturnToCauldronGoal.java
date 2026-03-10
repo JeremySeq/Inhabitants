@@ -19,7 +19,7 @@ public class BogreReturnToCauldronGoal extends Goal {
     @Override
     public boolean canUse() {
         if (bogre.cauldronPos == null) return false;
-        if (bogre.state != BogreEntity.State.CAUTIOUS) return false;
+        if (bogre.getAIState() != BogreEntity.State.CAUTIOUS) return false;
         if (bogre.getTarget() != null) return false;
         if (bogre.isRoaring()) return false;
 
@@ -30,7 +30,7 @@ public class BogreReturnToCauldronGoal extends Goal {
     @Override
     public boolean canContinueToUse() {
         if (bogre.cauldronPos == null) return false;
-        if (bogre.state != BogreEntity.State.CAUTIOUS) return false;
+        if (bogre.getAIState() != BogreEntity.State.CAUTIOUS) return false;
         if (bogre.getTarget() != null) return false;
         if (bogre.isRoaring()) return false;
 
