@@ -822,8 +822,9 @@ public class BogreEntity extends Monster implements GeoEntity {
                     ModNetworking.sendToPlayer(new ScreenShakePacketS2C(80), (ServerPlayer) roaredPlayer);
 
                     // roar effect particles
-                    Vec3 mouthPos = new Vec3(getX(), getY() + 2.5, getZ()).add(getLookAngle().scale(3));
-                    RoarEffectManager.addRoar((ServerLevel) level(), mouthPos, getLookAngle(), 45, 0.4);
+                    Vec3 add = new Vec3(getLookAngle().x, 0, getLookAngle().z).normalize().scale(2.25);
+                    Vec3 mouthPos = new Vec3(getX(), getY() + 1.8, getZ()).add(add);
+                    RoarEffectManager.addRoar((ServerLevel) level(), mouthPos, getLookAngle(), 45, 20);
                 }
             } else {
                 setRoaring(false);
