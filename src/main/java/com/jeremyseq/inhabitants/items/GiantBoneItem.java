@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class GiantBoneItem extends SwordItem {
     public GiantBoneItem() {
-        super(Tiers.NETHERITE, 11, -3.5f, new Item.Properties().stacksTo(1));
+        super(Tiers.NETHERITE, 7, -3.5f, new Item.Properties().stacksTo(1));
     }
 
     private static final float SHOCKWAVE_RADIUS = 9;
