@@ -297,8 +297,18 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean doHurtTarget(@NotNull Entity target) {
-        // trigger shockwave
-        ShockwaveManager.addShockwave((ServerLevel) this.level(), this.position(), SHOCKWAVE_DAMAGE, SHOCKWAVE_RADIUS, 40, this);
+
+        Vec3 offset = new Vec3(0, 0, 2); // offset to bone striking ground
+
+        float yaw = this.getYRot();
+        double rad = Math.toRadians(yaw);
+
+        double rotatedX = offset.x * Math.cos(rad) - offset.z * Math.sin(rad);
+        double rotatedZ = offset.x * Math.sin(rad) + offset.z * Math.cos(rad);
+        Vec3 rotatedOffset = new Vec3(-rotatedX, offset.y, rotatedZ);
+
+        Vec3 spawnPos = this.position().add(rotatedOffset);
+        ShockwaveManager.addShockwave((ServerLevel) this.level(), spawnPos, SHOCKWAVE_DAMAGE, SHOCKWAVE_RADIUS, 40, this);
         return true;
     }
 
