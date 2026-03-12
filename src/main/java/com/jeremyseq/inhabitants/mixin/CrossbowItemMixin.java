@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileWeaponItem;
@@ -82,6 +83,10 @@ public abstract class CrossbowItemMixin {
                 Vec3 vec3 = pShooter.getViewVector(1.0F);
                 Vector3f vector3f = vec3.toVector3f().rotate(quaternionf);
                 spike.shoot(vector3f.x(), vector3f.y(), vector3f.z(), pVelocity, pInaccuracy);
+
+                if (pIsCreativeMode || pProjectileAngle != 0.0F) {
+                    spike.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+                }
 
                 // if not in creative mode, consume one item
                 if (!pIsCreativeMode) {
