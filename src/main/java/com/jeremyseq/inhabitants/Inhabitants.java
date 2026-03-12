@@ -13,6 +13,8 @@ import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.paintings.ModPaintings;
 import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.potions.ModPotions;
+import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipeManager;
+
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -29,6 +31,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.event.AddReloadListenerEvent; 
 import org.slf4j.Logger;
 
 @Mod(Inhabitants.MODID)
@@ -78,6 +81,12 @@ public class Inhabitants
     public void onServerStarting(ServerStartingEvent event)
     {
 
+    }
+
+    @SubscribeEvent
+    public void onAddReloadListeners(AddReloadListenerEvent event)
+    {
+        event.addListener(new BogreRecipeManager());
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
