@@ -1,14 +1,17 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
+import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
+import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipeManager;
+import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreCraftingManager;
 import com.jeremyseq.inhabitants.entities.goals.AnimatedCooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
+
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
@@ -18,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -27,8 +31,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -50,6 +52,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+
+import net.minecraftforge.registries.ForgeRegistries;
+
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -87,6 +92,8 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> DANCING = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static final EntityDataAccessor<Integer> AI_STATE = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<String> HAMMER_SOUND = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<Integer> CARVE_DURATION = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT);
 
     private static final int JUKEBOX_RANGE = 15;
 
@@ -99,10 +106,13 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private DancePhase dancePhase = DancePhase.NONE; // client only
 
-    public static float FORGET_RANGE = 20f;
-    public static float ROAR_RANGE = 12f;
-    public static float HOSTILE_RANGE = 10f;
+    public static final float FORGET_RANGE = 20f;
+    public static final float ROAR_RANGE = 12f;
+    public static final float HOSTILE_RANGE = 10f;
+    public static final float FORGET_ATTACK_RANGE = 40f; // distance to forget player who attacked Bogre
     public static final double MAX_CAULDRON_DIST_SQR = 14*14;
+
+    public static final int DROP_FISH_OFFSET = 10;
 
     public BlockPos cauldronPos = null;
     public BlockPos entrancePos = null;
@@ -111,9 +121,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     // STUCK FAILSAFE FOR MAKE_CHOWDER
     private Vec3 lastPos = null;
     private int stuckTicks = 0;
-    private static final int STUCK_TICK_LIMIT = 40; // 2 seconds
-    private static final double MIN_MOVE_SQ = 0.0025; // 0.05 blocks
-
 
     private static final int ROAR_TICKS = 45; // how long a roar animation lasts (server)
 
@@ -121,9 +128,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     private Player roaredPlayer = null; // the player that the Bogre is currently roaring at
     private final List<Player> warnedPlayers = new ArrayList<>();
 
-    // CARVE_BONE
-    private static final int CARVE_TIME_TICKS = 160; // time it takes to carve a bone
-    private static final int CARVE_DESTROY_TICKS = 130; // when to destroy the bone blocks
+    private BogreRecipe activeRecipe = null;
     private int carveTicks = 0; // counts down while carving a bone
     private List<BlockPos> carvePositions; // the positions of the bone blocks to carve
 
@@ -133,13 +138,13 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     private ItemEntity droppedIngredientItem = null;
     private Player droppedIngredientPlayer = null; // the player that dropped the fish item
-    private static final double INGREDIENT_REACH_DISTANCE = 3;
     private static final int CHOWDER_TIME_TICKS = 160;
-    private static final int DROP_FISH_OFFSET = 10; // at what time the Bogre should drop the fish item after starting to make chowder
     private int chowderThrowDelay = -1;
 
     // list of players who have tamed the Bogre
     private final Set<UUID> tamedPlayers = new HashSet<>();
+    // list of players who have attacked Bogre
+    private final Set<UUID> attackedByPlayers = new HashSet<>();
 
     private boolean randomChance = false; // used to trigger a rare idle animation
 
@@ -272,19 +277,39 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         if (entityData.get(CARVING_ANIM)) {
             animationState.getController().setAnimation(RawAnimation.begin().then("carving", Animation.LoopType.PLAY_ONCE));
+            
+            int targetTicks = this.entityData.get(CARVE_DURATION);
+            if (targetTicks > 0) {
+                float speedMultiplier = 100.0f / targetTicks;
+                animationState.getController().setAnimationSpeed(speedMultiplier);
+            }
+            
             if (animationState.getController().hasAnimationFinished()) {
                 entityData.set(CARVING_ANIM, false);
                 animationState.getController().forceAnimationReset();
+                animationState.getController().setAnimationSpeed(1.0f); // reset speed
             }
             return PlayState.CONTINUE;
         }
-        return PlayState.CONTINUE;
+
+        animationState.getController().setAnimationSpeed(1.0f);
+        animationState.getController().forceAnimationReset();
+        return PlayState.STOP;
     }
 
     private void soundKeyframeHandler(SoundKeyframeEvent<BogreEntity> event) {
         if (event.getKeyframeData().getSound().equals("hammer_sound")) {
             Player player = ClientUtils.getClientPlayer();
             if (player != null) {
+                String customSound = this.entityData.get(HAMMER_SOUND);
+                if (!customSound.isEmpty()) {
+                    SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.parse(customSound));
+                    if (soundEvent != null) {
+                        player.playSound(soundEvent, 1f, 0.8F + new Random().nextFloat() * 0.4F);
+                        return;
+                    }
+                }
+                
                 if (this.getAIState() == State.CARVE_BONE) {
                     player.playSound(SoundEvents.BONE_BLOCK_HIT, 1f, 0.8F + new Random().nextFloat() * 0.4F);
                 } else {
@@ -371,6 +396,12 @@ public class BogreEntity extends Monster implements GeoEntity {
                 this.setTarget(null);
             } else if (this.getTarget() instanceof Player player && (player.isCreative() || player.isSpectator())) {
                 this.setTarget(null);
+            } else if (this.getTarget() instanceof Player player &&
+            !BogreUtil.isPlayerHoldingWeapon(player) &&
+            !attackedByPlayers.contains(player.getUUID())) {
+                
+                this.setTarget(null);
+                warnedPlayers.remove(player);
             } else {
                 // if the target is still valid, do not do custom AI step
                 return;
@@ -434,6 +465,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             // if the attacker is a player, remove them from tamedPlayers
             if (pSource.getEntity() instanceof Player player) {
                 tamedPlayers.remove(player.getUUID());
+                attackedByPlayers.add(player.getUUID());
             }
 
             this.setTarget(entity);
@@ -446,57 +478,7 @@ public class BogreEntity extends Monster implements GeoEntity {
      * This is a placeholder method for future implementation.
      */
     private void carveBoneAiStep() {
-        if (carvePositions == null || carvePositions.size() < 3) {
-            this.setAIState(State.CAUTIOUS); // revert to cautious state if not enough bone blocks found
-            return;
-        }
-
-        // ensure the bone blocks are still valid, if they haven't been removed
-        if (this.carveTicks < CARVE_DESTROY_TICKS) {
-            for (BlockPos pos : carvePositions) {
-                BlockState state = this.level().getBlockState(pos);
-                if (!state.is(Blocks.BONE_BLOCK)) {
-                    Inhabitants.LOGGER.debug("Bogre found invalid bone block at: {}", pos);
-                    this.setAIState(State.CAUTIOUS); // revert to cautious state if any block is not a bone block
-                    return;
-                }
-            }
-        }
-
-        // move to the carving site
-        BlockPos center = getAveragePosition(carvePositions);
-        double distance = this.distanceToSqr(center.getX() + 0.5, center.getY(), center.getZ() + 0.5);
-        distance = Math.sqrt(distance);
-        if (distance > 2.5) {
-            this.moveTo(center, 1);
-            return;
-        }
-
-        // carving
-        this.getNavigation().stop();
-        this.lookAt(EntityAnchorArgument.Anchor.FEET, Vec3.atCenterOf(center));
-        this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3.atCenterOf(center));
-        if (carveTicks == 0) {
-            entityData.set(CARVING_ANIM, false);
-            entityData.set(CARVING_ANIM, true);
-        }
-        carveTicks++;
-        if (carveTicks >= CARVE_TIME_TICKS + 40) {
-            this.setAIState(State.CAUTIOUS);
-            carveTicks = 0;
-        } else if (carveTicks == CARVE_TIME_TICKS) {
-            Inhabitants.LOGGER.debug("BONE CARVING COMPLETE!");
-            this.triggerAnim("grab", "grab");
-            EntityUtil.throwItemStack(this.level(), this, new ItemStack(ModItems.GIANT_BONE.get()), .3f, 0.3f);
-        } else if (carveTicks == CARVE_DESTROY_TICKS) {
-            // remove the bone blocks
-            for (BlockPos pos : carvePositions) {
-                if (this.level().getBlockState(pos).is(Blocks.BONE_BLOCK)) {
-                    this.level().destroyBlock(pos, false); // remove block without drops
-                }
-            }
-            this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F); // some kind of cracking/carving sound
-        }
+        BogreCraftingManager.carveBoneAiStep(this);
     }
 
     /**
@@ -504,47 +486,7 @@ public class BogreEntity extends Monster implements GeoEntity {
      * Goofy ahh code that is very similar to `carveBoneAiStep()`
      */
     private void carveDiscAiStep() {
-
-        // move to the disc site
-        BlockPos center = carvePositions.get(0);
-        ItemEntity nearestBrokenDisc = this.findBrokenDisc((int) ROAR_RANGE);
-        if (carveTicks < CARVE_DESTROY_TICKS && (nearestBrokenDisc == null || nearestBrokenDisc.blockPosition() != center)) {
-            this.setAIState(State.CAUTIOUS);
-            return;
-        }
-
-        if (nearestBrokenDisc != null) {
-            double distance = this.distanceTo(nearestBrokenDisc);
-            if (distance > 2.5) {
-                PrecisePathNavigation preciseNav = (PrecisePathNavigation) this.getNavigation();
-                preciseNav.preciseMoveTo(nearestBrokenDisc.position(), 1.0D);
-                return;
-            }
-        }
-
-        this.navigation.stop();
-        this.setDeltaMovement(0, 0, 0);
-        this.lookAt(EntityAnchorArgument.Anchor.FEET, Vec3.atCenterOf(center));
-        this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3.atCenterOf(center));
-        if (carveTicks == 0) {
-            entityData.set(CARVING_ANIM, false);
-            entityData.set(CARVING_ANIM, true);
-        }
-        carveTicks++;
-        if (carveTicks >= CARVE_TIME_TICKS + 40) {
-            this.setAIState(State.CAUTIOUS);
-            carveTicks = 0;
-        } else if (carveTicks == CARVE_DESTROY_TICKS) {
-            // replace the broken disc with a new disc item
-            assert nearestBrokenDisc != null; // should only be null after disc is removed and CarveTicks > CARVE_DESTROY_TICKS
-            if (nearestBrokenDisc.isAlive()) {
-                Vec3 position = nearestBrokenDisc.position();
-                nearestBrokenDisc.discard();
-                ItemEntity newDisc = new ItemEntity(this.level(), position.x, position.y, position.z, new ItemStack(ModItems.MUSIC_DISC_BOGRE.get()));
-                this.level().addFreshEntity(newDisc);
-                this.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F);
-            }
-        }
+        BogreCraftingManager.carveDiscAiStep(this);
     }
 
     private boolean isJukeboxPlayingNearby() {
@@ -579,189 +521,7 @@ public class BogreEntity extends Monster implements GeoEntity {
      * The fish should be droppedFishItem.
      */
     private void makeChowderAiStep() {
-        if (!this.getItemHeld().isEmpty() && isHoldingChowder()) {
-            // HOLDING CHOWDER
-
-            // chowder is dropped after a short delay during which the bogre turns to the player
-            if (droppedIngredientPlayer != null) {
-                if (chowderThrowDelay == -1) {
-                    this.lookAt(EntityAnchorArgument.Anchor.FEET, droppedIngredientPlayer.position());
-                    chowderThrowDelay = 20; // short delay before throwing chowder
-                    return;
-                } else if (chowderThrowDelay > 0) {
-                    // wait
-                    chowderThrowDelay--;
-                    return;
-                } else if (chowderThrowDelay == 0) {
-                    throwHeldItem();
-                    this.setAIState(State.CAUTIOUS);
-                    droppedIngredientPlayer = null;
-                    chowderThrowDelay = -1;
-                    return;
-                }
-            } else {
-                // fallback if no player
-                throwHeldItem();
-                this.setAIState(State.CAUTIOUS);
-                chowderThrowDelay = -1;
-                return;
-            }
-        } else if (!this.getItemHeld().isEmpty()) {
-            // HOLDING INGREDIENT
-
-            // find the target block, which is 3 blocks in front of the cauldron in the direction it is facing
-            BogreCauldronEntity bogreCauldron = getCauldronEntity();
-            if (bogreCauldron == null) {
-                this.setAIState(State.CAUTIOUS);
-                return;
-            }
-            Direction direction = bogreCauldron.getDirection();
-            Direction dirLeft = direction.getCounterClockWise(Direction.Axis.Y);
-
-            // offsets for where the bogre should stand relative to cauldron (facing forward)
-            final float forwardDist = 2.25f;
-            final float leftDist = .9f;
-
-            Vec3i forwardI = direction.getNormal();
-            Vec3i leftI = dirLeft.getNormal();
-            Vec3 forward = new Vec3(forwardI.getX(), forwardI.getY(), forwardI.getZ()).scale(forwardDist);
-            Vec3 left = new Vec3(leftI.getX(), leftI.getY(), leftI.getZ()).scale(leftDist);
-
-            Vec3 targetCenter = Vec3.atBottomCenterOf(cauldronPos).add(forward).add(left);
-
-            double distSqr = this.distanceToSqr(targetCenter);
-
-            PrecisePathNavigation preciseNav = (PrecisePathNavigation) this.getNavigation();
-
-            Vec3 currentPos = this.position();
-
-            if (lastPos != null) {
-                double movedSq = currentPos.distanceToSqr(lastPos);
-
-                if (movedSq < MIN_MOVE_SQ && distSqr > 0.3) {
-                    stuckTicks++;
-                } else {
-                    stuckTicks = 0;
-                }
-            }
-
-            lastPos = currentPos;
-
-            // FAILSAFE: teleport if stuck
-            if (stuckTicks > STUCK_TICK_LIMIT && this.entrancePos != null) {
-                Vec3 tp = Vec3.atCenterOf(this.entrancePos);
-
-                this.setPos(tp.x, tp.y, tp.z);
-                this.getNavigation().stop();
-
-                stuckTicks = 0;
-                pathSet = false;
-
-                return;
-            }
-
-            if (!pathSet && distSqr > .3) {
-                // starting path to cauldron
-                preciseNav.preciseMoveTo(targetCenter, 1.0D);
-                pathSet = true;
-                return;
-            }
-
-            if (distSqr > .3) {
-                // walking to cauldron
-                return;
-            }
-
-            // arrived at cauldron
-            pathSet = false;
-            this.getNavigation().stop();
-
-            this.lookAt(EntityAnchorArgument.Anchor.FEET, cauldronPos.getCenter());
-            this.lookAt(EntityAnchorArgument.Anchor.EYES, cauldronPos.getCenter());
-            // start cooking animation
-            if (getCookingTicks() == DROP_FISH_OFFSET) {
-                triggerAnim("grab", "grab");
-            } else if (getCookingTicks() == 25) {
-                entityData.set(COOKING_ANIM, false);
-                entityData.set(COOKING_ANIM, true);
-                bogreCauldron.setCooking(true);
-            }
-
-            setCookingTicks(getCookingTicks()+1);
-            if (getCookingTicks() >= CHOWDER_TIME_TICKS) {
-                Inhabitants.LOGGER.debug("CHOWDER COMPLETE!");
-
-                // chowder complete
-                this.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F); // play something watery?
-                tamedPlayers.add(droppedIngredientPlayer.getUUID()); // add the player that dropped the ingredient to the tamed list
-                bogreCauldron.setCooking(false);
-
-                // 30% chance of suspicious stew with random effects
-                if (this.level().random.nextFloat() < 0.3f) {
-                    ItemStack stew = new ItemStack(Items.SUSPICIOUS_STEW);
-                    MobEffectInstance[] effects = new MobEffectInstance[] {
-                            new MobEffectInstance(MobEffects.SATURATION, 7),
-                            new MobEffectInstance(MobEffects.NIGHT_VISION, 80),
-                            new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 80),
-                            new MobEffectInstance(MobEffects.BLINDNESS, 160),
-                            new MobEffectInstance(MobEffects.WEAKNESS, 180),
-                            new MobEffectInstance(MobEffects.REGENERATION, 160),
-                            new MobEffectInstance(MobEffects.JUMP, 80),
-                            new MobEffectInstance(MobEffects.POISON, 240),
-                            new MobEffectInstance(MobEffects.WITHER, 160)
-                    };
-
-                    MobEffectInstance chosen =
-                            effects[this.level().random.nextInt(effects.length)];
-                    SuspiciousStewItem.saveMobEffect(stew, chosen.getEffect(), chosen.getDuration());
-
-                    this.setItemHeld(stew);
-                } else {
-                    if (this.getItemHeld().is(Items.POISONOUS_POTATO)) {
-                        this.setItemHeld(new ItemStack(ModItems.STINKY_BOUILLON.get()));
-                    } else if (this.getItemHeld().is(Items.ROTTEN_FLESH) ||  this.getItemHeld().is(Items.SPIDER_EYE)) {
-                        this.setItemHeld(new ItemStack(ModItems.UNCANNY_POTTAGE.get()));
-                    } else {
-                        this.setItemHeld(new ItemStack(ModItems.FISH_SNOT_CHOWDER.get()));
-                    }
-                }
-
-                setCookingTicks(0);
-            }
-
-            return;
-        }
-
-        // DID NOT YET PICK UP INGREDIENT
-
-        if (droppedIngredientItem == null || !droppedIngredientItem.isAlive()) {
-            this.setAIState(State.CAUTIOUS);
-            return;
-        }
-
-        double distance = this.distanceTo(droppedIngredientItem);
-        if (distance > INGREDIENT_REACH_DISTANCE) {
-            BlockPos pos = new BlockPos(droppedIngredientItem.getBlockX(), droppedIngredientItem.getBlockY(), droppedIngredientItem.getBlockZ());
-            this.moveTo(pos, 1, false);
-            return;
-        }
-
-        if (this.getItemHeld().isEmpty()) {
-            this.triggerAnim("grab", "grab");
-            this.getNavigation().stop();
-            ItemStack ingredientStack = droppedIngredientItem.getItem();
-            Item ingredientItem = ingredientStack.getItem();
-
-            if (ingredientStack.getCount() > 1) {
-                ingredientStack.shrink(1); // remove only one ingredient
-            } else {
-                droppedIngredientItem.discard(); // discard the item if it was the last one
-            }
-
-            this.setItemHeld(new ItemStack(ingredientItem, 1)); // set the holding ingredient state
-            droppedIngredientItem = null; // reset the dropped ingredient item
-            return;
-        }
+        BogreCraftingManager.makeChowderAiStep(this);
     }
 
     private BogreCauldronEntity getCauldronEntity() {
@@ -791,7 +551,8 @@ public class BogreEntity extends Monster implements GeoEntity {
             for (Player player : withinRoarRange) {
                 if (!this.isTamedBy(player) && !warnedPlayers.contains(player)
                         && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)
-                        && !player.isCreative() && !player.isSpectator()) {
+                        && !player.isCreative() && !player.isSpectator()
+                        && BogreUtil.isPlayerHoldingWeapon(player)) {
                     // face player and start roaring
                     roaredPlayer = player;
                     this.lookControl.setLookAt(roaredPlayer);
@@ -867,7 +628,8 @@ public class BogreEntity extends Monster implements GeoEntity {
             withinHostileRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
             for (Player player : withinHostileRange) {
                 if (!this.isTamedBy(player) && this.hasLineOfSight(player)
-                        && !player.isCreative() && !player.isSpectator()) {
+                        && !player.isCreative() && !player.isSpectator()
+                        && BogreUtil.isPlayerHoldingWeapon(player)) {
                     this.setTarget(player);
                     break;
                 }
@@ -876,6 +638,10 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         // prune warnedPlayers list
         warnedPlayers.removeIf(player -> player.distanceTo(this) > FORGET_RANGE);
+        attackedByPlayers.removeIf(uuid -> {
+            Player p = this.level().getPlayerByUUID(uuid);
+            return p == null || p.distanceTo(this) > FORGET_ATTACK_RANGE;
+        });
 
         if (this.cauldronPos == null || !this.isValidCauldron(this.cauldronPos)) {
             // if no cauldron is assigned, don't attempt to make chowder or carve bone
@@ -893,49 +659,56 @@ public class BogreEntity extends Monster implements GeoEntity {
                 // get nearby item entities (fish on ground)
                 List<ItemEntity> nearbyItems = this.level().getEntitiesOfClass(ItemEntity.class,
                         player.getBoundingBox().inflate(4), // check small radius around player
-                        item -> item.isAlive() &&
-                                (item.getItem().is(Items.COD)
-                                        || item.getItem().is(Items.SALMON)
-                                        || item.getItem().is(Items.TROPICAL_FISH)
-                                        || item.getItem().is(Items.PUFFERFISH)
-                                        || item.getItem().is(Items.ROTTEN_FLESH)
-                                        || item.getItem().is(Items.SPIDER_EYE)
-                                        || item.getItem().is(Items.POISONOUS_POTATO)
-                                )
+                        item -> item.isAlive() && BogreRecipeManager.isCookingIngredient(item.getItem().getItem())
                 );
 
                 for (ItemEntity ingredient : nearbyItems) {
                     if (this.hasLineOfSight(ingredient)) {
-
-                        ingredient.setExtendedLifetime();
-                        droppedIngredientItem = ingredient;
-                        droppedIngredientPlayer = player; // store the player that dropped the fish
-                        this.setAIState(State.MAKE_CHOWDER); // change state to make chowder
-                        return;
+                        Optional<BogreRecipe> recipeOpt = BogreRecipeManager.getCookingRecipe(ingredient.getItem().getItem());
+                        if (recipeOpt.isPresent()) {
+                            ingredient.setExtendedLifetime();
+                            droppedIngredientItem = ingredient;
+                            droppedIngredientPlayer = player; // store the player that dropped the fishh
+                            this.setActiveRecipe(recipeOpt.get()); // cache recipe
+                            this.setAIState(State.MAKE_CHOWDER); // change state to make chowder
+                            return;
+                        }
                     }
                 }
             }
         }
 
         // check for bone blocks to carve
-        List<BlockPos> boneBlockPositions = findThreeBoneBlocksInLine((int) ROAR_RANGE);
-        if (boneBlockPositions != null && boneBlockPositions.size() >= 3) {
-            if (findNearbyTrustedPlayer(getAveragePosition(boneBlockPositions), 5) != null) {
-                // if a trusted player is nearby, carve the bone blocks
-                Inhabitants.LOGGER.debug("Found bone blocks to carve: {}", boneBlockPositions);
-                this.carvePositions = boneBlockPositions; // store the positions for carving
-                this.setAIState(State.CARVE_BONE); // change state to carve bone
-                return;
+        List<BlockPos> boneBlockPositions = BogreCraftingManager.findCarvableBlocks(this, (int) ROAR_RANGE);
+        if (boneBlockPositions != null && !boneBlockPositions.isEmpty()) {
+            Player trustedPlayer = BogreCraftingManager.findNearbyTrustedPlayer(this, BogreCraftingManager.getAveragePosition(boneBlockPositions), 5);
+            if (trustedPlayer != null) {
+                Optional<BogreRecipe> recipeOpt = BogreRecipeManager.getCarvingRecipe(this.level().getBlockState(boneBlockPositions.get(0)).getBlock());
+                if (recipeOpt.isPresent()) {
+                    this.setActiveRecipe(recipeOpt.get()); // cache recipe + sync to client
+                    this.carvePositions = boneBlockPositions;
+                    this.setDroppedIngredientPlayer(trustedPlayer);
+                    this.setAIState(State.CARVE_BONE);
+                    this.resetCarveTicks();
+                    return;
+                }
             }
         }
 
         // check for broken disc to make Bogre disc
-        ItemEntity disc = findBrokenDisc((int) ROAR_RANGE);
+        ItemEntity disc = BogreCraftingManager.findBrokenDisc(this, (int) ROAR_RANGE);
         if (disc != null) {
-            if (findNearbyTrustedPlayer(disc.blockPosition(), 5) != null) {
-                this.carvePositions = List.of(disc.blockPosition());
-                this.setAIState(State.MAKE_DISC); // change state to make disc
-                return;
+            Player trustedPlayer = BogreCraftingManager.findNearbyTrustedPlayer(this, disc.blockPosition(), 5);
+            if (trustedPlayer != null) {
+                Optional<BogreRecipe> recipeOpt = BogreRecipeManager.getTransformationRecipe(disc.getItem().getItem());
+                if (recipeOpt.isPresent()) {
+                    this.setActiveRecipe(recipeOpt.get()); // cache recipe + sync to client
+                    this.carvePositions = List.of(disc.blockPosition());
+                    this.setDroppedIngredientPlayer(trustedPlayer);
+                    this.setAIState(State.MAKE_DISC);
+                    this.resetCarveTicks();
+                    return;
+                }
             }
         }
     }
@@ -949,7 +722,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         List<ItemEntity> discs = this.level().getEntitiesOfClass(
                 ItemEntity.class,
                 searchBox,
-                item -> item.isAlive() && item.getItem().getItem().equals(Items.MUSIC_DISC_11)
+                item -> item.isAlive() && BogreRecipeManager.isTransformationIngredient(item.getItem().getItem())
         );
         if (discs.isEmpty()) return null;
         return discs.get(0);
@@ -983,7 +756,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         return false;
     }
 
-    private boolean moveTo(BlockPos pos, double speed, boolean checkCauldronDistance) {
+    public boolean moveTo(BlockPos pos, double speed, boolean checkCauldronDistance) {
         if (checkCauldronDistance && this.cauldronPos != null && this.cauldronPos.distToCenterSqr(pos.getX(), pos.getY(), pos.getZ()) > MAX_CAULDRON_DIST_SQR) {
             return false;
         }
@@ -991,7 +764,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         return true;
     }
 
-    private boolean moveTo(BlockPos pos, double speed) {
+    public boolean moveTo(BlockPos pos, double speed) {
         return moveTo(pos, speed, true);
     }
 
@@ -1032,6 +805,8 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(ITEM_HELD, ItemStack.EMPTY);
         entityData.define(DANCING, false);
         entityData.define(AI_STATE, 0);
+        entityData.define(HAMMER_SOUND, "");
+        entityData.define(CARVE_DURATION, 130);
     }
 
     /**
@@ -1100,7 +875,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                 || this.getItemHeld().is(Items.SUSPICIOUS_STEW);
     }
 
-    private void setItemHeld(ItemStack itemHeld) {
+    public void setItemHeld(ItemStack itemHeld) {
         // play pickup sound
         this.playSound(SoundEvents.ITEM_PICKUP, 1, 1);
         this.entityData.set(ITEM_HELD, itemHeld);
@@ -1164,67 +939,49 @@ public class BogreEntity extends Monster implements GeoEntity {
         }
     }
 
-    private @Nullable Player findNearbyTrustedPlayer(BlockPos center, double radius) {
-        List<Player> players = this.level().getEntitiesOfClass(Player.class, new AABB(center).inflate(radius));
-        for (Player player : players) {
-            if (tamedPlayers.contains(player.getUUID())) {
-                return player;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    private List<BlockPos> findThreeBoneBlocksInLine(int radius) {
-        BlockPos origin = this.blockPosition();
-        List<BlockPos> boneBlocks = new ArrayList<>();
-
-        // collect all bone blocks in the search radius
-        BlockPos.betweenClosedStream(origin.offset(-radius, -3, -radius), origin.offset(radius, 3, radius))
-                .forEach(pos -> {
-                    if (this.level().getBlockState(pos).is(Blocks.BONE_BLOCK)) {
-                        boneBlocks.add(pos.immutable());
-                    }
-                });
-
-        // sort by distance to Bogre
-        boneBlocks.sort(Comparator.comparingDouble(pos -> pos.distSqr(origin)));
-
-        Set<BlockPos> boneBlockSet = new HashSet<>(boneBlocks);
-
-        // try to find a line of 3 in any direction centered on one of the blocks
-        for (BlockPos pos : boneBlocks) {
-            if (boneBlockSet.contains(pos.offset(-1, 0, 0)) && boneBlockSet.contains(pos.offset(1, 0, 0))) {
-                return List.of(pos.offset(-1, 0, 0), pos, pos.offset(1, 0, 0));
-            }
-            if (boneBlockSet.contains(pos.offset(0, 0, -1)) && boneBlockSet.contains(pos.offset(0, 0, 1))) {
-                return List.of(pos.offset(0, 0, -1), pos, pos.offset(0, 0, 1));
-            }
-        }
-
-        return null;
-    }
-
-    private BlockPos getAveragePosition(List<BlockPos> positions) {
-        int x = 0, y = 0, z = 0;
-        for (BlockPos pos : positions) {
-            x += pos.getX();
-            y += pos.getY();
-            z += pos.getZ();
-        }
-        return new BlockPos(x / positions.size(), y / positions.size(), z / positions.size());
-    }
-
-    private int getCookingTicks() {
-        return entityData.get(COOKING_TICKS);
-    }
-
-    private void setCookingTicks(int ticks) {
-        entityData.set(COOKING_TICKS, ticks);
-    }
-
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
     }
+    
+    public void setActiveRecipe(BogreRecipe recipe) {
+        this.activeRecipe = recipe;
+        if (recipe != null) {
+            this.entityData.set(CARVE_DURATION, recipe.timeTicks());
+            if (recipe.hammerSound().isPresent()) {
+                this.entityData.set(HAMMER_SOUND, recipe.hammerSound().get().getLocation().toString());
+            } else {
+                this.entityData.set(HAMMER_SOUND, "");
+            }
+        } else {
+            this.entityData.set(CARVE_DURATION, 130);
+            this.entityData.set(HAMMER_SOUND, "");
+        }
+    }
+    
+    public List<BlockPos> getCarvePositions() { return carvePositions; }
+    public void setCarvePositions(List<BlockPos> positions) { this.carvePositions = positions; }
+    public BogreRecipe getActiveRecipe() { return activeRecipe; }
+    public int getCarveTicks() { return carveTicks; }
+    public void incrementCarveTicks() { this.carveTicks++; }
+    public void resetCarveTicks() { this.carveTicks = 0; }
+    public Player getDroppedIngredientPlayer() { return droppedIngredientPlayer; }
+    public void setDroppedIngredientPlayer(Player player) { this.droppedIngredientPlayer = player; }
+    public int getChowderThrowDelay() { return chowderThrowDelay; }
+    public void setChowderThrowDelay(int delay) { this.chowderThrowDelay = delay; }
+    public void decrementChowderThrowDelay() { this.chowderThrowDelay--; }
+    public Vec3 getLastPos() { return lastPos; }
+    public void setLastPos(Vec3 pos) { this.lastPos = pos; }
+    public int getStuckTicks() { return stuckTicks; }
+    public void incrementStuckTicks() { this.stuckTicks++; }
+    public void resetStuckTicks() { this.stuckTicks = 0; }
+    public boolean isPathSet() { return pathSet; }
+    public void setPathSet(boolean pathSet) { this.pathSet = pathSet; }
+    public Set<UUID> getTamedPlayers() { return tamedPlayers; }
+    public ItemEntity getDroppedIngredientItem() { return droppedIngredientItem; }
+    public void setDroppedIngredientItem(ItemEntity item) { this.droppedIngredientItem = item; }
+    public int getCookingTicks() { return entityData.get(COOKING_TICKS); }
+    public void setCookingTicks(int ticks) { entityData.set(COOKING_TICKS, ticks); }
+    public void incrementCookingTicks() { setCookingTicks(getCookingTicks() + 1); }
+    public void resetCookingTicks() { setCookingTicks(0); }
 }
