@@ -12,6 +12,7 @@ import com.jeremyseq.inhabitants.entities.goals.AnimatedCooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
+import com.jeremyseq.inhabitants.entities.bogre.BogreUtil;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -113,6 +114,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final float FORGET_RANGE = 20f;
     public static final float ROAR_RANGE = 12f;
     public static final float HOSTILE_RANGE = 10f;
+    public static final float FORGET_ATTACK_RANGE = 40f; // distance to forget player who attacked Bogre
     public static final double MAX_CAULDRON_DIST_SQR = 14*14;
 
     public static final int DROP_FISH_OFFSET = 10;
@@ -149,6 +151,8 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     // list of players who have tamed the Bogre
     private final Set<UUID> tamedPlayers = new HashSet<>();
+    // list of players who have attacked Bogre
+    private final Set<UUID> attackedByPlayers = new HashSet<>();
 
     private boolean randomChance = false; // used to trigger a rare idle animation
 
@@ -400,6 +404,12 @@ public class BogreEntity extends Monster implements GeoEntity {
                 this.setTarget(null);
             } else if (this.getTarget() instanceof Player player && (player.isCreative() || player.isSpectator())) {
                 this.setTarget(null);
+            } else if (this.getTarget() instanceof Player player &&
+            !BogreUtil.isPlayerHoldingWeapon(player) &&
+            !attackedByPlayers.contains(player.getUUID())) {
+                
+                this.setTarget(null);
+                warnedPlayers.remove(player);
             } else {
                 // if the target is still valid, do not do custom AI step
                 return;
@@ -463,6 +473,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             // if the attacker is a player, remove them from tamedPlayers
             if (pSource.getEntity() instanceof Player player) {
                 tamedPlayers.remove(player.getUUID());
+                attackedByPlayers.add(player.getUUID());
             }
 
             this.setTarget(entity);
@@ -548,7 +559,8 @@ public class BogreEntity extends Monster implements GeoEntity {
             for (Player player : withinRoarRange) {
                 if (!this.isTamedBy(player) && !warnedPlayers.contains(player)
                         && player.distanceTo(this) <= ROAR_RANGE && this.hasLineOfSight(player)
-                        && !player.isCreative() && !player.isSpectator()) {
+                        && !player.isCreative() && !player.isSpectator()
+                        && BogreUtil.isPlayerHoldingWeapon(player)) {
                     // face player and start roaring
                     roaredPlayer = player;
                     this.lookControl.setLookAt(roaredPlayer);
@@ -624,7 +636,8 @@ public class BogreEntity extends Monster implements GeoEntity {
             withinHostileRange.sort((p1, p2) -> Float.compare(p1.distanceTo(this), p2.distanceTo(this)));
             for (Player player : withinHostileRange) {
                 if (!this.isTamedBy(player) && this.hasLineOfSight(player)
-                        && !player.isCreative() && !player.isSpectator()) {
+                        && !player.isCreative() && !player.isSpectator()
+                        && BogreUtil.isPlayerHoldingWeapon(player)) {
                     this.setTarget(player);
                     break;
                 }
@@ -633,6 +646,10 @@ public class BogreEntity extends Monster implements GeoEntity {
 
         // prune warnedPlayers list
         warnedPlayers.removeIf(player -> player.distanceTo(this) > FORGET_RANGE);
+        attackedByPlayers.removeIf(uuid -> {
+            Player p = this.level().getPlayerByUUID(uuid);
+            return p == null || p.distanceTo(this) > FORGET_ATTACK_RANGE;
+        });
 
         if (this.cauldronPos == null || !this.isValidCauldron(this.cauldronPos)) {
             // if no cauldron is assigned, don't attempt to make chowder or carve bone
