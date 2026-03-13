@@ -1,11 +1,9 @@
 package com.jeremyseq.inhabitants.entities.bogre.recipe;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
-import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -160,7 +158,7 @@ public class BogreCraftingManager {
         int timeTicks = activeRecipe.timeTicks();
 
         if (bogre.getCarveTicks() == timeTicks) {
-            if (nearestBrokenDisc != null && nearestBrokenDisc.isAlive()) {
+            if (nearestBrokenDisc.isAlive()) {
                 nearestBrokenDisc.discard();
                 bogre.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F);
             }
@@ -416,7 +414,7 @@ public class BogreCraftingManager {
                     bogre.decrementChowderThrowDelay();
                     return true;
                 } else if (bogre.getChowderThrowDelay() == 0) {
-                    throwHeldItem(bogre, droppedIngredientPlayer);
+                    throwHeldItem(bogre);
                     bogre.setAIState(BogreEntity.State.CAUTIOUS);
                     bogre.setActiveRecipe(null);
                     bogre.setDroppedIngredientPlayer(null);
@@ -424,7 +422,7 @@ public class BogreCraftingManager {
                     return true;
                 }
             } else {
-                throwHeldItem(bogre, null);
+                throwHeldItem(bogre);
                 bogre.setAIState(BogreEntity.State.CAUTIOUS);
                 bogre.setActiveRecipe(null);
                 bogre.setChowderThrowDelay(-1);
@@ -434,7 +432,7 @@ public class BogreCraftingManager {
         return false;
     }
 
-    private static void throwHeldItem(BogreEntity bogre, Player target) {
+    private static void throwHeldItem(BogreEntity bogre) {
         bogre.triggerAnim("grab", "grab");
         EntityUtil.throwItemStack(bogre.level(), bogre, bogre.getItemHeld(), .3f, 0);
         bogre.setItemHeld(ItemStack.EMPTY);

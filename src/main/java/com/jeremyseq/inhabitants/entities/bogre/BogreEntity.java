@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
@@ -12,7 +11,6 @@ import com.jeremyseq.inhabitants.entities.goals.AnimatedCooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
-import com.jeremyseq.inhabitants.entities.bogre.BogreUtil;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -33,8 +31,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -47,7 +43,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
@@ -118,9 +113,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final double MAX_CAULDRON_DIST_SQR = 14*14;
 
     public static final int DROP_FISH_OFFSET = 10;
-    private static final float INGREDIENT_REACH_DISTANCE = 3.0f;
-    private static final int STUCK_TICK_LIMIT = 40;
-    private static final double MIN_MOVE_SQ = 0.0025;
 
     public BlockPos cauldronPos = null;
     public BlockPos entrancePos = null;
@@ -311,7 +303,7 @@ public class BogreEntity extends Monster implements GeoEntity {
             if (player != null) {
                 String customSound = this.entityData.get(HAMMER_SOUND);
                 if (!customSound.isEmpty()) {
-                    SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(customSound));
+                    SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.parse(customSound));
                     if (soundEvent != null) {
                         player.playSound(soundEvent, 1f, 0.8F + new Random().nextFloat() * 0.4F);
                         return;
