@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "inhabitants:item/stinky_bouillon"
+    "layer0": "inhabitants:item/baneful_potato"
   }
 }

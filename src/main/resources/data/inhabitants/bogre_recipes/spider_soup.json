@@ -1,7 +1,7 @@
 {
   "type": "cooking",
   "ingredient": "minecraft:spider_eye",
-  "result": "inhabitants:uncanny_pottage",
+  "result": "inhabitants:spider_soup",
   "suspicious_stew_chance": 0.3,
   "time_ticks": 160
 }

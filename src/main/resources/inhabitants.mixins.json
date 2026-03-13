@@ -5,10 +5,13 @@
   "refmap": "inhabitants.refmap.json",
   "mixins": [
     "CrossbowItemMixin",
-    "NearestAttackableTargetGoalMixin"
+    "NearestAttackableTargetGoalMixin",
+    "StickyLegsMixin",
+    "ReverseGrowthMixin"
   ],
   "client": [
-    "SubtitleOverlayMixin"
+    "SubtitleOverlayMixin",
+    "ReverseGrowthClientMixin"
   ],
   "minVersion": "0.8"
 }
