@@ -15,6 +15,11 @@ import java.util.List;
 public class TransformationSkill extends BogreSkills.Skill {
 
     @Override
+    public int getDuration() {
+        return 100;
+    }
+
+    @Override
     public BogreRecipe.Type getType() {
         return BogreRecipe.Type.TRANSFORMATION;
     }
@@ -82,9 +87,7 @@ public class TransformationSkill extends BogreSkills.Skill {
         
         bogre.incrementCarveTicks();
 
-        int timeTicks = activeRecipe.timeTicks();
-
-        if (bogre.getCarveTicks() >= timeTicks) {
+        if (bogre.getCarveTicks() >= getDuration()) {
             if (nearestBrokenDisc.isAlive()) {
                 nearestBrokenDisc.discard();
                 bogre.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F);

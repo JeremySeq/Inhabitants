@@ -26,6 +26,7 @@ public final class BogreSkills {
         public abstract BogreRecipe.Type getType();
         public abstract void aiStep(BogreEntity bogre);
         public abstract boolean canPerform(BogreEntity bogre);
+        public abstract int getDuration();
 
         protected void finishSkill(BogreEntity bogre) {
             bogre.setAIState(BogreEntity.State.CAUTIOUS);

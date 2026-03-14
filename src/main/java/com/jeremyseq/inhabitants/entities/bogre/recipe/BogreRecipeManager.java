@@ -54,26 +54,29 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
                 Item resultItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(GsonHelper.getAsString(json, "result")));
                 int count = GsonHelper.getAsInt(json, "count", 1);
                 ItemStack result = new ItemStack(resultItem, count);
-                int timeTicks = GsonHelper.getAsInt(json, "time_ticks", 160);
+                
                 float stewChance = GsonHelper.getAsFloat(json, "suspicious_stew_chance", 0.3f);
 
                 Optional<Item> triggerItem = Optional.empty();
                 Optional<Block> triggerBlock = Optional.empty();
 
                 if (json.has("ingredient")) {
-                    triggerItem = Optional.ofNullable(ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(GsonHelper.getAsString(json, "ingredient"))));
+                    triggerItem = Optional.ofNullable(ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(
+                            GsonHelper.getAsString(json, "ingredient"))));
                 }
                 if (json.has("block")) {
-                    triggerBlock = Optional.ofNullable(ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryParse(GsonHelper.getAsString(json, "block"))));
+                    triggerBlock = Optional.ofNullable(ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryParse(
+                        GsonHelper.getAsString(json, "block"))));
                 }
                 int requiredBlocks = GsonHelper.getAsInt(json, "required_blocks", 1);
 
                 Optional<SoundEvent> hammerSound = Optional.empty();
                 if (json.has("hammer_sound")) {
-                    hammerSound = Optional.ofNullable(ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.tryParse(GsonHelper.getAsString(json, "hammer_sound"))));
+                    hammerSound = Optional.ofNullable(ForgeRegistries.SOUND_EVENTS.getValue(
+                        ResourceLocation.tryParse(GsonHelper.getAsString(json, "hammer_sound"))));
                 }
 
-                BogreRecipe recipe = new BogreRecipe(type, triggerItem, triggerBlock, result, stewChance, timeTicks, requiredBlocks, hammerSound);
+                BogreRecipe recipe = new BogreRecipe(type, triggerItem, triggerBlock, result, stewChance, requiredBlocks, hammerSound);
 
                 switch (type) {
                     case COOKING -> triggerItem.ifPresent(item -> cookingBuilder.put(item, recipe));
@@ -93,32 +96,32 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
         if (!mutableCarving.containsKey(Blocks.BONE_BLOCK)) {
             mutableCarving.put(Blocks.BONE_BLOCK, new BogreRecipe(
                     BogreRecipe.Type.CARVING, Optional.empty(), Optional.of(Blocks.BONE_BLOCK), 
-                    new ItemStack(ModItems.GIANT_BONE.get(), 1), 0.0f, 130, 3, Optional.empty()));
+                    new ItemStack(ModItems.GIANT_BONE.get(), 1), 0.0f, 3, Optional.empty()));
         }
 
         if (!mutableTransformation.containsKey(Items.MUSIC_DISC_11)) {
             mutableTransformation.put(Items.MUSIC_DISC_11, new BogreRecipe(
                     BogreRecipe.Type.TRANSFORMATION, Optional.of(Items.MUSIC_DISC_11), Optional.empty(), 
-                    new ItemStack(ModItems.MUSIC_DISC_BOGRE.get(), 1), 0.0f, 100, 1, Optional.empty()));
+                    new ItemStack(ModItems.MUSIC_DISC_BOGRE.get(), 1), 0.0f, 1, Optional.empty()));
         }
 
         if (mutableCooking.isEmpty()) {
-            record Fallback(Item in, RegistryObject<Item> out, float chance, int time) {}
+            record Fallback(Item in, RegistryObject<Item> out, float chance) {}
             var defaults = new Fallback[] {
-                new Fallback(Items.COD, ModItems.FISH_SNOT_CHOWDER, 0.3f, 160),
-                new Fallback(Items.COOKED_COD, ModItems.FISH_SNOT_CHOWDER, 0.3f, 160),
-                new Fallback(Items.SALMON, ModItems.FISH_SNOT_CHOWDER, 0.3f, 160),
-                new Fallback(Items.COOKED_SALMON, ModItems.FISH_SNOT_CHOWDER, 0.3f, 160),
-                new Fallback(Items.PUFFERFISH, ModItems.UNCANNY_POTTAGE, 0.5f, 160),
-                new Fallback(Items.TROPICAL_FISH, ModItems.FISH_SNOT_CHOWDER, 0.3f, 160),
-                new Fallback(Items.SPIDER_EYE, ModItems.SPIDER_SOUP, 0.2f, 160),
-                new Fallback(Items.POISONOUS_POTATO, ModItems.BANEFUL_POTATO, 0.3f, 160),
-                new Fallback(Items.ROTTEN_FLESH, ModItems.MONSTER_MEAL, 0.4f, 200),
-                new Fallback(Items.ENDER_PEARL, ModItems.DIMENTIONAL_SNACK, 0.5f, 160)
+                new Fallback(Items.COD, ModItems.FISH_SNOT_CHOWDER, 0.3f),
+                new Fallback(Items.COOKED_COD, ModItems.FISH_SNOT_CHOWDER, 0.3f),
+                new Fallback(Items.SALMON, ModItems.FISH_SNOT_CHOWDER, 0.3f),
+                new Fallback(Items.COOKED_SALMON, ModItems.FISH_SNOT_CHOWDER, 0.3f),
+                new Fallback(Items.PUFFERFISH, ModItems.UNCANNY_POTTAGE, 0.5f),
+                new Fallback(Items.TROPICAL_FISH, ModItems.FISH_SNOT_CHOWDER, 0.3f),
+                new Fallback(Items.SPIDER_EYE, ModItems.SPIDER_SOUP, 0.2f),
+                new Fallback(Items.POISONOUS_POTATO, ModItems.BANEFUL_POTATO, 0.3f),
+                new Fallback(Items.ROTTEN_FLESH, ModItems.MONSTER_MEAL, 0.4f),
+                new Fallback(Items.ENDER_PEARL, ModItems.DIMENTIONAL_SNACK, 0.5f)
             };
             
             for (Fallback f : defaults) {
-                addCookingFallback(mutableCooking, f.in(), f.out(), f.chance(), f.time());
+                addCookingFallback(mutableCooking, f.in(), f.out(), f.chance());
             }
         }
 
@@ -153,8 +156,10 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
         return carvingRecipes.containsKey(block);
     }
 
-    private static void addCookingFallback(Map<Item, BogreRecipe> map, Item ingredient, RegistryObject<Item> resultItem, float stewChance, int timeTicks) {
+    private static void addCookingFallback(Map<Item, BogreRecipe> map, Item ingredient,
+    RegistryObject<Item> resultItem, float stewChance) {
+
         map.put(ingredient, new BogreRecipe(BogreRecipe.Type.COOKING, Optional.of(ingredient), Optional.empty(),
-                new ItemStack(resultItem.get(), 1), stewChance, timeTicks, 1, Optional.empty()));
+                new ItemStack(resultItem.get(), 1), stewChance, 1, Optional.empty()));
     }
 }

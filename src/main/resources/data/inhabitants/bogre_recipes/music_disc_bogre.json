@@ -3,6 +3,5 @@
   "ingredient": "minecraft:music_disc_11",
   "result": "inhabitants:music_disc_bogre",
   "count": 1,
-  "time_ticks": 100,
   "hammer_sound": "minecraft:block.anvil.land"
 }

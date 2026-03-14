@@ -15,6 +15,11 @@ import java.util.List;
 public class CarvingSkill extends BogreSkills.Skill {
 
     @Override
+    public int getDuration() {
+        return 130;
+    }
+    
+    @Override
     public BogreRecipe.Type getType() {
         return BogreRecipe.Type.CARVING;
     }
@@ -81,9 +86,7 @@ public class CarvingSkill extends BogreSkills.Skill {
         
         bogre.incrementCarveTicks();
 
-        int timeTicks = activeRecipe.timeTicks();
-
-        if (bogre.getCarveTicks() >= timeTicks) {
+        if (bogre.getCarveTicks() >= getDuration()) {
             bogre.setItemHeld(activeRecipe.result().copy());
             bogre.setChowderThrowDelay(20);
             

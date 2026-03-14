@@ -7,6 +7,7 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipeManager;
 import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreCraftingManager;
+import com.jeremyseq.inhabitants.entities.bogre.skill.BogreSkills;
 import com.jeremyseq.inhabitants.entities.goals.AnimatedCooldownMeleeAttackGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
@@ -927,7 +928,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public void setActiveRecipe(BogreRecipe recipe) {
         this.activeRecipe = recipe;
         if (recipe != null) {
-            this.entityData.set(CARVE_DURATION, recipe.timeTicks());
+            this.entityData.set(CARVE_DURATION, BogreSkills.forType(recipe.type()).getDuration());
             if (recipe.hammerSound().isPresent()) {
                 this.entityData.set(HAMMER_SOUND, recipe.hammerSound().get().getLocation().toString());
             } else {

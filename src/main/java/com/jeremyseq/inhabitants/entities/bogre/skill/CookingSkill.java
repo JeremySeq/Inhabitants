@@ -22,6 +22,11 @@ import net.minecraft.core.BlockPos;
 public class CookingSkill extends BogreSkills.Skill {
 
     @Override
+    public int getDuration() {
+        return 160;
+    }
+
+    @Override
     public BogreRecipe.Type getType() {
         return BogreRecipe.Type.COOKING;
     }
@@ -110,9 +115,7 @@ public class CookingSkill extends BogreSkills.Skill {
 
             bogre.incrementCookingTicks();
 
-            int cookingTime = activeRecipe.timeTicks();
-
-            if (bogre.getCookingTicks() >= cookingTime) {
+            if (bogre.getCookingTicks() >= getDuration()) {
                 bogre.playSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 0.8F);
                 if (bogre.getDroppedIngredientPlayer() != null) {
                     bogre.getTamedPlayers().add(bogre.getDroppedIngredientPlayer().getUUID());
