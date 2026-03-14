@@ -72,12 +72,8 @@ import java.util.function.Predicate;
 public class BogreEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
-    public enum State {
-        CAUTIOUS,
-        MAKE_CHOWDER,
-        CARVE_BONE,
-        MAKE_DISC
-    }
+    public enum State { CAUTIOUS, CRAFTING }
+    public enum CraftingState { NONE, COOKING, CARVING, TRANSFORMATION }
 
     boolean pathSet = false;
 
@@ -92,6 +88,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> DANCING = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static final EntityDataAccessor<Integer> AI_STATE = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> CRAFTING_STATE = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<String> HAMMER_SOUND = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.STRING);
     public static final EntityDataAccessor<Integer> CARVE_DURATION = SynchedEntityData.defineId(BogreEntity.class, EntityDataSerializers.INT);
 
@@ -118,7 +115,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public BlockPos entrancePos = null;
 
 
-    // STUCK FAILSAFE FOR MAKE_CHOWDER
+    // STUCK FAILSAFE FOR COOKING
     private Vec3 lastPos = null;
     private int stuckTicks = 0;
 
@@ -310,7 +307,7 @@ public class BogreEntity extends Monster implements GeoEntity {
                     }
                 }
                 
-                if (this.getAIState() == State.CARVE_BONE) {
+                if (this.getAIState() == State.CRAFTING && this.getCraftingState() == CraftingState.CARVING) {
                     player.playSound(SoundEvents.BONE_BLOCK_HIT, 1f, 0.8F + new Random().nextFloat() * 0.4F);
                 } else {
                     player.playSound(SoundEvents.ANVIL_LAND, .5f, 0.8F + new Random().nextFloat() * 0.4F);
@@ -419,12 +416,9 @@ public class BogreEntity extends Monster implements GeoEntity {
             }
 
             cautiousAiStep();
-        } else if (this.getAIState() == State.MAKE_CHOWDER) {
-            makeChowderAiStep();
-        } else if (this.getAIState() == State.CARVE_BONE) {
-            carveBoneAiStep();
-        } else if (this.getAIState() == State.MAKE_DISC) {
-            carveDiscAiStep();
+        } else {
+            // crafting states
+            BogreCraftingManager.aiStep(this);
         }
     }
 
@@ -473,22 +467,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         return result;
     }
 
-    /**
-     * The Bogre carves a giant bone from 3 bone blocks.
-     * This is a placeholder method for future implementation.
-     */
-    private void carveBoneAiStep() {
-        BogreCraftingManager.carveBoneAiStep(this);
-    }
-
-    /**
-     * The Bogre makes a disc from a broken disc.
-     * Goofy ahh code that is very similar to `carveBoneAiStep()`
-     */
-    private void carveDiscAiStep() {
-        BogreCraftingManager.carveDiscAiStep(this);
-    }
-
     private boolean isJukeboxPlayingNearby() {
         BlockPos origin = this.blockPosition();
 
@@ -514,14 +492,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.triggerAnim("grab", "grab");
         EntityUtil.throwItemStack(this.level(), this, this.getItemHeld(), .3f, 0);
         setItemHeld(ItemStack.EMPTY);
-    }
-
-    /**
-     * The Bogre attempts to make chowder from a fish dropped by a player.
-     * The fish should be droppedFishItem.
-     */
-    private void makeChowderAiStep() {
-        BogreCraftingManager.makeChowderAiStep(this);
     }
 
     private BogreCauldronEntity getCauldronEntity() {
@@ -643,11 +613,6 @@ public class BogreEntity extends Monster implements GeoEntity {
             return p == null || p.distanceTo(this) > FORGET_ATTACK_RANGE;
         });
 
-        if (this.cauldronPos == null || !this.isValidCauldron(this.cauldronPos)) {
-            // if no cauldron is assigned, don't attempt to make chowder or carve bone
-            return;
-        }
-
         // detect fish dropped by non-hostile players
         List<Player> possibleFishDroppers = this.level().getEntitiesOfClass(Player.class,
                 AABB.ofSize(position(), FORGET_RANGE * 2, FORGET_RANGE * 2, FORGET_RANGE * 2),
@@ -666,11 +631,15 @@ public class BogreEntity extends Monster implements GeoEntity {
                     if (this.hasLineOfSight(ingredient)) {
                         Optional<BogreRecipe> recipeOpt = BogreRecipeManager.getCookingRecipe(ingredient.getItem().getItem());
                         if (recipeOpt.isPresent()) {
+                            // only cook if a cauldron is present
+                            if (this.cauldronPos == null || !this.isValidCauldron(this.cauldronPos)) continue;
+
                             ingredient.setExtendedLifetime();
                             droppedIngredientItem = ingredient;
                             droppedIngredientPlayer = player; // store the player that dropped the fishh
                             this.setActiveRecipe(recipeOpt.get()); // cache recipe
-                            this.setAIState(State.MAKE_CHOWDER); // change state to make chowder
+                            this.setAIState(State.CRAFTING);
+                            this.setCraftingState(CraftingState.COOKING);
                             return;
                         }
                     }
@@ -688,7 +657,8 @@ public class BogreEntity extends Monster implements GeoEntity {
                     this.setActiveRecipe(recipeOpt.get()); // cache recipe + sync to client
                     this.carvePositions = boneBlockPositions;
                     this.setDroppedIngredientPlayer(trustedPlayer);
-                    this.setAIState(State.CARVE_BONE);
+                    this.setAIState(State.CRAFTING);
+                    this.setCraftingState(CraftingState.CARVING);
                     this.resetCarveTicks();
                     return;
                 }
@@ -705,7 +675,8 @@ public class BogreEntity extends Monster implements GeoEntity {
                     this.setActiveRecipe(recipeOpt.get()); // cache recipe + sync to client
                     this.carvePositions = List.of(disc.blockPosition());
                     this.setDroppedIngredientPlayer(trustedPlayer);
-                    this.setAIState(State.MAKE_DISC);
+                    this.setAIState(State.CRAFTING);
+                    this.setCraftingState(CraftingState.TRANSFORMATION);
                     this.resetCarveTicks();
                     return;
                 }
@@ -805,6 +776,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(ITEM_HELD, ItemStack.EMPTY);
         entityData.define(DANCING, false);
         entityData.define(AI_STATE, 0);
+        entityData.define(CRAFTING_STATE, 0);
         entityData.define(HAMMER_SOUND, "");
         entityData.define(CARVE_DURATION, 130);
     }
@@ -822,6 +794,15 @@ public class BogreEntity extends Monster implements GeoEntity {
      */
     public void setAIState(State state) {
         entityData.set(AI_STATE, state.ordinal());
+    }
+
+    public CraftingState getCraftingState() {
+        int state = entityData.get(CRAFTING_STATE);
+        return CraftingState.values()[state];
+    }
+
+    public void setCraftingState(CraftingState state) {
+        entityData.set(CRAFTING_STATE, state.ordinal());
     }
 
     public boolean isTamedBy(Player player) {

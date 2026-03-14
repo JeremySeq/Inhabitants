@@ -27,6 +27,12 @@ public class PrecisePathNavigation extends GroundPathNavigation {
     }
 
     @Override
+    public void stop() {
+        super.stop();
+        this.preciseTarget = null;
+    }
+
+    @Override
     public void tick() {
         ++this.tick;
         if (this.hasDelayedRecomputation) this.recomputePath();
