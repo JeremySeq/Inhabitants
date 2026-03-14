@@ -17,6 +17,12 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> MONSTER_DISGUISE =
             EFFECTS.register("monster_disguise", MonsterDisguiseEffect::new);
 
+    public static final RegistryObject<MobEffect> STICKY_LEGS =
+            EFFECTS.register("sticky_legs", StickyLegsEffect::new);
+
+    public static final RegistryObject<MobEffect> REVERSE_GROWTH =
+            EFFECTS.register("reverse_growth", ReverseGrowthEffect::new);
+
     public static void register(IEventBus bus) {
         EFFECTS.register(bus);
     }

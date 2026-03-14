@@ -34,6 +34,8 @@ public class ModSoundEvents {
 
     public static final RegistryObject<SoundEvent> BOGRE_SONG = registerSoundEvent("disc.bogre");
 
+    public static final RegistryObject<SoundEvent> REVERSE_GROWTH = registerSoundEvent("effects.reverse_growth");
+
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));
     }

@@ -16,7 +16,6 @@ public record BogreRecipe(
     Optional<Block> triggerBlock,
     ItemStack result,
     float suspiciousStewChance,
-    int timeTicks,
     int requiredBlocks,
     Optional<SoundEvent> hammerSound
 ) {

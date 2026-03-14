@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.items;
+package com.jeremyseq.inhabitants.items.food;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;

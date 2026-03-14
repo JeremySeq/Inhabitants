@@ -43,6 +43,10 @@ public class ModParticles {
             PARTICLES.register("shockwave",
                     () -> new SimpleParticleType(true));
 
+    public static final RegistryObject<SimpleParticleType> ABRACADABRA =
+            PARTICLES.register("abracadabra",
+                    () -> new SimpleParticleType(false));
+
     @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent evt) {
         evt.registerSpriteSet(ModParticles.IMPALER_SCREAM.get(), ScreamParticle.Factory::new);
@@ -52,5 +56,6 @@ public class ModParticles {
         evt.registerSpriteSet(ModParticles.ROAR_EFFECT.get(), RoarEffectParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.SONIC_WAVE.get(), SonicWaveParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.SHOCKWAVE.get(), ShockwaveParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.ABRACADABRA.get(), AbracadabraParticle.Factory::new);
     }
 }

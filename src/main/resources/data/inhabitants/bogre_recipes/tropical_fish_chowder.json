@@ -2,6 +2,5 @@
   "type": "cooking",
   "ingredient": "minecraft:tropical_fish",
   "result": "inhabitants:fish_snot_chowder",
-  "suspicious_stew_chance": 0.3,
-  "time_ticks": 160
+  "suspicious_stew_chance": 0.3
 }

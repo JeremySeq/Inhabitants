@@ -1,0 +1,6 @@
+{
+  "type": "cooking",
+  "ingredient": "minecraft:poisonous_potato",
+  "result": "inhabitants:baneful_potato",
+  "suspicious_stew_chance": 0.3
+}

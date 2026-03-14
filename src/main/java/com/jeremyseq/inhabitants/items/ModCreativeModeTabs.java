@@ -21,12 +21,15 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
                         pOutput.accept(ModItems.UNCANNY_POTTAGE.get());
-                        pOutput.accept(ModItems.STINKY_BOUILLON.get());
                         pOutput.accept(ModItems.GIANT_BONE.get());
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
                         pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
+                        pOutput.accept(ModItems.MONSTER_MEAL.get());
+                        pOutput.accept(ModItems.BANEFUL_POTATO.get());
+                        pOutput.accept(ModItems.SPIDER_SOUP.get());
+                        pOutput.accept(ModItems.DIMENSIONAL_SNACK.get());
                     })
                     .build());
 

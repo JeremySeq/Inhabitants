@@ -24,7 +24,7 @@ public class BogreUtil {
     private static final TagKey<Item> TAG_SPEARS = forge("tools/spears");
 
     private static TagKey<Item> forge(String path) {
-        return TagKey.create(Registries.ITEM, new ResourceLocation("forge", path));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("forge", path));
     }
 
     public static boolean isPlayerHoldingWeapon(Player player) {

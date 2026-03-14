@@ -328,5 +328,16 @@
         "stream": true
       }
     ]
+  },
+
+  "effects.reverse_growth": {
+    "subtitle": "subtitles.inhabitants.effects.reverse_growth",
+    "sounds": [
+      {
+        "name": "inhabitants:effects/reverse_growth"
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
   }
 }

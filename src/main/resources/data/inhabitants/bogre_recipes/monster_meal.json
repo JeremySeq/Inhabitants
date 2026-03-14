@@ -1,0 +1,6 @@
+{
+  "type": "cooking",
+  "ingredient": "minecraft:rotten_flesh",
+  "result": "inhabitants:monster_meal",
+  "suspicious_stew_chance": 0.4
+}

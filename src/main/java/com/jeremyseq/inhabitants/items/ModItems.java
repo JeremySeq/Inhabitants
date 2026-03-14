@@ -3,12 +3,14 @@ package com.jeremyseq.inhabitants.items;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
-import net.minecraft.world.item.*;
+import com.jeremyseq.inhabitants.items.food.*;
+
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.item.*;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Inhabitants.MODID);
@@ -20,8 +22,14 @@ public class ModItems {
             FishSnotChowderItem::new);
     public static final RegistryObject<Item> UNCANNY_POTTAGE = ITEMS.register("uncanny_pottage",
             UncannyPottageItem::new);
-    public static final RegistryObject<Item> STINKY_BOUILLON = ITEMS.register("stinky_bouillon",
-            StinkyBouillonItem::new);
+    public static final RegistryObject<Item> SPIDER_SOUP = ITEMS.register("spider_soup",
+            SpiderSoupItem::new);
+    public static final RegistryObject<Item> BANEFUL_POTATO = ITEMS.register("baneful_potato",
+            BanefulPotatoItem::new);
+    public static final RegistryObject<Item> MONSTER_MEAL = ITEMS.register("monster_meal",
+            MonsterMealItem::new);
+    public static final RegistryObject<Item> DIMENSIONAL_SNACK = ITEMS.register("dimensional_snack",
+            DimensionalSnackItem::new);
 
     public static final RegistryObject<Item> CREATIVE_TAB = ITEMS.register("creative_tab",
             () -> new Item(new Item.Properties().stacksTo(1)));
