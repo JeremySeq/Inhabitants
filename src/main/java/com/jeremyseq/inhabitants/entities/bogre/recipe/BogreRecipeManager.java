@@ -53,6 +53,7 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
 
                 Item resultItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(GsonHelper.getAsString(json, "result")));
                 int count = GsonHelper.getAsInt(json, "count", 1);
+                assert resultItem != null;
                 ItemStack result = new ItemStack(resultItem, count);
                 
                 float stewChance = GsonHelper.getAsFloat(json, "suspicious_stew_chance", 0.3f);
@@ -117,7 +118,7 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
                 new Fallback(Items.SPIDER_EYE, ModItems.SPIDER_SOUP, 0.2f),
                 new Fallback(Items.POISONOUS_POTATO, ModItems.BANEFUL_POTATO, 0.3f),
                 new Fallback(Items.ROTTEN_FLESH, ModItems.MONSTER_MEAL, 0.4f),
-                new Fallback(Items.ENDER_PEARL, ModItems.DIMENTIONAL_SNACK, 0.5f)
+                new Fallback(Items.ENDER_PEARL, ModItems.DIMENSIONAL_SNACK, 0.5f)
             };
             
             for (Fallback f : defaults) {

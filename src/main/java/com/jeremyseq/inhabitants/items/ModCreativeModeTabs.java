@@ -29,7 +29,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.MONSTER_MEAL.get());
                         pOutput.accept(ModItems.BANEFUL_POTATO.get());
                         pOutput.accept(ModItems.SPIDER_SOUP.get());
-                        pOutput.accept(ModItems.DIMENTIONAL_SNACK.get());
+                        pOutput.accept(ModItems.DIMENSIONAL_SNACK.get());
                     })
                     .build());
 

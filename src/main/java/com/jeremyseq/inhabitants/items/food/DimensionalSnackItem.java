@@ -1,7 +1,6 @@
 package com.jeremyseq.inhabitants.items.food;
 
 import com.jeremyseq.inhabitants.util.PlayerPositionTracker;
-import com.jeremyseq.inhabitants.ModSoundEvents;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,8 +16,10 @@ import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
 
-public class DimentionalSnackItem extends BowlFoodItem {
-    public DimentionalSnackItem() {
+import java.util.Objects;
+
+public class DimensionalSnackItem extends BowlFoodItem {
+    public DimensionalSnackItem() {
         super(new Item.Properties().stacksTo(1).food(
             new FoodProperties.Builder()
             .nutrition(2)
@@ -28,11 +29,11 @@ public class DimentionalSnackItem extends BowlFoodItem {
     }
 
     @Override
-    public @NotNull ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level level, LivingEntity entity) {
+    public @NotNull ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level level, @NotNull LivingEntity entity) {
         if (!level.isClientSide && entity instanceof ServerPlayer player) {
             PlayerPositionTracker.PositionRecord record = PlayerPositionTracker.getPastPosition(player);
             if (record != null) {
-                ServerLevel targetLevel = player.getServer().getLevel(record.dimension());
+                ServerLevel targetLevel = Objects.requireNonNull(player.getServer()).getLevel(record.dimension());
                 if (targetLevel != null) {
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);

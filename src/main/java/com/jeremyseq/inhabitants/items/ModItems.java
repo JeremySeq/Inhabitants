@@ -28,8 +28,8 @@ public class ModItems {
             BanefulPotatoItem::new);
     public static final RegistryObject<Item> MONSTER_MEAL = ITEMS.register("monster_meal",
             MonsterMealItem::new);
-    public static final RegistryObject<Item> DIMENTIONAL_SNACK = ITEMS.register("dimentional_snack",
-            DimentionalSnackItem::new);
+    public static final RegistryObject<Item> DIMENSIONAL_SNACK = ITEMS.register("dimensional_snack",
+            DimensionalSnackItem::new);
 
     public static final RegistryObject<Item> CREATIVE_TAB = ITEMS.register("creative_tab",
             () -> new Item(new Item.Properties().stacksTo(1)));
