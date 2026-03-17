@@ -2,5 +2,6 @@
   "type": "cooking",
   "ingredient": "minecraft:ender_pearl",
   "result": "inhabitants:dimensional_snack",
-  "suspicious_stew_chance": 0.5
+  "suspicious_stew_chance": 0.5,
+  "time_ticks": 100
 }
