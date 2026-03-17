@@ -6,7 +6,7 @@ import com.jeremyseq.inhabitants.entities.bogre.ai.*;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreSkillingGoal;
 import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogrePathNavigation;
-import com.jeremyseq.inhabitants.entities.bogre.render.HammerEffectRenderer;
+import com.jeremyseq.inhabitants.entities.bogre.render.HammerEffectsRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.render.BogreAnimationHandler;
 
 import net.minecraft.core.BlockPos;
@@ -230,7 +230,7 @@ public class TransformationSkill extends BogreSkills.Skill {
                     precisePos = Vec3.atCenterOf(targetPos);
                 }
 
-                HammerEffectRenderer.spawnTransformationParticles(bogre.level(), precisePos);
+                HammerEffectsRenderer.spawnTransformationParticles(bogre.level(), precisePos);
                 
                 if (currentHits >= expectedHits && nearestTransformationItem != null) {
                     keyframeTriggered(bogre, "skill_finished");
@@ -270,7 +270,7 @@ public class TransformationSkill extends BogreSkills.Skill {
                     precisePos = Vec3.atCenterOf(targetPos);
                 }
                 
-                HammerEffectRenderer.spawnTransformationParticles(bogre.level(), precisePos);
+                HammerEffectsRenderer.spawnTransformationParticles(bogre.level(), precisePos);
             }
         }
     }

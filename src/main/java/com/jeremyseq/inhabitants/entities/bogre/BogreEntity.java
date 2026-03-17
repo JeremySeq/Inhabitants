@@ -313,9 +313,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         this.entityData.set(ITEM_HELD, itemHeld);
     }
 
-    //     return this.getItemHeld();
-    // }
-
     private boolean isHoldingChowder() {
         return this.getItemHeld().is(ModItems.FISH_SNOT_CHOWDER.get())
                 || this.getItemHeld().is(ModItems.UNCANNY_POTTAGE.get())

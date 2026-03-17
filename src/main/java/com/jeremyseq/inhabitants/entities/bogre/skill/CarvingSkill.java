@@ -3,7 +3,7 @@ package com.jeremyseq.inhabitants.entities.bogre.skill;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogrePathNavigation;
-import com.jeremyseq.inhabitants.entities.bogre.render.HammerEffectRenderer;
+import com.jeremyseq.inhabitants.entities.bogre.render.HammerEffectsRenderer;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.BogreDetectionHelper;
 import com.jeremyseq.inhabitants.entities.bogre.render.BogreAnimationHandler;
@@ -217,7 +217,7 @@ public class CarvingSkill extends BogreSkills.Skill {
                 }
 
                 if (targetPos != null && !targetPos.equals(BlockPos.ZERO)) {
-                    HammerEffectRenderer.spawnCarvingParticles(bogre.level(), targetPos, bogre.level().getBlockState(targetPos));
+                    HammerEffectsRenderer.spawnCarvingParticles(bogre.level(), targetPos, bogre.level().getBlockState(targetPos));
                     for (int i = 0; i < blocks.size(); i++) {
                         bogre.level().destroyBlockProgress(bogre.getId() + i, blocks.get(i), progress);
                     }
@@ -251,7 +251,7 @@ public class CarvingSkill extends BogreSkills.Skill {
                 List<BlockPos> blocks = BogreDetectionHelper.findCarvableBlocks(bogre, 5);
                 BlockPos targetPos = bogre.getEntityData().get(BogreEntity.TARGET_POS);
                 if (targetPos != null && !targetPos.equals(BlockPos.ZERO)) {
-                    HammerEffectRenderer.spawnCarvingParticles(bogre.level(), targetPos, bogre.level().getBlockState(targetPos));
+                    HammerEffectsRenderer.spawnCarvingParticles(bogre.level(), targetPos, bogre.level().getBlockState(targetPos));
                 }
             }
         }
