@@ -20,7 +20,6 @@ public class ModCreativeModeTabs {
 
                         pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
-                        pOutput.accept(ModItems.UNCANNY_POTTAGE.get());
                         pOutput.accept(ModItems.MONSTER_MEAL.get());
                         pOutput.accept(ModItems.BANEFUL_POTATO.get());
                         pOutput.accept(ModItems.SPIDER_SOUP.get());

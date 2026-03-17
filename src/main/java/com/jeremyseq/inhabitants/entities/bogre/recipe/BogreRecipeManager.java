@@ -113,7 +113,6 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
                 new Fallback(Items.COOKED_COD, ModItems.FISH_SNOT_CHOWDER, 0.3f),
                 new Fallback(Items.SALMON, ModItems.FISH_SNOT_CHOWDER, 0.3f),
                 new Fallback(Items.COOKED_SALMON, ModItems.FISH_SNOT_CHOWDER, 0.3f),
-                new Fallback(Items.PUFFERFISH, ModItems.UNCANNY_POTTAGE, 0.5f),
                 new Fallback(Items.TROPICAL_FISH, ModItems.FISH_SNOT_CHOWDER, 0.3f),
                 new Fallback(Items.SPIDER_EYE, ModItems.SPIDER_SOUP, 0.2f),
                 new Fallback(Items.POISONOUS_POTATO, ModItems.BANEFUL_POTATO, 0.3f),
