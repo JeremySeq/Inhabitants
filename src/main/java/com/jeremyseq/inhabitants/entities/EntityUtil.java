@@ -24,19 +24,25 @@ import java.util.function.Predicate;
 
 public class EntityUtil {
     public static void throwItemStack(Level level, Entity entity, ItemStack stack, float speed, float upwardBias) {
+        if (level.isClientSide || stack.isEmpty() || entity == null) return;
+        throwItemStack(level,
+        new Vec3(entity.getX(), entity.getEyeY(), entity.getZ()),
+        entity.getLookAngle(), stack, speed, upwardBias);
+    }
+
+    public static void throwItemStack(Level level, Vec3 pos, Vec3 direction, ItemStack stack, float speed, float upwardBias) {
         if (level.isClientSide || stack.isEmpty()) return;
 
-        // spawn the item
         ItemEntity itemEntity = new ItemEntity(
                 level,
-                entity.getX(),
-                entity.getEyeY(),
-                entity.getZ(),
+                pos.x,
+                pos.y,
+                pos.z,
                 stack.copy()
         );
 
         // direction in front of the entity
-        Vec3 look = entity.getLookAngle().normalize();
+        Vec3 look = direction.normalize();
         Vec3 motion = look.scale(speed).add(0, upwardBias, 0);
         itemEntity.setDeltaMovement(motion);
 

@@ -1,22 +1,46 @@
 package com.jeremyseq.inhabitants.entities.bogre.skill;
 
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreCraftingManager;
 import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
-import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
+import com.jeremyseq.inhabitants.entities.bogre.ai.*;
+import com.jeremyseq.inhabitants.entities.bogre.ai.BogreSkillingGoal;
+import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
+import com.jeremyseq.inhabitants.entities.bogre.ai.BogrePathNavigation;
+import com.jeremyseq.inhabitants.entities.bogre.render.HammerEffectRenderer;
+import com.jeremyseq.inhabitants.entities.bogre.render.BogreAnimationHandler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.sounds.SoundEvents;
 
-import java.util.List;
+import java.util.*;
 
 public class TransformationSkill extends BogreSkills.Skill {
+    public static final float detectionRadius = 20.0f;
+    public static final float MIN_DISTANCE = 1.5f;
+    public static final float MAX_DISTANCE = 2.0f;
 
     @Override
-    public int getDuration() {
-        return 100;
+    public int getAnimationDuration(Animation animation) {
+        return switch (animation) {
+            case START -> 15; // 20 ticks at 1.3x speed = almost 15 ticks
+            case LOOP -> 0;
+            case END -> 20;
+        };
+    }
+
+    @Override
+    public int getDuration(BogreEntity bogre) {
+        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+        if (activeRecipe != null) {
+            // START + (10 * hits)
+            return getAnimationDuration(Animation.START) + (10 * activeRecipe.hammer_hits());
+        }
+        return getAnimationDuration(Animation.START) + 70;
     }
 
     @Override
@@ -30,84 +54,236 @@ public class TransformationSkill extends BogreSkills.Skill {
     }
 
     @Override
+    public void cancel(BogreEntity bogre) {
+        finishSkill(bogre);
+    }
+
+    @Override
     public void aiStep(BogreEntity bogre) {
-        BogreRecipe activeRecipe = bogre.getActiveRecipe();
+        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
         if (activeRecipe == null) {
             finishSkill(bogre);
             return;
         }
 
-        if (BogreCraftingManager.handleThrowingResult(bogre)) {
+        if (BogreSkillingGoal.handleThrowingResult(bogre)) {
             return;
         }
 
-        List<BlockPos> carvePositions = bogre.getCarvePositions();
-        if (carvePositions == null || carvePositions.isEmpty()) {
+        if (bogre.getCraftingState() == BogreAi.SkillingState.MOVING_TO_TARGET) {
+            handleMovement(bogre);
+        } else if (bogre.getCraftingState() == BogreAi.SkillingState.TRANSFORMATION) {
+            handleSkilling(bogre);
+        }
+    }
+
+    @Override
+    public void handleMovement(BogreEntity bogre) {
+        ItemEntity nearestTransformationItem =
+        BogreSkillingGoal.findTransformationItem(bogre, (int) detectionRadius);
+
+        if (nearestTransformationItem == null || !nearestTransformationItem.isAlive()) {
             finishSkill(bogre);
             return;
         }
 
-        BlockPos center = carvePositions.get(0);
-        ItemEntity nearestBrokenDisc = BogreCraftingManager.findBrokenDisc(bogre, (int) BogreEntity.ROAR_RANGE);
+        Vec3 itemPos = nearestTransformationItem.position();
+        double dx = bogre.getX() - itemPos.x;
+        double dz = bogre.getZ() - itemPos.z;
+        Vec3 dir;
 
-        if (nearestBrokenDisc != null) {
-            double distance = bogre.distanceTo(nearestBrokenDisc);
-            if (distance > 3.5) {
-                Vec3 discPos = nearestBrokenDisc.position();
-                Vec3 dir = bogre.position().subtract(discPos).normalize();
-                Vec3 approachPos = discPos.add(dir.scale(2.5));
-                PrecisePathNavigation preciseNav = (PrecisePathNavigation) bogre.getNavigation();
-                preciseNav.preciseMoveTo(approachPos, 1.0D);
-                bogre.resetCarveTicks();
-                bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
-                return;
-            }
-        }
-
-        bogre.getNavigation().stop();
-        
-        if (nearestBrokenDisc != null) {
-            bogre.getLookControl().setLookAt(nearestBrokenDisc.getX(), nearestBrokenDisc.getY(), nearestBrokenDisc.getZ(), 100f, 100f);
+        if (dx * dx + dz * dz < 0.01) {
+            dir = bogre.getForward();
         } else {
-            Vec3 discCenter = Vec3.atCenterOf(center);
-            bogre.getLookControl().setLookAt(discCenter.x, discCenter.y + 0.5, discCenter.z, 100f, 100f);
+            dir = new Vec3(dx, 0, dz).normalize();
         }
+        
+        float targetDist = (MIN_DISTANCE + MAX_DISTANCE) / 2.0f;
+        Vec3 moveTarget = new Vec3(itemPos.x + dir.x * targetDist, itemPos.y, itemPos.z + dir.z * targetDist);
 
-        if (bogre.getCarveTicks() == 0) {
-            bogre.getEntityData().set(BogreEntity.CARVING_ANIM, true);
+        double distance = bogre.distanceTo(nearestTransformationItem);
+
+        if (bogre.getNavigation().isDone() ||
+        bogre.tickCount % 5 == 0) {
+            BogrePathNavigation preciseNav = (BogrePathNavigation) bogre.getNavigation();
+            preciseNav.preciseMoveTo(moveTarget, 1.0D);
         }
+        
+        if (distance >= MIN_DISTANCE &&
+        distance <= MAX_DISTANCE && Math.abs(bogre.getY() - itemPos.y) < 1.5) {
+            bogre.getNavigation().stop();
+            bogre.setCraftingState(BogreAi.SkillingState.TRANSFORMATION);
+            setTransformationTicks(bogre, 0);
+        }
+    }
 
-        // validate disc is still present and valid
-        if (nearestBrokenDisc == null || !nearestBrokenDisc.isAlive()) {
-            bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
-            bogre.resetCarveTicks();
+    @Override
+    public void handlePlacingItem(BogreEntity bogre) {
+        // not used yet
+    }
+
+    @Override
+    public void handleSkilling(BogreEntity bogre) {
+        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+        if (activeRecipe == null) {
             finishSkill(bogre);
             return;
         }
-        
-        bogre.incrementCarveTicks();
 
-        if (bogre.getCarveTicks() >= getDuration()) {
-            if (nearestBrokenDisc.isAlive()) {
-                nearestBrokenDisc.discard();
-                bogre.playSound(SoundEvents.STONE_BREAK, 1.0F, 0.7F);
-            }
-            
-            if (activeRecipe.result() != null && !activeRecipe.result().isEmpty()) {
-
-                ItemEntity resultItem = new ItemEntity(bogre.level(),
-                center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5,
-                activeRecipe.result().copy());
-
-                resultItem.setDefaultPickUpDelay();
-                bogre.level().addFreshEntity(resultItem);
-            }
-            
-            bogre.getNavigation().stop();
-            bogre.setCarvePositions(List.of());
-            bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
-            bogre.resetCarveTicks();
+        // validate transformation item is still present and valid
+        ItemEntity nearestTransformationItem = BogreSkillingGoal.findTransformationItem(bogre, (int) BogreAi.ROAR_RANGE);
+        if (nearestTransformationItem == null || !nearestTransformationItem.isAlive()) {
             finishSkill(bogre);
+            return;
         }
+
+        bogre.getLookControl().setLookAt(
+            nearestTransformationItem.getX(),
+            nearestTransformationItem.getY(),
+            nearestTransformationItem.getZ(),
+            100f, 100f
+        );
+
+        int ticks = getTransformationTicks(bogre);
+        if (ticks == 0) {
+            bogre.getEntityData().set(BogreEntity.SKILL_HITS, 0);
+            bogre.getEntityData().set(BogreEntity.TARGET_POS, nearestTransformationItem.blockPosition());
+            bogre.getEntityData().set(BogreEntity.TARGET_ENTITY_ID, nearestTransformationItem.getId());
+            bogre.getEntityData().set(BogreEntity.SKILL_DURATION, getDuration(bogre));
+            bogre.getEntityData().set(BogreEntity.ANIMATION_PHASE, 0); // Start
+            bogre.getEntityData().set(BogreEntity.CARVING_ANIM, true);
+
+            // special flag for music disc transformation visuals
+            if (activeRecipe.triggerItem().isPresent() && activeRecipe.triggerItem().get().toString().equals("music_disc_11")) {
+                bogre.getEntityData().set(BogreEntity.IS_TRANSFORMING_DISC, true);
+                nearestTransformationItem.setInvisible(true);
+            }
+        } else if (ticks == getAnimationDuration(Animation.START)) {
+            bogre.getEntityData().set(BogreEntity.ANIMATION_PHASE, 1); // Loop
+        }
+
+        incrementTransformationTicks(bogre);
+    }
+
+    @Override
+    public void keyframeTriggered(BogreEntity bogre, String name) {
+        if (name.equals("skill_finished")) {
+            if (!bogre.level().isClientSide) {
+                BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+                ItemEntity nearestTransformationItem = BogreSkillingGoal.findTransformationItem(bogre, (int) BogreAi.ROAR_RANGE);
+                if (activeRecipe != null && nearestTransformationItem != null) {
+                    Vec3 dropPos = nearestTransformationItem.position();
+                    nearestTransformationItem.discard();
+                    if (activeRecipe.result() != null && !activeRecipe.result().isEmpty()) {
+
+                        ItemEntity itemEntity = new
+                        ItemEntity(bogre.level(),
+                        dropPos.x, dropPos.y + 0.5, dropPos.z,
+                        activeRecipe.result().copy());
+
+                        itemEntity.setDeltaMovement(
+                            (bogre.getRandom().nextDouble() * 0.2 - 0.1),
+                            0.45,
+                            (bogre.getRandom().nextDouble() * 0.2 - 0.1)
+                        );
+
+                        itemEntity.setDefaultPickUpDelay();
+                        bogre.level().addFreshEntity(itemEntity);
+                        bogre.playSound(SoundEvents.ITEM_PICKUP, 0.5F, 1.2F);
+                    }
+                }
+
+                bogre.getNavigation().stop();
+                bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
+                setTransformationTicks(bogre, 0);
+                bogre.resetCookingTicks();
+                bogre.triggerAnim("trigger_controller", "grab");
+                bogre.getEntityData().set(BogreEntity.TARGET_POS, BlockPos.ZERO);
+                bogre.getEntityData().set(BogreEntity.TARGET_ENTITY_ID, -1);
+                bogre.getEntityData().set(BogreEntity.IS_TRANSFORMING_DISC, false);
+                finishSkill(bogre);
+            }
+            return;
+        }
+
+        if (!name.equals("hammer_sound")) return;
+
+        if (bogre.getCraftingState() == BogreAi.SkillingState.TRANSFORMATION) {
+            BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+            if (!bogre.level().isClientSide && activeRecipe == null) return;
+            
+            if (!bogre.level().isClientSide) {
+                int currentHits = bogre.getEntityData().get(BogreEntity.SKILL_HITS) + 1;
+                bogre.getEntityData().set(BogreEntity.SKILL_HITS, currentHits);
+                
+                int expectedHits = activeRecipe.hammer_hits();
+                if (expectedHits < 1) expectedHits = 1;
+
+                ItemEntity nearestTransformationItem = BogreSkillingGoal.findTransformationItem(bogre, (int) BogreAi.ROAR_RANGE);
+                Vec3 precisePos = null;
+                if (nearestTransformationItem != null) {
+                    precisePos = nearestTransformationItem.position();
+                }
+
+                if (precisePos == null) {
+                    BlockPos targetPos = bogre.getEntityData().get(BogreEntity.TARGET_POS);
+                    precisePos = Vec3.atCenterOf(targetPos);
+                }
+
+                HammerEffectRenderer.spawnTransformationParticles(bogre.level(), precisePos);
+                
+                if (currentHits >= expectedHits && nearestTransformationItem != null) {
+                    keyframeTriggered(bogre, "skill_finished");
+                }
+            } else {
+                bogre.clientSkillHits++;
+                int expectedHits = bogre.getEntityData().get(BogreEntity.HAMMER_HITS);
+                if (expectedHits < 1) expectedHits = 1;
+
+                if (bogre.clientSkillHits >= expectedHits) {
+                    bogre.hammerHideTicks = 10;
+                    bogre.isHammerHidden = true;
+                    bogre.clientSkillHits = 0;
+                    
+                    BogreAnimationHandler.getBonePosition(bogre, "hammer").ifPresent(pos -> {
+                        for (int i = 0; i < 7; ++i) {
+                            double d0 = bogre.getRandom().nextGaussian() * 0.02D;
+                            double d1 = bogre.getRandom().nextGaussian() * 0.02D;
+                            double d2 = bogre.getRandom().nextGaussian() * 0.02D;
+                            bogre.level().addParticle(ParticleTypes.POOF, 
+                                pos.x, pos.y, pos.z, d0, d1, d2);
+                        }
+                    });
+                }
+
+                int targetId = bogre.getEntityData().get(BogreEntity.TARGET_ENTITY_ID);
+                Vec3 precisePos = null;
+                if (targetId != -1) {
+                    Entity targetEntity = bogre.level().getEntity(targetId);
+                    if (targetEntity != null) {
+                        precisePos = targetEntity.position();
+                    }
+                }
+                
+                if (precisePos == null) {
+                    BlockPos targetPos = bogre.getEntityData().get(BogreEntity.TARGET_POS);
+                    precisePos = Vec3.atCenterOf(targetPos);
+                }
+                
+                HammerEffectRenderer.spawnTransformationParticles(bogre.level(), precisePos);
+            }
+        }
+    }
+
+    public static int getTransformationTicks(BogreEntity bogre) {
+        return bogre.getAiTicks();
+    }
+
+    public static void setTransformationTicks(BogreEntity bogre, int ticks) {
+        bogre.setAiTicks(ticks);
+    }
+
+    public static void incrementTransformationTicks(BogreEntity bogre) {
+        bogre.incrementAiTicks();
     }
 }

@@ -1,10 +1,10 @@
-package com.jeremyseq.inhabitants.entities.bogre;
+package com.jeremyseq.inhabitants.entities.bogre.ai;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
-import com.jeremyseq.inhabitants.networking.ShockwaveParticlePacketS2C;
+import com.jeremyseq.inhabitants.networking.bogre.ShockwaveParticlePacketS2C;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -19,12 +19,10 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ShockwaveManager {
+public class ShockwaveGoal {
 
     private static final List<ActiveShockwave> activeShockwaves = new ArrayList<>();
 
@@ -35,10 +33,12 @@ public class ShockwaveManager {
      * @param radius shockwave max radius
      * @param lifetime shockwave duration in ticks
      */
-    public static void addShockwave(ServerLevel level, Vec3 center, float damage, float radius, int lifetime, LivingEntity owner) {
+    public static void addShockwave(ServerLevel level, Vec3 center, float damage, float radius,
+    int lifetime, LivingEntity owner) {
         activeShockwaves.add(new ActiveShockwave(level, center, damage, radius, lifetime, owner));
 
-        level.playSound(null, center.x, center.y, center.z, ModSoundEvents.SHOCKWAVE.get(), SoundSource.HOSTILE, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
+        level.playSound(null, center.x, center.y, center.z, ModSoundEvents.SHOCKWAVE.get(),
+        SoundSource.HOSTILE, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
         
         level.sendParticles(ParticleTypes.EXPLOSION, center.x, center.y, center.z, 2, 0.5D, 0.5D, 0.5D, 0.0D);
 
@@ -61,6 +61,7 @@ public class ShockwaveManager {
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END && !activeShockwaves.isEmpty()) {
             Iterator<ActiveShockwave> iterator = activeShockwaves.iterator();
+            
             while (iterator.hasNext()) {
                 ActiveShockwave shockwave = iterator.next();
                 shockwave.tick();

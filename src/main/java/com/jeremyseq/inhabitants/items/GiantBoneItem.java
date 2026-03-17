@@ -1,6 +1,8 @@
 package com.jeremyseq.inhabitants.items;
 
-import com.jeremyseq.inhabitants.entities.bogre.ShockwaveManager;
+import com.jeremyseq.inhabitants.entities.bogre.ai.ShockwaveGoal;
+import com.jeremyseq.inhabitants.networking.bogre.ShockwaveParticlePacketS2C;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -12,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
+
 import org.jetbrains.annotations.NotNull;
 
 public class GiantBoneItem extends SwordItem {
@@ -42,7 +45,7 @@ public class GiantBoneItem extends SwordItem {
         }
 
         if (!pLevel.isClientSide) {
-            ShockwaveManager.addShockwave((ServerLevel) pLevel, rayTraceResult.getLocation(), SHOCKWAVE_DAMAGE, SHOCKWAVE_RADIUS, 40, pPlayer);
+            ShockwaveGoal.addShockwave((ServerLevel) pLevel, rayTraceResult.getLocation(), SHOCKWAVE_DAMAGE, SHOCKWAVE_RADIUS, 40, pPlayer);
         }
 
         pPlayer.getCooldowns().addCooldown(this, 100);

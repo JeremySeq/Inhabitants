@@ -2,7 +2,7 @@ package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
+import com.jeremyseq.inhabitants.entities.bogre.render.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
