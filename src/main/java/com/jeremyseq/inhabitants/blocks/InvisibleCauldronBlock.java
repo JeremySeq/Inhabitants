@@ -22,12 +22,12 @@ public class InvisibleCauldronBlock extends Block {
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state,
     @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
-        return Block.box(0, 0, 0, 32, 16, 32);
+        return Block.box(-8, 0, -8, 24, 16, 24);
     }
 
     @Override
     public @NotNull VoxelShape getCollisionShape(@NotNull BlockState state,
     @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
-        return Block.box(0, 0, 0, 32, 16, 32);
+        return Block.box(-8, 0, -8, 24, 16, 24);
     }
 }
