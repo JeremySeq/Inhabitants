@@ -40,8 +40,8 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
             return false;
         }
 
-        if (bogre.getNeutralState() == BogreAi.NeutralState.DANCING) {
-            return false;
+        if (shouldDance(bogre)) {
+            return true;
         }
 
         return super.canUse();
@@ -53,8 +53,8 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
             return false;
         }
 
-        if (bogre.getNeutralState() == BogreAi.NeutralState.DANCING) {
-            return false;
+        if (bogre.getNeutralState() == BogreAi.NeutralState.DANCING || shouldDance(bogre)) {
+            return true;
         }
 
         return super.canContinueToUse();
@@ -74,22 +74,17 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
 
     @Override
     public void tick() {
-        
         handleRoaringInitiation();
-        if (bogre.getAIState() == BogreAi.State.AGGRESSIVE) {
+        if (bogre.getAIState() == BogreAi.State.AGGRESSIVE || bogre.getAIState() == BogreAi.State.SKILLING) {
             return;
         }
         
-        if (bogre.getAIState() == BogreAi.State.SKILLING) {
-            return;
-        }
+        handleJukebox();
         
         if (bogre.getNeutralState() == BogreAi.NeutralState.DANCING) {
             handleDancing();
             return;
         }
-        
-        handleJukebox();
         
         if (!bogre.isRoaring()) {
             super.tick();
