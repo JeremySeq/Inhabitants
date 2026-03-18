@@ -21,6 +21,9 @@
   "item.inhabitants.music_disc_bogre": "Music Disc",
   "item.inhabitants.music_disc_bogre.desc": "BoboTweaks - Hermit",
 
+  "tooltip.inhabitants.special_effect": "Special Ability",
+  "tooltip.inhabitants.giant_bone": "25% chance to perform a Shockwave on critical hit.",
+
   "effect.inhabitants.concussion": "Concussion",
   "effect.inhabitants.monster_disguise": "Monster Disguise",
   "effect.inhabitants.sticky_legs": "Sticky Legs",
@@ -53,7 +56,7 @@
 
   "key.categories.inhabitants": "Inhabitants",
   "key.inhabitants_key": "Inhabitants Special Ability",
-  
+
   "painting.inhabitants.my_precious.title": "My Precious",
   "painting.inhabitants.my_precious.author": "Catalyst",
   "painting.inhabitants.endermans_last_day.title": "Enderman's Last Day",
