@@ -1,6 +1,8 @@
 package com.jeremyseq.inhabitants.networking;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.networking.bogre.*;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -28,6 +30,13 @@ public class ModNetworking {
 
     public static void register() {
         // Client → Server
+        CHANNEL.registerMessage(
+                packetId++,
+                BogreSkillKeyframePacketC2S.class,
+                BogreSkillKeyframePacketC2S::encode,
+                BogreSkillKeyframePacketC2S::decode,
+                BogreSkillKeyframePacketC2S::handle
+        );
 
         // Server → Client
         CHANNEL.registerMessage(

@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.networking;
+package com.jeremyseq.inhabitants.networking.bogre;
 
 import com.jeremyseq.inhabitants.particles.ModParticles;
 import net.minecraft.client.Minecraft;

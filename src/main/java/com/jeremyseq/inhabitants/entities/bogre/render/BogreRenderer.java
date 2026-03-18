@@ -1,24 +1,39 @@
-package com.jeremyseq.inhabitants.entities.bogre;
+package com.jeremyseq.inhabitants.entities.bogre.render;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.jeremyseq.inhabitants.debug.BogreDebugRenderer;
+import com.jeremyseq.inhabitants.debug.DevMode;
+import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
+import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
+
+import net.minecraft.client.gui.Font;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.entity.Entity;
+
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
+import org.joml.Matrix4f;
 
 public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
     private static final float scale = 1.25f;
@@ -34,44 +49,31 @@ public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
     }
 
     @Override
+    public void render(BogreEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
+    MultiBufferSource bufferSource, int packedLight) {
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+
+        this.getGeoModel().getBone("mouthPoint").ifPresent(bone -> {
+            entity.clientMouthPos = new Vec3(
+                    bone.getWorldPosition().x,
+                    bone.getWorldPosition().y,
+                    bone.getWorldPosition().z
+            );
+        });
+
+        if (DevMode.bogreStates()) {
+            BogreDebugRenderer.renderStateLabel(entity, poseStack, bufferSource,
+            this.entityRenderDispatcher, this.getFont(), packedLight);
+        }
+    }
+
+    @Override
     public RenderType getRenderType(BogreEntity animatable, ResourceLocation texture, @Nullable MultiBufferSource bufferSource, float partialTick) {
         return RenderType.entityTranslucent(getTextureLocation(animatable));
     }
 
     @Override
     public void postRender(PoseStack poseStack, BogreEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        // spit particles
-
-        if (!animatable.level().isClientSide) return;
-        if (!animatable.isRoaring()) return;
-
-        int tick = animatable.getRoaringTick();
-        if (tick >= 10 && tick <= 12 && lastSpitTick != tick) {
-
-            GeoBone head = this.getGeoModel().getBone("head").orElse(null);
-            if (head == null) return;
-
-            Vec3 mouthPos = new Vec3(head.getWorldPosition().x, head.getWorldPosition().y, head.getWorldPosition().z);
-            Vec3 look = animatable.getLookAngle().normalize();
-            mouthPos = mouthPos.add(look.x * 0.2, look.y * 0.2, look.z * 0.2);
-            ClientLevel level = (ClientLevel) animatable.level();
-
-            double vx = look.x * 0.6 + level.random.nextGaussian() * 0.05;
-            double vy = (look.y-.4) * .3 + level.random.nextGaussian() * 0.05; // more downward bias
-            double vz = look.z * 0.6 + level.random.nextGaussian() * 0.05;
-
-            level.addParticle(
-                    ParticleTypes.POOF,
-                    mouthPos.x,
-                    mouthPos.y,
-                    mouthPos.z,
-                    vx,
-                    vy,
-                    vz
-            );
-        }
-        lastSpitTick = tick;
-
     }
 
     @Override
@@ -91,7 +93,7 @@ public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
 
         @Override
         protected @Nullable ItemStack getStackForBone(GeoBone bone, BogreEntity animatable) {
-            if ("fish".equals(bone.getName()) && !animatable.getAnimateItemHeld().isEmpty()) {
+            if ("fish".equals(bone.getName()) && !animatable.getItemHeld().isEmpty()) {
                 return animatable.getItemHeld();
             }
 

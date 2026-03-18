@@ -1,4 +1,7 @@
-package com.jeremyseq.inhabitants.entities.bogre;
+package com.jeremyseq.inhabitants.entities.bogre.ai;
+
+import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
+import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
@@ -19,18 +22,19 @@ public class BogreReturnToCauldronGoal extends Goal {
     @Override
     public boolean canUse() {
         if (bogre.cauldronPos == null) return false;
-        if (bogre.getAIState() != BogreEntity.State.CAUTIOUS) return false;
+        if (bogre.getAIState() != BogreAi.State.NEUTRAL) return false;
         if (bogre.getTarget() != null) return false;
         if (bogre.isRoaring()) return false;
 
         return !this.bogre.canSeeCauldron() || bogre.cauldronPos.distToCenterSqr(bogre.position())
-                > BogreEntity.MAX_CAULDRON_DIST_SQR;
+                > BogreNeutralGoal.MAX_CAULDRON_DIST_SQR;
+
     }
 
     @Override
     public boolean canContinueToUse() {
         if (bogre.cauldronPos == null) return false;
-        if (bogre.getAIState() != BogreEntity.State.CAUTIOUS) return false;
+        if (bogre.getAIState() != BogreAi.State.NEUTRAL) return false;
         if (bogre.getTarget() != null) return false;
         if (bogre.isRoaring()) return false;
 
@@ -41,6 +45,7 @@ public class BogreReturnToCauldronGoal extends Goal {
     @Override
     public void start() {
         moveTowardTarget();
+        bogre.setNeutralState(BogreAi.NeutralState.WANDERING);
     }
 
     @Override
@@ -51,12 +56,19 @@ public class BogreReturnToCauldronGoal extends Goal {
             moveTowardTarget();
         }
 
+        if (bogre.getNavigation().isDone()) {
+            bogre.setNeutralState(BogreAi.NeutralState.IDLE);
+        } else {
+            bogre.setNeutralState(BogreAi.NeutralState.WANDERING);
+        }
+
         // teleport to entrance if path ended and cauldron not visible
         // or if bogre is very far from entrance
         if (bogre.entrancePos != null && ((bogre.getNavigation().isDone() && !bogre.canSeeCauldron()) || bogre.distanceToSqr(bogre.entrancePos.getCenter()) > 20*20)) {
             Vec3 entrance = Vec3.atCenterOf(bogre.entrancePos);
             bogre.setPos(entrance.x, entrance.y, entrance.z);
             bogre.getNavigation().stop();
+            bogre.setNeutralState(BogreAi.NeutralState.IDLE);
         }
     }
 
@@ -64,6 +76,7 @@ public class BogreReturnToCauldronGoal extends Goal {
     @Override
     public void stop() {
         bogre.getNavigation().stop();
+        bogre.setNeutralState(BogreAi.NeutralState.IDLE);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants;
 import com.jeremyseq.inhabitants.blocks.entity.ModBlockEntities;
 import com.jeremyseq.inhabitants.gui.ModMenuTypes;
 import com.jeremyseq.inhabitants.effects.ModEffects;
+import com.jeremyseq.inhabitants.debug.DebugCommands;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
@@ -63,6 +64,7 @@ public class Inhabitants
         ModPaintings.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(DebugCommands.class);
 
         modEventBus.addListener(this::addCreative);
     }

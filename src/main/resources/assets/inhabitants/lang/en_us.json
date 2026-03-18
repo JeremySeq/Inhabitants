@@ -9,6 +9,7 @@
 
   "item.inhabitants.bogre_spawn_egg": "Bogre Spawn Egg",
   "item.inhabitants.giant_bone": "Giant Bone",
+  "item.inhabitants.uncanny_pottage": "Uncanny Pottage",
   "item.inhabitants.warped_clam": "Warped Clam",
   "item.inhabitants.impaler_spawn_egg": "Impaler Spawn Egg",
   "item.inhabitants.impaler_spike": "Impaler Spike",
@@ -19,6 +20,9 @@
   "item.inhabitants.dimensional_snack": "Dimensional Snack",
   "item.inhabitants.music_disc_bogre": "Music Disc",
   "item.inhabitants.music_disc_bogre.desc": "BoboTweaks - Hermit",
+
+  "tooltip.inhabitants.special_effect": "Special Ability",
+  "tooltip.inhabitants.giant_bone": "25% chance to perform a Shockwave on critical hit.",
 
   "effect.inhabitants.concussion": "Concussion",
   "effect.inhabitants.monster_disguise": "Monster Disguise",
@@ -52,7 +56,7 @@
 
   "key.categories.inhabitants": "Inhabitants",
   "key.inhabitants_key": "Inhabitants Special Ability",
-  
+
   "painting.inhabitants.my_precious.title": "My Precious",
   "painting.inhabitants.my_precious.author": "Catalyst",
   "painting.inhabitants.endermans_last_day.title": "Enderman's Last Day",

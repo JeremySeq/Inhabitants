@@ -75,25 +75,23 @@
     "volume": 1.0,
     "pitch": 1.0
   },
-
-
   "bogre.attack": {
     "subtitle": "subtitles.inhabitants.bogre.attack",
     "sounds": [
       {
-        "name": "inhabitants:bogre/bogre_attack_0",
+        "name": "inhabitants:bogre/aggressive/bogre_attack_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_attack_1",
+        "name": "inhabitants:bogre/aggressive/bogre_attack_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_attack_2",
+        "name": "inhabitants:bogre/aggressive/bogre_attack_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_attack_3",
+        "name": "inhabitants:bogre/aggressive/bogre_attack_3",
         "weight": 1
       }
     ],
@@ -104,11 +102,11 @@
     "subtitle": "subtitles.inhabitants.bogre.death",
     "sounds": [
       {
-        "name": "inhabitants:bogre/bogre_death_0",
+        "name": "inhabitants:bogre/neutral/bogre_death_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_death_1",
+        "name": "inhabitants:bogre/neutral/bogre_death_1",
         "weight": 1
       }
     ],
@@ -119,19 +117,19 @@
     "subtitle": "subtitles.inhabitants.bogre.hurt",
     "sounds": [
       {
-        "name": "inhabitants:bogre/bogre_hurt_0",
+        "name": "inhabitants:bogre/neutral/bogre_hurt_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_hurt_1",
+        "name": "inhabitants:bogre/neutral/bogre_hurt_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_hurt_2",
+        "name": "inhabitants:bogre/neutral/bogre_hurt_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_hurt_3",
+        "name": "inhabitants:bogre/neutral/bogre_hurt_3",
         "weight": 1
       }
     ],
@@ -142,23 +140,23 @@
     "subtitle": "subtitles.inhabitants.bogre.idle",
     "sounds": [
       {
-        "name": "inhabitants:bogre/bogre_idle_0",
+        "name": "inhabitants:bogre/neutral/bogre_idle_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_idle_1",
+        "name": "inhabitants:bogre/neutral/bogre_idle_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_idle_2",
+        "name": "inhabitants:bogre/neutral/bogre_idle_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_idle_3",
+        "name": "inhabitants:bogre/neutral/bogre_idle_3",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_idle_4",
+        "name": "inhabitants:bogre/neutral/bogre_idle_4",
         "weight": 1
       }
     ],
@@ -169,20 +167,17 @@
     "subtitle": "subtitles.inhabitants.bogre.roar",
     "sounds": [
       {
-        "name": "inhabitants:bogre/bogre_roar_0",
+        "name": "inhabitants:bogre/aggressive/bogre_roar_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/bogre_roar_1",
+        "name": "inhabitants:bogre/aggressive/bogre_roar_1",
         "weight": 1
       }
     ],
     "volume": 1.0,
     "pitch": 1.0
   },
-
-
-
   "impaler.attack": {
     "subtitle": "subtitles.inhabitants.impaler.attack",
     "sounds": [
@@ -308,19 +303,17 @@
     "volume": 1.0,
     "pitch": 1.0
   },
-
   "shockwave": {
     "subtitle": "subtitles.inhabitants.shockwave",
     "sounds": [
       {
-        "name": "inhabitants:shockwave",
+        "name": "inhabitants:bogre/aggressive/bogre_shockwave_feedback",
         "weight": 1
       }
     ],
     "volume": 1.0,
     "pitch": 1.0
   },
-
   "disc.bogre": {
     "sounds": [
       {
@@ -329,12 +322,34 @@
       }
     ]
   },
-
   "effects.reverse_growth": {
     "subtitle": "subtitles.inhabitants.effects.reverse_growth",
     "sounds": [
       {
         "name": "inhabitants:effects/reverse_growth"
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.hammer_knock": {
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/skilling/hammer_knock1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:bogre/skilling/hammer_knock2",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.carving_finish": {
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/skilling/carving_finish_sound"
       }
     ],
     "volume": 1.0,
