@@ -5,6 +5,8 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
+import com.jeremyseq.inhabitants.entities.concher.ConcherEntity;
+import com.jeremyseq.inhabitants.entities.concher.ConcherRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
@@ -60,11 +62,19 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
 
+    public static final RegistryObject<EntityType<ConcherEntity>> CONCHER =
+            REGISTRY.register("concher",
+                    () -> EntityType.Builder.of(ConcherEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(2f, 2f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "concher").toString()));
+
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
+        event.put(ModEntities.CONCHER.get(), ConcherEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -74,5 +84,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
+        EntityRenderers.register(ModEntities.CONCHER.get(), ConcherRenderer::new);
     }
 }
