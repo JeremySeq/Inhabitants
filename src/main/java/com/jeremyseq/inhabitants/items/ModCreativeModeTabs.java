@@ -30,6 +30,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BANEFUL_POTATO.get());
                         pOutput.accept(ModItems.SPIDER_SOUP.get());
                         pOutput.accept(ModItems.DIMENSIONAL_SNACK.get());
+                        pOutput.accept(ModItems.CONCHER_SPAWN_EGG.get());
                     })
                     .build());
 
