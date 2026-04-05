@@ -7,16 +7,16 @@ import software.bernie.geckolib.model.GeoModel;
 public class ConcherModel extends GeoModel<ConcherEntity> {
     @Override
     public ResourceLocation getModelResource(ConcherEntity concherEntity) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/concher_3.geo.json");
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("geo/concher_%d.geo.json", concherEntity.getStage()));
     }
 
     @Override
     public ResourceLocation getTextureResource(ConcherEntity concherEntity) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/concher_3.png");
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("textures/entity/concher_%d.png", concherEntity.getStage()));
     }
 
     @Override
     public ResourceLocation getAnimationResource(ConcherEntity concherEntity) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "animations/concher_3.animation.json");
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("animations/concher_%d.animation.json", concherEntity.getStage()));
     }
 }

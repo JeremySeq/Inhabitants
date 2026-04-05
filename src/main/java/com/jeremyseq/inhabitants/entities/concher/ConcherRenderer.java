@@ -13,6 +13,5 @@ public class ConcherRenderer extends GeoEntityRenderer<ConcherEntity> {
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull ConcherEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/concher_3.png");
-    }
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("textures/entity/concher_%d.png", animatable.getStage()));}
 }
