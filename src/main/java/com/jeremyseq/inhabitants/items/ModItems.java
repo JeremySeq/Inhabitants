@@ -47,6 +47,10 @@ public class ModItems {
     public static final RegistryObject<Item> MUSIC_DISC_BOGRE = ITEMS.register("music_disc_bogre",
             () -> new RecordItem(6, ModSoundEvents.BOGRE_SONG, new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 2100));
 
+    public static final RegistryObject<Item> NIGHTMARE_SPAWN_EGG = ITEMS.register("nightmare_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.NIGHTMARE, 0x98312C, 0x672024, new Item.Properties()));
+
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

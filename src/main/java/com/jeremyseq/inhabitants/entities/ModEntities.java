@@ -9,6 +9,8 @@ import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
+import com.jeremyseq.inhabitants.entities.nightmare.NightmareEntity;
+import com.jeremyseq.inhabitants.entities.nightmare.NightmareRenderer;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -60,11 +62,19 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
 
+    public static final RegistryObject<EntityType<NightmareEntity>> NIGHTMARE =
+            REGISTRY.register("nightmare",
+                    () -> EntityType.Builder.of(NightmareEntity::new, MobCategory.MONSTER)
+                            .sized(1, 2.4f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "nightmare").toString()));
+
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
+        event.put(ModEntities.NIGHTMARE.get(), NightmareEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -74,5 +84,6 @@ public class ModEntities {
         EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
         EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
+        EntityRenderers.register(ModEntities.NIGHTMARE.get(), NightmareRenderer::new);
     }
 }
