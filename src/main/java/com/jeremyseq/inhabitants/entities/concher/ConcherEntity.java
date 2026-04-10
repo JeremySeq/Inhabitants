@@ -60,7 +60,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     }
 
     public void setStage(int stage) {
-        int clamped = Math.max(0, Math.min(2, stage));
+        int clamped = Math.max(0, Math.min(3, stage));
         this.entityData.set(STAGE, clamped);
     }
 
@@ -250,7 +250,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
      * @return [width, height]
      */
     public float[] getCurrentSize() {
-        float[][] sizes = {{1f, .5f}, {1.5f, 1.25f}, {2f, 2.1f}};
+        float[][] sizes = {{.85f, .3f}, {1f, .5f}, {1.5f, 1.25f}, {2f, 2.1f}};
         return sizes[this.getStage()];
     }
 
