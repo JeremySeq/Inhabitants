@@ -36,6 +36,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(paintingStack(ModPaintings.ENDERMANS_LAST_DAY));
                         pOutput.accept(paintingStack(ModPaintings.MY_PRECIOUS));
                         pOutput.accept(ModItems.NIGHTMARE_SPAWN_EGG.get());
+                        pOutput.accept(ModItems.DREAD_CLOTH.get());
                     })
                     .build());
 

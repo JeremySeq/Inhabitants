@@ -79,7 +79,7 @@ public class NightmareEntity extends Monster implements GeoEntity {
         if (this.dyingTicks >= MAX_DYING_TICKS) {
             this.remove(Entity.RemovalReason.KILLED);
             this.playSound(SoundEvents.ITEM_PICKUP);
-            this.spawnAtLocation(new ItemStack(ModItems.NIGHTMARE_SPAWN_EGG.get(), new Random().nextInt(1, 3)));
+            this.spawnAtLocation(new ItemStack(ModItems.DREAD_CLOTH.get(), new Random().nextInt(1, 2)));
         }
     }
 

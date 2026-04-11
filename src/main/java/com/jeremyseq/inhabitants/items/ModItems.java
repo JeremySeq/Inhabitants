@@ -50,6 +50,8 @@ public class ModItems {
     public static final RegistryObject<Item> NIGHTMARE_SPAWN_EGG = ITEMS.register("nightmare_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.NIGHTMARE, 0x98312C, 0x672024, new Item.Properties()));
 
+    public static final RegistryObject<Item> DREAD_CLOTH = ITEMS.register("dread_cloth",
+            () -> new Item(new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
