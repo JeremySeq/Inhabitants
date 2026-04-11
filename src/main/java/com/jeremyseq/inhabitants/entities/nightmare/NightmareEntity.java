@@ -1,6 +1,11 @@
 package com.jeremyseq.inhabitants.entities.nightmare;
 
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -19,6 +24,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -31,6 +37,9 @@ import java.util.Random;
 
 public class NightmareEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+
+    public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(NightmareEntity.class, EntityDataSerializers.INT);
+
 
     public static final int MAX_DYING_TICKS = 120;
 
@@ -84,6 +93,41 @@ public class NightmareEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    public boolean isNoGravity() {
+        return true;
+    }
+
+    @Override
+    protected void checkFallDamage(double y, boolean onGround, @NotNull BlockState state, @NotNull BlockPos pos) {
+        // no fall damage
+    }
+
+    public int getTexture() {
+        return entityData.get(TEXTURE);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(TEXTURE, random.nextInt(0, 6));
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putInt("texture", entityData.get(TEXTURE));
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+
+        if (tag.contains("texture")) {
+            entityData.set(TEXTURE, tag.getInt("texture"));
+        }
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "movement", 10, this::predicate));
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
@@ -109,7 +153,7 @@ public class NightmareEntity extends Monster implements GeoEntity {
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this , Player.class, false));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomFlyingGoal(this, 1.0D));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
     }
 
     @Override

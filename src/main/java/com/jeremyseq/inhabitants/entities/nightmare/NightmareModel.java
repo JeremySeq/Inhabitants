@@ -12,7 +12,7 @@ public class NightmareModel extends GeoModel<NightmareEntity> {
 
     @Override
     public ResourceLocation getTextureResource(NightmareEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/nightmare/nightmare_0.png");
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/nightmare/nightmare_" + animatable.getTexture() + ".png");
     }
 
     @Override
