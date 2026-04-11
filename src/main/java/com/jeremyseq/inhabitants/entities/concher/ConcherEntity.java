@@ -101,7 +101,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         if (!this.level().isClientSide()) {
             // increment growTimer once per second and attempt growth
             if (this.tickCount % TICKS_PER_GROW_CHECK == 0) {
-                if (!isGrowthInhibited() && this.getStage() < 2) {
+                if (!isGrowthInhibited() && this.getStage() < 3) {
                     growTimer++;
                     if (growTimer >= GROW_THRESHOLD_SECONDS) {
                         int old = this.getStage();
