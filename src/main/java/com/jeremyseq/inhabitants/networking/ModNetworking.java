@@ -1,8 +1,11 @@
 package com.jeremyseq.inhabitants.networking;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.networking.bogre.*;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -28,6 +31,34 @@ public class ModNetworking {
 
     public static void register() {
         // Client → Server
+        CHANNEL.registerMessage(
+                packetId++,
+                BogreSkillKeyframePacketC2S.class,
+                BogreSkillKeyframePacketC2S::encode,
+                BogreSkillKeyframePacketC2S::decode,
+                BogreSkillKeyframePacketC2S::handle
+        );
+        CHANNEL.registerMessage(
+                packetId++,
+                BogreRecipePacketC2S.class,
+                BogreRecipePacketC2S::encode,
+                BogreRecipePacketC2S::decode,
+                BogreRecipePacketC2S::handle
+        );
+        CHANNEL.registerMessage(
+                packetId++,
+                AscendPacketC2S.class,
+                AscendPacketC2S::encode,
+                AscendPacketC2S::decode,
+                AscendPacketC2S::handle
+        );
+        CHANNEL.registerMessage(
+                packetId++,
+                DrillDamagePacketC2S.class,
+                DrillDamagePacketC2S::encode,
+                DrillDamagePacketC2S::decode,
+                DrillDamagePacketC2S::handle
+        );
 
         // Server → Client
         CHANNEL.registerMessage(
@@ -50,6 +81,13 @@ public class ModNetworking {
                 TinnitusPacketS2C::encode,
                 TinnitusPacketS2C::decode,
                 TinnitusPacketS2C::handle
+        );
+        CHANNEL.registerMessage(
+                packetId++,
+                BogreRecipePacketS2C.class,
+                BogreRecipePacketS2C::encode,
+                BogreRecipePacketS2C::decode,
+                BogreRecipePacketS2C::handle
         );
     }
 }

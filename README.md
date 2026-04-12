@@ -13,7 +13,7 @@ So far, 8 mobs are planned, each with unique behaviors and interactions.
 - [@JeremySeq](https://www.curseforge.com/members/jeremyseq/projects): lead coder
 - [@Catalyst](https://x.com/Catalyst2000251): artist, animator, and designer
 - [@mattseq](https://www.curseforge.com/members/mattseq/projects): coder
-- [@BoboTweaks](https://bobotweaks.com/): sound designer
+- [@BoboTweaks](https://bobotweaks.com/): sound designer, coder
 
 **Contributors**
 

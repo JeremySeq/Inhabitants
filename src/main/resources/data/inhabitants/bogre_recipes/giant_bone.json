@@ -4,5 +4,6 @@
   "required_blocks": 3,
   "result": "inhabitants:giant_bone",
   "count": 1,
+  "hammer_hits": 7,
   "hammer_sound": "minecraft:block.bone_block.hit"
 }

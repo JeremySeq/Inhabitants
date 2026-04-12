@@ -1,0 +1,15 @@
+{
+  "name": "inhabitants:swamp_lair/start_pool",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "inhabitants:swamp_lair",
+        "processors": "inhabitants:no_hollow_base",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

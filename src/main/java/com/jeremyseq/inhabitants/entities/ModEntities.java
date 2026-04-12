@@ -2,25 +2,18 @@ package com.jeremyseq.inhabitants.entities;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.BogreRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
-import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
-import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
-import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.nightmare.NightmareEntity;
-import com.jeremyseq.inhabitants.entities.nightmare.NightmareRenderer;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
-import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderers;
+import com.jeremyseq.inhabitants.entities.javelin.JavelinEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -32,12 +25,12 @@ public class ModEntities {
     public static final RegistryObject<EntityType<BogreEntity>> BOGRE =
             REGISTRY.register("bogre",
                     () -> EntityType.Builder.of(BogreEntity::new, MobCategory.MONSTER)
-                            .sized(2f, 3.5f)
+                            .sized(1.75f, 3.5f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre").toString()));
 
     public static final RegistryObject<EntityType<BogreCauldronEntity>> BOGRE_CAULDRON =
             REGISTRY.register("bogre_cauldron",
-                    () -> EntityType.Builder.of(BogreCauldronEntity::new, MobCategory.MONSTER)
+                    () -> EntityType.Builder.of(BogreCauldronEntity::new, MobCategory.MISC)
                             .sized(2f, 1.3f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre_cauldron").toString()));
 
@@ -62,6 +55,14 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
 
+    public static final RegistryObject<EntityType<JavelinEntity>> JAVELIN =
+            REGISTRY.register("javelin",
+                    () -> EntityType.Builder.<JavelinEntity>of(JavelinEntity::new, MobCategory.MISC)
+                            .sized(0.75f, 0.75f)
+                            .clientTrackingRange(4)
+                            .updateInterval(20)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "javelin").toString()));
+
     public static final RegistryObject<EntityType<NightmareEntity>> NIGHTMARE =
             REGISTRY.register("nightmare",
                     () -> EntityType.Builder.of(NightmareEntity::new, MobCategory.MONSTER)
@@ -75,15 +76,5 @@ public class ModEntities {
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
         event.put(ModEntities.NIGHTMARE.get(), NightmareEntity.setAttributes());
-    }
-
-    @SubscribeEvent
-    public static void onClientSetup(FMLClientSetupEvent event) {
-        EntityRenderers.register(ModEntities.BOGRE.get(), BogreRenderer::new);
-        EntityRenderers.register(ModEntities.BOGRE_CAULDRON.get(), BogreCauldronRenderer::new);
-        EntityRenderers.register(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
-        EntityRenderers.register(ModEntities.IMPALER.get(), ImpalerRenderer::new);
-        EntityRenderers.register(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
-        EntityRenderers.register(ModEntities.NIGHTMARE.get(), NightmareRenderer::new);
     }
 }

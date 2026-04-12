@@ -13,14 +13,14 @@ public class ScreamParticle extends TextureSheetParticle {
     private final double screamSpeed;
     private final double yawRad;
 
-    protected ScreamParticle(ClientLevel level, double x, double y, double z, SpriteSet sprites, double screamSpeed, double yawRad) {
+    protected ScreamParticle(ClientLevel level, double x, double y, double z, SpriteSet sprites, double screamSpeed, double yawRad, double scale) {
         super(level, x, y, z);
         this.yawRad = yawRad + Math.PI / 2;
         this.screamSpeed = screamSpeed;
         pickSprite(sprites);
         hasPhysics = false;
         lifetime = 20;
-        quadSize = 1.25f;
+        quadSize = scale > 0 ? (float) scale : 1.25f;
         xd = yd = zd = 0;
     }
 
@@ -108,7 +108,7 @@ public class ScreamParticle extends TextureSheetParticle {
          */
         @Override
         public Particle createParticle(@NotNull SimpleParticleType type, @NotNull ClientLevel level, double x, double y, double z, double mx, double my, double mz) {
-            return new ScreamParticle(level, x, y, z, sprites, mx, my);
+            return new ScreamParticle(level, x, y, z, sprites, mx, my, mz);
         }
     }
 }

@@ -1,0 +1,11 @@
+{
+  "type": "cooking",
+  "ingredients": [
+    "minecraft:poisonous_potato",
+    "minecraft:fermented_spider_eye",
+    "minecraft:bone"
+  ],
+  "result": "inhabitants:uncanny_pottage",
+  "container": "minecraft:bowl",
+  "time_ticks": 100
+}

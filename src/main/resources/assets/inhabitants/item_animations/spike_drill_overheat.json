@@ -1,0 +1,57 @@
+{
+  "duration_ticks": 15,
+  "easing": "easeOutSine",
+  "loop_mode": "play_once",
+  "keyframes": [
+    {
+      "time": 0.0,
+      "translate": [
+        -0.55,
+        0.1,
+        -0.15
+      ],
+      "rotate_x": -110.0,
+      "rotate_y": 0.0,
+      "rotate_z": 90.0
+    },
+    {
+      "time": 0.3,
+      "translate": [
+        -0.4,
+        -0.3,
+        -0.5
+      ],
+      "rotate_x": -70.0,
+      "rotate_y": -10.0,
+      "rotate_z": 60.0
+    },
+    {
+      "time": 0.6,
+      "translate": [
+        -0.4,
+        -0.3,
+        -0.5
+      ],
+      "rotate_x": -70.0,
+      "rotate_y": -10.0,
+      "rotate_z": 60.0
+    },
+    {
+      "time": 1.0,
+      "translate": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotate_x": 0.0,
+      "rotate_y": 0.0,
+      "rotate_z": 0.0
+    }
+  ],
+  "vibrate": {
+    "amplitude_x": 0.03,
+    "amplitude_y": 0.03,
+    "freq_x": 15.0,
+    "freq_y": 20.0
+  }
+}

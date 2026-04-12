@@ -1,0 +1,61 @@
+{
+  "duration_ticks": 5,
+  "easing": "easeOutSine",
+  "loop_mode": "looping",
+  "exit_to": "spike_drill_end",
+  "keyframes": [
+    {
+      "time": 0.0,
+      "translate": [-0.55, 0.1, -0.15],
+      "rotate_x": -110.0,
+      "rotate_y": 0.0,
+      "rotate_z": 90.0,
+      "trigger_keyframe": "inhabitants:drill_loop_sound"
+    },
+    {
+      "time": 0.15,
+      "translate": [-0.55, 0.1, -0.275],
+      "rotate_x": -110.0,
+      "rotate_y": 0.0,
+      "rotate_z": 90.0,
+      "trigger_keyframe": "inhabitants:drill_dig"
+    },
+    {
+      "time": 0.35,
+      "translate": [-0.55, 0.1, -0.15],
+      "rotate_x": -110.0,
+      "rotate_y": 0.0,
+      "rotate_z": 90.0,
+      "trigger_keyframe": "inhabitants:drill_dig"
+    },
+    {
+      "time": 0.65,
+      "translate": [-0.55, 0.1, -0.15],
+      "rotate_x": -110.0,
+      "rotate_y": 0.0,
+      "rotate_z": 90.0,
+      "trigger_keyframe": "inhabitants:drill_dig"
+    },
+    {
+      "time": 0.85,
+      "translate": [-0.55, 0.1, -0.15],
+      "rotate_x": -110.0,
+      "rotate_y": 0.0,
+      "rotate_z": 90.0,
+      "trigger_keyframe": "inhabitants:drill_dig"
+    },
+    {
+      "time": 1.0,
+      "translate": [-0.55, 0.1, -0.15],
+      "rotate_x": -110.0,
+      "rotate_y": 0.0,
+      "rotate_z": 90.0
+    }
+  ],
+  "vibrate": {
+    "amplitude_x": 0.012,
+    "amplitude_y": 0.008,
+    "freq_x": 4.5,
+    "freq_y": 7.0
+  }
+}

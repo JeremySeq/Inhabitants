@@ -1,0 +1,67 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "inhabitants:item/spike_drill/spike_drill"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 0.0,
+        "inhabitants:drilling": 1.0
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_anim"
+    },
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 0.25
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_heat_25_idle"
+    },
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 0.25,
+        "inhabitants:drilling": 1.0
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_heat_25_anim"
+    },
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 0.50
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_heat_50_idle"
+    },
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 0.50,
+        "inhabitants:drilling": 1.0
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_heat_50_anim"
+    },
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 0.75
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_heat_75_idle"
+    },
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 0.75,
+        "inhabitants:drilling": 1.0
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_heat_75_anim"
+    },
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 1.0
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_heat_100_idle"
+    },
+    {
+      "predicate": {
+        "inhabitants:drill_temperature": 1.0,
+        "inhabitants:drilling": 1.0
+      },
+      "model": "inhabitants:item/spike_drill/spike_drill_heat_100_anim"
+    }
+  ]
+}

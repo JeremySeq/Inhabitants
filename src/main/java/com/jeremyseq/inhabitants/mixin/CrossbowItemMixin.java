@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.mixin;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.items.ModItems;
+
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -15,8 +16,10 @@ import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,19 +32,74 @@ import java.util.function.Predicate;
 @Mixin(CrossbowItem.class)
 public abstract class CrossbowItemMixin {
 
+    @Inject(
+        method = "shootProjectile",
+        at = @At("HEAD"),
+        cancellable = true
+    )
+    private static void inhabitants$onShoot(Level pLevel, LivingEntity pShooter,
+        InteractionHand pHand, ItemStack pCrossbowStack, ItemStack pAmmoStack,
+        float pSoundPitch, boolean pIsCreativeMode, float pVelocity, float pInaccuracy,
+        float pProjectileAngle, CallbackInfo ci) {
+        if (pAmmoStack.is(ModItems.IMPALER_SPIKE.get())) {
+
+            // shoot impaler spike
+            if (!pLevel.isClientSide) {
+                ImpalerSpikeProjectile spike = new ImpalerSpikeProjectile(
+                    ModEntities.IMPALER_SPIKE_PROJECTILE.get(), pShooter, pLevel);
+
+                Vec3 vec31 = pShooter.getUpVector(1.0F);
+                
+                Quaternionf quaternionf = 
+                    (new Quaternionf()).setAngleAxis(pProjectileAngle * ((float)Math.PI / 180F),
+                    vec31.x, vec31.y, vec31.z);
+
+                Vec3 vec3 = pShooter.getViewVector(1.0F);
+                Vector3f vector3f = vec3.toVector3f().rotate(quaternionf);
+                spike.shoot(vector3f.x(), vector3f.y(), vector3f.z(), pVelocity, pInaccuracy);
+
+                if (pIsCreativeMode || pProjectileAngle != 0.0F) {
+                    spike.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+                }
+
+                // if not in creative mode, consume one item
+                if (!pIsCreativeMode) {
+                    pAmmoStack.shrink(1);
+                }
+
+                pCrossbowStack.hurtAndBreak(1, pShooter, (lE) -> lE.broadcastBreakEvent(pHand));
+
+                pLevel.addFreshEntity(spike);
+            }
+
+            pLevel.playSound(null, pShooter.getX(), pShooter.getY(), pShooter.getZ(),
+                    SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, pSoundPitch);
+
+            ci.cancel();
+        }
+    }
+
     @Shadow
     private static boolean loadProjectile(LivingEntity pShooter, ItemStack pCrossbowStack, ItemStack pAmmoStack, boolean pHasAmmo, boolean pIsCreative) {
         return false;
     }
 
-    @Inject(method="getAllSupportedProjectiles", at=@At("HEAD"), cancellable = true)
-    private void getAllSupportedProjectiles(CallbackInfoReturnable<Predicate<ItemStack>> cir) {
+    @Inject(
+        method="getAllSupportedProjectiles",
+        at=@At("HEAD"),
+        cancellable = true
+    )
+    private void inhabitants$getAllSupportedProjectiles(CallbackInfoReturnable<Predicate<ItemStack>> cir) {
         cir.setReturnValue(ProjectileWeaponItem.ARROW_ONLY.or((item) -> item.is(ModItems.IMPALER_SPIKE.get())));
         cir.cancel();
     }
 
-    @Inject(method="tryLoadProjectiles", at=@At("HEAD"), cancellable = true)
-    private static void loadProjectile(LivingEntity pShooter, ItemStack pCrossbowStack, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(
+        method="tryLoadProjectiles",
+        at=@At("HEAD"),
+        cancellable = true
+    )
+    private static void inhabitants$loadProjectile(LivingEntity pShooter, ItemStack pCrossbowStack, CallbackInfoReturnable<Boolean> cir) {
         ItemStack projectileStack = pShooter.getProjectile(pCrossbowStack);
         if (!projectileStack.is(ModItems.IMPALER_SPIKE.get())) return;
 
@@ -68,40 +126,5 @@ public abstract class CrossbowItemMixin {
         }
 
         cir.setReturnValue(true);
-    }
-
-    @Inject(method = "shootProjectile", at = @At("HEAD"), cancellable = true)
-    private static void onShoot(Level pLevel, LivingEntity pShooter, InteractionHand pHand, ItemStack pCrossbowStack, ItemStack pAmmoStack, float pSoundPitch, boolean pIsCreativeMode, float pVelocity, float pInaccuracy, float pProjectileAngle, CallbackInfo ci) {
-        if (pAmmoStack.is(ModItems.IMPALER_SPIKE.get())) {
-
-            // shoot impaler spike
-            if (!pLevel.isClientSide) {
-                ImpalerSpikeProjectile spike = new ImpalerSpikeProjectile(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), pShooter, pLevel);
-
-                Vec3 vec31 = pShooter.getUpVector(1.0F);
-                Quaternionf quaternionf = (new Quaternionf()).setAngleAxis(pProjectileAngle * ((float)Math.PI / 180F), vec31.x, vec31.y, vec31.z);
-                Vec3 vec3 = pShooter.getViewVector(1.0F);
-                Vector3f vector3f = vec3.toVector3f().rotate(quaternionf);
-                spike.shoot(vector3f.x(), vector3f.y(), vector3f.z(), pVelocity, pInaccuracy);
-
-                if (pIsCreativeMode || pProjectileAngle != 0.0F) {
-                    spike.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
-                }
-
-                // if not in creative mode, consume one item
-                if (!pIsCreativeMode) {
-                    pAmmoStack.shrink(1);
-                }
-
-                pCrossbowStack.hurtAndBreak(1, pShooter, (p_40858_) -> p_40858_.broadcastBreakEvent(pHand));
-
-                pLevel.addFreshEntity(spike);
-            }
-
-            pLevel.playSound(null, pShooter.getX(), pShooter.getY(), pShooter.getZ(),
-                    SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, pSoundPitch);
-
-            ci.cancel();
-        }
     }
 }

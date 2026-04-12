@@ -23,9 +23,9 @@ public class FishSnotChowderItem extends BowlFoodItem {
 
     @Override
     public @NotNull ItemStack finishUsingItem(@NotNull ItemStack pStack, @NotNull Level pLevel, LivingEntity pEntityLiving) {
-        if (!pEntityLiving.isInFluidType(Fluids.WATER.getFluidType())) {
-            pEntityLiving.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 300, 1, false, true, true));
-        }
+        pEntityLiving.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 1, false, true, true));
+
+        pEntityLiving.setAirSupply(pEntityLiving.getMaxAirSupply());
 
         return super.finishUsingItem(pStack, pLevel, pEntityLiving);
     }

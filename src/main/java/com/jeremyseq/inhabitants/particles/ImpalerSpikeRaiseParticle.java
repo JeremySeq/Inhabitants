@@ -102,11 +102,11 @@ public class ImpalerSpikeRaiseParticle extends TextureSheetParticle {
 
     public static void spawnSpikeBurst(ClientLevel level, LivingEntity entity, int count) {
         double radius = entity.getBbWidth() * 0.85;
-
-        double cx = entity.getX();
         double cy = entity.getY() + entity.getBbHeight() * 0.5;
-        double cz = entity.getZ();
+        spawnSpikeBurst(level, entity.getX(), cy, entity.getZ(), radius, count);
+    }
 
+    public static void spawnSpikeBurst(ClientLevel level, double cx, double cy, double cz, double radius, int count) {
         for (int i = 0; i < count; i++) {
             double t = (double) i / count;
             double phi = Math.acos(1 - 2 * t);

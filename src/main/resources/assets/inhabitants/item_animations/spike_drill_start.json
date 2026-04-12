@@ -1,0 +1,40 @@
+{
+  "duration_ticks": 10,
+  "easing": "easeOutSine",
+  "loop_mode": "play_once",
+  "continue_to": "spike_drill_loop",
+  "keyframes": [
+    {
+      "time": 0.0,
+      "translate": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotate_x": 0.0,
+      "rotate_y": 0.0,
+      "rotate_z": 0.0,
+      "trigger_keyframe": "inhabitants:drill_start_sound"
+    },
+    {
+      "time": 0.5,
+      "translate": [
+        0.3,
+        -0.6,
+        -0.6
+      ],
+      "rotate_x": -80.0,
+      "rotate_y": 0.0,
+      "rotate_z": 15.0
+    },
+    {
+      "time": 1.0,
+      "translate": [
+        -0.55, 0.1, -0.15
+      ],
+      "rotate_x": -110.0,
+      "rotate_y": 0.0,
+      "rotate_z": 90.0
+    }
+  ]
+}

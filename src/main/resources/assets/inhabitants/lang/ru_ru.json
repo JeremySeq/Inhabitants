@@ -1,0 +1,88 @@
+{
+  "entity.inhabitants.bogre": "Бологр",
+
+  "entity.inhabitants.bogre_cauldron": "Котел Бологра",
+  "entity.inhabitants.warped_clam": "Искаженная ракушка",
+  "entity.inhabitants.impaler": "Пронзатель",
+
+  "creativetab.inhabitants_tab": "Обитатели",
+
+  "item.inhabitants.bogre_spawn_egg": "Яйцо призыва Бологра",
+  "item.inhabitants.giant_bone": "Гигантская кость",
+  "item.inhabitants.uncanny_pottage": "Жуткая похлебка",
+  "item.inhabitants.warped_clam": "Искаженная ракушка",
+  "item.inhabitants.impaler_spawn_egg": "Яйцо призыва Пронзателя",
+  "item.inhabitants.impaler_spike": "Шип пронзателя",
+  "item.inhabitants.fish_snot_chowder": "Рыбно-сопливый суп",
+  "item.inhabitants.marinated_spider": "Маринованый паук",
+  "item.inhabitants.baked_brains": "Запеченные мозги",
+  "item.inhabitants.dimensional_serving": "Межпространственная порция",
+  "item.inhabitants.music_disc_bogre": "Музыкальная пластинка",
+  "item.inhabitants.music_disc_bogre.desc": "BoboTweaks - Hermit",
+  "item.inhabitants.javelin": "Метательное копье",
+  "item.inhabitants.swamp_lair_map": "Карта болотного логова",
+  "item.inhabitants.bogre_cauldron": "Котел Бологра",
+  "item.inhabitants.spike_drill": "Шипобур",
+  "item.inhabitants.impaler_head": "Голова Пронзателя",
+  "item.inhabitants.dripstone_impaler_head": "Голова сталагмитового Пронзателя",
+
+  "block.inhabitants.impaler_head": "Голова Пронзателя",
+  "block.inhabitants.dripstone_impaler_head": "Голова сталагмитового Пронзателя",
+
+
+  "tooltip.inhabitants.special_effect": "Особая способность",
+  "tooltip.inhabitants.giant_bone": "25% шанс создать ударную волну при критическом уроне",
+  "tooltip.inhabitants.spike_drill": "Может быть охлажден снежками",
+  "tooltip.inhabitants.spike_drill.overheated": "Бур перегрет",
+  "tooltip.inhabitants.spike_drill.temperature": "Температура: %s / %s",
+
+  "effect.inhabitants.concussion": "Сотрясение",
+  "effect.inhabitants.monster_disguise": "Трупная маскировка",
+  "effect.inhabitants.sticky_legs": "Липкие ноги",
+  "effect.inhabitants.reverse_growth": "Обратный рост",
+  "effect.inhabitants.immaterial": "Нематериальный",
+
+  "advancement.inhabitants.david_and_goliath.title": "Давид и Голиаф",
+  "advancement.inhabitants.david_and_goliath.description": "Сразите Бологра",
+  "advancement.inhabitants.ate_fish_snot_chowder.title": "А это вообще съедобно?",
+  "advancement.inhabitants.ate_fish_snot_chowder.description": "Отведайте все блюда Бологра",
+
+  "subtitles.inhabitants.warped_clam.closing": "Искаженная ракушка закрывается",
+  "subtitles.inhabitants.warped_clam.opening": "Искаженная ракушка открывается",
+  "subtitles.inhabitants.warped_clam.closed_damage": "Искаженная ракушка щелкает",
+  "subtitles.inhabitants.warped_clam.opened_damage": "Искаженная ракушка получает урон",
+  "subtitles.inhabitants.bogre.attack": "Бологр атакует",
+  "subtitles.inhabitants.bogre.death": "Бологр умирает",
+  "subtitles.inhabitants.bogre.hurt": "Бологр получает урон",
+  "subtitles.inhabitants.bogre.idle": "Бологр бормочет",
+  "subtitles.inhabitants.bogre.roar": "Бологр рычит",
+  "subtitles.inhabitants.impaler.attack": "Пронзатель кусает",
+  "subtitles.inhabitants.impaler.death": "Пронзатель умирает",
+  "subtitles.inhabitants.impaler.hurt": "Пронзатель получает урон",
+  "subtitles.inhabitants.impaler.idle": "Пронзатель гогочет",
+  "subtitles.inhabitants.impaler.scream": "Пронзатель кричит",
+  "subtitles.inhabitants.impaler.spikes": "Пронзатель раскрывает шипы",
+  "subtitles.inhabitants.impaler.concussion": "Сотрясение",
+  "subtitles.inhabitants.inaudible": "[Неразличимо]",
+  "subtitles.inhabitants.shockwave": "Ударная волна",
+  "subtitles.inhabitants.effects.reverse_growth": "Обратный рост",
+
+  "key.categories.inhabitants": "Обитатели",
+  "key.inhabitants_key": "Обитатели особая способность",
+
+  "painting.inhabitants.my_precious.title": "Моя прелесть",
+  "painting.inhabitants.my_precious.author": "Catalyst",
+  "painting.inhabitants.endermans_last_day.title": "Последний день Эндермена",
+  "painting.inhabitants.endermans_last_day.author": "Cucuber",
+
+  "gui.inhabitants.missing_heat_source": "Необходим источник тепла (например костер)",
+
+  "gui.inhabitants.jei.cooking": "Бологр готовка (Котел)",
+  "gui.inhabitants.jei.transformation": "Превращение Бологром",
+  "gui.inhabitants.jei.carving": "Ремесло Бологра",
+
+  "enchantment.inhabitants.diamond_tip": "Алмазный наконечник",
+  "enchantment.inhabitants.thermal_capacity": "Тепловая вместительность",
+
+  "death.attack.inhabitants.impaled": "%1$s был пронзен"
+}
