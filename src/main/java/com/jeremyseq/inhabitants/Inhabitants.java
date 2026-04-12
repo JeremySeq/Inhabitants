@@ -6,6 +6,7 @@ import com.jeremyseq.inhabitants.debug.DebugCommands;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
+import com.jeremyseq.inhabitants.entities.nightmare.NightmareRenderer;
 import com.jeremyseq.inhabitants.items.*;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
@@ -181,6 +182,7 @@ public class Inhabitants
             event.registerEntityRenderer(ModEntities.IMPALER.get(), ImpalerRenderer::new);
             event.registerEntityRenderer(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
             event.registerEntityRenderer(ModEntities.JAVELIN.get(), JavelinRenderer::new);
+            event.registerEntityRenderer(ModEntities.NIGHTMARE.get(), NightmareRenderer::new);
 
             event.registerBlockEntityRenderer(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(),
                     context -> new ImpalerHeadRenderer());

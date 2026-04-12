@@ -6,8 +6,10 @@ import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.food.*;
 import com.jeremyseq.inhabitants.items.javelin.JavelinItem;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
+
 import net.minecraft.world.item.*;
 import net.minecraft.core.Direction;
+
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.*;
