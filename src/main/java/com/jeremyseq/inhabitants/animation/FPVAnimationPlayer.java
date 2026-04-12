@@ -6,8 +6,6 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
 
-import net.minecraftforge.common.MinecraftForge;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import org.joml.Quaternionf;

@@ -7,8 +7,6 @@ import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import net.minecraftforge.eventbus.api.*;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.*;
 
 public class ModBlockEntities {
