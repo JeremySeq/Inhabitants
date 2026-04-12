@@ -1,0 +1,6 @@
+{
+  "parent": "inhabitants:block/impaler_head_gui",
+  "textures": {
+    "2": "inhabitants:block/dripstone_impaler_head_texture"
+  }
+}

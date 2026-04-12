@@ -1,0 +1,11 @@
+{
+  "type": "cooking",
+  "ingredients": [
+    "minecraft:spider_eye",
+    "minecraft:fermented_spider_eye",
+    "minecraft:slime_ball"
+  ],
+  "result": "inhabitants:marinated_spider",
+  "container": "minecraft:bowl",
+  "time_ticks": 30
+}

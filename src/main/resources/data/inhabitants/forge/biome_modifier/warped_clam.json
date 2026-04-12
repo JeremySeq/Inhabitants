@@ -1,15 +1,11 @@
 {
   "type": "forge:add_spawns",
-  "biomes": [
-    "minecraft:end_highlands",
-    "minecraft:end_midlands",
-    "minecraft:small_end_islands"
-  ],
+  "biomes": "#minecraft:is_end",
   "spawners": {
     "type": "inhabitants:warped_clam",
     "category": "creature",
-    "weight": 100,
+    "weight": 250,
     "minCount": 1,
-    "maxCount": 3
+    "maxCount": 2
   }
 }

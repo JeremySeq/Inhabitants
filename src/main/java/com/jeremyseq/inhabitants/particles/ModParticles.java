@@ -1,15 +1,13 @@
 package com.jeremyseq.inhabitants.particles;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.particles.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.*;
 
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModParticles {
@@ -45,6 +43,10 @@ public class ModParticles {
 
     public static final RegistryObject<SimpleParticleType> ABRACADABRA =
             PARTICLES.register("abracadabra",
+                    () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> IMPALER_HEAD_ATTACK =
+            PARTICLES.register("impaler_head_attack",
                     () -> new SimpleParticleType(false));
 
     @SubscribeEvent

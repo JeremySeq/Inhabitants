@@ -1,18 +1,22 @@
 package com.jeremyseq.inhabitants.entities.impaler.spike;
 
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.damagesource.ModDamageTypes;
+
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.phys.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.damagesource.DamageSource;
+
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
+import software.bernie.geckolib.core.animatable.instance.*;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+
+import org.jetbrains.annotations.NotNull;
 
 public class ImpalerSpikeProjectile extends AbstractArrow implements GeoAnimatable {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -69,5 +73,28 @@ public class ImpalerSpikeProjectile extends AbstractArrow implements GeoAnimatab
 
         this.yRotO = this.getYRot();
         this.xRotO = this.getXRot();
+    }
+
+    @Override
+    protected void onHitEntity(EntityHitResult pResult) {
+        Entity entity = pResult.getEntity();
+        float f = (float)this.getDeltaMovement().length();
+        int i = Mth.ceil(Mth.clamp((double)f * this.getBaseDamage(), 0.0D, Integer.MAX_VALUE));
+
+        if (this.isCritArrow()) {
+            i += this.random.nextInt(i / 2 + 2);
+        }
+
+        Entity shooter = this.getOwner();
+        DamageSource damagesource =
+            ModDamageTypes.causeImpaledDamage(this.level(), this, shooter);
+
+        if (entity.hurt(damagesource, (float)i)) {
+            this.discard();
+        } else {
+            this.setDeltaMovement(this.getDeltaMovement().scale(-0.1D));
+            this.setYRot(this.getYRot() + 180.0F);
+            this.yRotO += 180.0F;
+        }
     }
 }

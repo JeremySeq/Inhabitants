@@ -1,0 +1,6 @@
+{
+  "parent": "inhabitants:item/spike_drill",
+  "textures": {
+    "layer0": "inhabitants:item/spike_drill/spike_drill_heat_100"
+  }
+}

@@ -1,7 +1,9 @@
 package com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+
 import net.minecraft.resources.ResourceLocation;
+
 import software.bernie.geckolib.model.GeoModel;
 
 public class BogreCauldronModel extends GeoModel<BogreCauldronEntity> {

@@ -1,0 +1,11 @@
+{
+  "type": "cooking",
+  "ingredients": [
+    "minecraft:gunpowder",
+    "minecraft:rotten_flesh",
+    "minecraft:rotten_flesh"
+  ],
+  "result": "inhabitants:baked_brains",
+  "container": "minecraft:skeleton_skull",
+  "time_ticks": 100
+}

@@ -10,6 +10,46 @@
           ]
         }
       }
+    },
+    "ate_uncanny_pottage": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "inhabitants:uncanny_pottage"
+          ]
+        }
+      }
+    },
+    "ate_marinated_spider": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "inhabitants:marinated_spider"
+          ]
+        }
+      }
+    },
+    "ate_baked_brains": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "inhabitants:baked_brains"
+          ]
+        }
+      }
+    },
+    "ate_dimensional_serving": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "inhabitants:dimensional_serving"
+          ]
+        }
+      }
     }
   },
   "display": {

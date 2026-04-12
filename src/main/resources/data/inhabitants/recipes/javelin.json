@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "  i",
+    " f ",
+    "s  "
+  ],
+  "key": {
+    "i": {
+      "item": "inhabitants:impaler_spike"
+    },
+    "f": {
+      "item": "minecraft:feather"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "inhabitants:javelin",
+    "count": 4
+  }
+}

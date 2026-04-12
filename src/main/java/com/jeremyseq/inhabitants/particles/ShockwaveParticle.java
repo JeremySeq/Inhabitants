@@ -69,10 +69,10 @@ public class ShockwaveParticle extends TextureSheetParticle {
                 if (!state.isAir() && state.getRenderShape() != RenderShape.INVISIBLE) {
                     this.level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, state), particleX, particleY, particleZ, velocityX, 0.2D, velocityZ);
                     if (this.random.nextBoolean()) {
-//                        this.level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, particleX, particleY, particleZ, velocityX, 0.1D, velocityZ);
+                       this.level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, particleX, particleY, particleZ, velocityX, 0.1D, velocityZ);
                     }
                 } else {
-//                    this.level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, particleX, particleY, particleZ, velocityX, 0.05D, velocityZ);
+                   this.level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, particleX, particleY, particleZ, velocityX, 0.05D, velocityZ);
                 }
             }
         }

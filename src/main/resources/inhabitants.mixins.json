@@ -7,11 +7,26 @@
     "CrossbowItemMixin",
     "NearestAttackableTargetGoalMixin",
     "StickyLegsMixin",
-    "ReverseGrowthMixin"
+    "ReverseGrowthMixin$Physics",
+    "GiantBoneSpecialAttackMixin",
+    "LivingEntityMixin",
+    "LivingEntityMixin$LivingEntityAccessor",
+    "ImmaterialMixin$Physics",
+    "ConcussionMixins$Movement",
+    "NoteBlockMixin"
   ],
   "client": [
     "SubtitleOverlayMixin",
-    "ReverseGrowthClientMixin"
+    "ReverseGrowthMixin$Client",
+    "ImmaterialMixin$Visuals",
+    "ImmaterialMixin$BlockRendering",
+    "LowpassFilterMixin$AudioChannel",
+    "LowpassFilterMixin$AudioLibrary",
+    "ConcussionMixins$ClientInput",
+    "EntityRendererMixin",
+    "ItemInHandRendererMixin",
+    "HumanoidModelMixin",
+    "LocalPlayerMixin"
   ],
   "minVersion": "0.8"
 }

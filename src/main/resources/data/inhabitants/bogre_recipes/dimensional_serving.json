@@ -1,0 +1,11 @@
+{
+  "type": "cooking",
+  "ingredients": [
+    "minecraft:phantom_membrane",
+    "minecraft:phantom_membrane",
+    "minecraft:ender_pearl"
+  ],
+  "result": "inhabitants:dimensional_serving",
+  "container": "minecraft:bowl",
+  "time_ticks": 100
+}

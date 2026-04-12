@@ -24,19 +24,25 @@ import java.util.function.Predicate;
 
 public class EntityUtil {
     public static void throwItemStack(Level level, Entity entity, ItemStack stack, float speed, float upwardBias) {
+        if (level.isClientSide || stack.isEmpty() || entity == null) return;
+        throwItemStack(level,
+        new Vec3(entity.getX(), entity.getEyeY(), entity.getZ()),
+        entity.getLookAngle(), stack, speed, upwardBias);
+    }
+
+    public static void throwItemStack(Level level, Vec3 pos, Vec3 direction, ItemStack stack, float speed, float upwardBias) {
         if (level.isClientSide || stack.isEmpty()) return;
 
-        // spawn the item
         ItemEntity itemEntity = new ItemEntity(
                 level,
-                entity.getX(),
-                entity.getEyeY(),
-                entity.getZ(),
+                pos.x,
+                pos.y,
+                pos.z,
                 stack.copy()
         );
 
         // direction in front of the entity
-        Vec3 look = entity.getLookAngle().normalize();
+        Vec3 look = direction.normalize();
         Vec3 motion = look.scale(speed).add(0, upwardBias, 0);
         itemEntity.setDeltaMovement(motion);
 
@@ -161,9 +167,35 @@ public class EntityUtil {
     }
 
     public static void screamParticles(ClientLevel level, Vec3 pos, Vec3 lookAngle, double screamSpeed) {
+        screamParticles(level, pos, lookAngle, screamSpeed, 0, 4.0);
+    }
+
+    public static void screamParticles(ClientLevel level, Vec3 pos, Vec3 lookAngle, double screamSpeed, double scale) {
+        screamParticles(level, pos, lookAngle, screamSpeed, scale, 4.0);
+    }
+
+    public static void screamParticles(ClientLevel level, Vec3 pos, Vec3 lookAngle, double screamSpeed, double scale, double forwardOffset) {
         lookAngle = new Vec3(lookAngle.x, 0, lookAngle.z).normalize();
-        pos = pos.add(lookAngle.scale(4));
+        pos = pos.add(lookAngle.scale(forwardOffset));
         float yaw = (float) Math.atan2(lookAngle.z, lookAngle.x);
-        level.addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, screamSpeed, yaw, 0);
+        level.addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, screamSpeed, yaw, scale);
+    }
+
+    public static boolean isInScreamBox(LivingEntity source, Entity target, double forwardDist, double sideDist, double heightDist) {
+        Vec3 mouth = source.getEyePosition();
+        Vec3 look = source.getLookAngle().normalize();
+        Vec3 toTarget = target.getBoundingBox().getCenter().subtract(mouth);
+
+        double fwd = toTarget.dot(look);
+        if (fwd < 0 || fwd > forwardDist) return false;
+
+        Vec3 sideLook = new Vec3(-look.z, 0, look.x).normalize();
+        double side = Math.abs(toTarget.dot(sideLook));
+        if (side > sideDist / 2.0) return false;
+
+        double vert = Math.abs(toTarget.y);
+        if (vert > heightDist / 2.0) return false;
+
+        return true;
     }
 }

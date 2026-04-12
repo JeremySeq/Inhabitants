@@ -1,16 +1,25 @@
 package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.food.*;
+import com.jeremyseq.inhabitants.items.javelin.JavelinItem;
+import com.jeremyseq.inhabitants.blocks.ModBlocks;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.core.Direction;
 
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
-import net.minecraft.world.item.*;
+import net.minecraftforge.registries.*;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Inhabitants.MODID);
@@ -22,14 +31,12 @@ public class ModItems {
             FishSnotChowderItem::new);
     public static final RegistryObject<Item> UNCANNY_POTTAGE = ITEMS.register("uncanny_pottage",
             UncannyPottageItem::new);
-    public static final RegistryObject<Item> SPIDER_SOUP = ITEMS.register("spider_soup",
-            SpiderSoupItem::new);
-    public static final RegistryObject<Item> BANEFUL_POTATO = ITEMS.register("baneful_potato",
-            BanefulPotatoItem::new);
-    public static final RegistryObject<Item> MONSTER_MEAL = ITEMS.register("monster_meal",
-            MonsterMealItem::new);
-    public static final RegistryObject<Item> DIMENSIONAL_SNACK = ITEMS.register("dimensional_snack",
-            DimensionalSnackItem::new);
+    public static final RegistryObject<Item> MARINATED_SPIDER = ITEMS.register("marinated_spider",
+            MarinatedSpiderItem::new);
+    public static final RegistryObject<Item> BAKED_BRAINS = ITEMS.register("baked_brains",
+            BakedBrainsItem::new);
+    public static final RegistryObject<Item> DIMENSIONAL_SERVING = ITEMS.register("dimensional_serving",
+            DimensionalServingItem::new);
 
     public static final RegistryObject<Item> CREATIVE_TAB = ITEMS.register("creative_tab",
             () -> new Item(new Item.Properties().stacksTo(1)));
@@ -48,6 +55,29 @@ public class ModItems {
 
     public static final RegistryObject<Item> MUSIC_DISC_BOGRE = ITEMS.register("music_disc_bogre",
             () -> new RecordItem(6, ModSoundEvents.BOGRE_SONG, new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 2100));
+
+    public static final RegistryObject<Item> JAVELIN = ITEMS.register("javelin",
+            () -> new JavelinItem(new Item.Properties().stacksTo(16)));
+
+    /* this item show's ONLY in JEI, so don't dream getting it in-game *kiss*, *kiss* */
+    public static final RegistryObject<Item> BOGRE_CAULDRON = ITEMS.register("bogre_cauldron",
+            () -> new Item(new Item.Properties()));
+    /* the end of the joke, i hope */
+
+    public static final RegistryObject<Item> SPIKE_DRILL = ITEMS.register("spike_drill",
+            () -> new SpikeDrillItem(new Item.Properties().defaultDurability(2342)));
+
+    public static final RegistryObject<Item> IMPALER_HEAD = ITEMS.register("impaler_head",
+            () -> new StandingAndWallBlockItem(ModBlocks.IMPALER_HEAD.get(),
+            ModBlocks.IMPALER_WALL_HEAD.get(),
+            new Item.Properties().rarity(Rarity.UNCOMMON),
+            Direction.DOWN));
+
+    public static final RegistryObject<Item> DRIPSTONE_IMPALER_HEAD = ITEMS.register("dripstone_impaler_head",
+            () -> new StandingAndWallBlockItem(ModBlocks.DRIPSTONE_IMPALER_HEAD.get(),
+            ModBlocks.DRIPSTONE_IMPALER_WALL_HEAD.get(),
+            new Item.Properties().rarity(Rarity.UNCOMMON),
+            Direction.DOWN));
 
     public static final RegistryObject<Item> CONCHER_SPAWN_EGG = ITEMS.register("concher_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.CONCHER, 0x91C8C7, 0x527499, new Item.Properties()));

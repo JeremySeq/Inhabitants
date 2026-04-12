@@ -1,7 +1,8 @@
 package com.jeremyseq.inhabitants.entities.bogre.skill;
 
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
+import com.jeremyseq.inhabitants.recipe.IBogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
+import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 
 import java.util.List;
 
@@ -15,25 +16,53 @@ public final class BogreSkills {
 
     private BogreSkills() {}
 
-    public static Skill forType(BogreRecipe.Type type) {
+    public static Skill forType(IBogreRecipe.Type type) {
         return ALL.stream()
         .filter(s -> s.getType() == type)
         .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("no skiill for type: " + type));
+        .orElseThrow(() -> new IllegalArgumentException("no skill for type: " + type));
+    }
+
+    public static void cancelCurrentSkill(BogreEntity bogre) {
+        if (bogre.getAi().getActiveRecipe() == null) return;
+        Skill skill = forType(bogre.getAi().getActiveRecipe().getBogreRecipeType());
+        skill.cancel(bogre);
     }
 
     public static abstract class Skill {
-        public abstract BogreRecipe.Type getType();
+        public enum Animation { START, LOOP, END }
+
+        public abstract int getAnimationDuration(Animation animation);
+        public abstract IBogreRecipe.Type getType();
         public abstract void aiStep(BogreEntity bogre);
+
+        public abstract void handleMovement(BogreEntity bogre);
+        public abstract void handleSkilling(BogreEntity bogre);
+        
         public abstract boolean canPerform(BogreEntity bogre);
-        public abstract int getDuration();
+        public abstract int getDuration(BogreEntity bogre);
+        public abstract void cancel(BogreEntity bogre);
+        
+        public void keyframeTriggered(BogreEntity bogre, String name) {}
+        
 
         protected void finishSkill(BogreEntity bogre) {
-            bogre.setAIState(BogreEntity.State.CAUTIOUS);
-            bogre.setCraftingState(BogreEntity.CraftingState.NONE);
-            bogre.setActiveRecipe(null);
-            bogre.setPathSet(false);
-            bogre.resetStuckTicks();
+            bogre.setAIState(BogreAi.State.NEUTRAL);
+            bogre.setCraftingState(BogreAi.SkillingState.NONE);
+            bogre.getAi().setActiveRecipe(null);
+            bogre.getAi().setPathSet(false);
+            bogre.getAi().resetStuckTicks();
+            bogre.getAi().setSkillingMoveSide(0);
+
+            // stop animations
+            bogre.getEntityData().set(BogreEntity.COOKING_ANIM, false);
+            bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
+
+            if (bogre.level().isClientSide) {
+                bogre.isHammerHidden = false;
+                bogre.hammerHideTicks = 0;
+                bogre.clientSkillHits = 0;
+            }
         }
     }
 }

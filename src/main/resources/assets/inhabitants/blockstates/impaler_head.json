@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "powered=false": { "model": "inhabitants:block/impaler_head" },
+    "powered=true":  { "model": "inhabitants:block/impaler_head" }
+  }
+}

@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.networking;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.FriendlyByteBuf;

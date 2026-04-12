@@ -1,42 +1,37 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
-import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
-import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
+import com.jeremyseq.inhabitants.entities.goals.*;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.damagesource.ModDamageTypes;
+
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.network.syncher.*;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.damagesource.*;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.*;
 import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.goal.target.*;
+import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import org.jetbrains.annotations.*;
+
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
+import software.bernie.geckolib.core.animatable.instance.*;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
@@ -49,14 +44,16 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public static final int THORN_DAMAGE = 3;
     public static final int SCREAM_COOLDOWN = 300;
     public int screamCooldown = 0;
-    public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> SCREAM_TRIGGER = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
+    
+    public static final EntityDataAccessor<Boolean> SPIKED =
+        SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Integer> SCREAM_START_TICK =
+        SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
     public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
     private static final int SPIKE_ANIM_DURATION = 30;
     private int spiked_client_timer = -1; // used for spike particle timing, counts up
-    private int scream_client_timer = -1; // used for scream particle timing
 
     private int attackAnimTimer = 0;
 
@@ -127,11 +124,16 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
 
         if (this.level().isClientSide) {
-            if (scream_client_timer == 6 || scream_client_timer == 1) {
-                EntityUtil.screamParticles((ClientLevel) this.level(), new Vec3(getX(), getY() + 0.5, getZ()), this.getLookAngle());
-            }
-            if (scream_client_timer > -1) {
-                scream_client_timer--;
+            int startTick = this.entityData.get(SCREAM_START_TICK);
+            if (startTick != -1) {
+                int elapsed = (int) (this.level().getGameTime() - startTick);
+                if (elapsed >= 0 && elapsed <= 10) {
+                    if (elapsed == 0 || elapsed == 5) {
+                        EntityUtil.screamParticles((ClientLevel) this.level(),
+                            new Vec3(getX(), getY() + 0.5, getZ()),
+                            this.getLookAngle());
+                    }
+                }
             }
         }
     }
@@ -140,6 +142,13 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void dropCustomDeathLoot(@NotNull DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
         this.spawnAtLocation(new ItemStack(ModItems.IMPALER_SPIKE.get(), new Random().nextInt(2, 4)));
+
+        if (source.getEntity() instanceof Creeper creeper &&
+            creeper.isPowered()) {
+            
+            this.spawnAtLocation(this.getTextureType() == 1 ?
+                ModItems.DRIPSTONE_IMPALER_HEAD.get() : ModItems.IMPALER_HEAD.get());
+        }
     }
 
     @Override
@@ -186,11 +195,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> pKey) {
         super.onSyncedDataUpdated(pKey);
-        if (this.level().isClientSide && pKey == SCREAM_TRIGGER) {
-            if (this.entityData.get(SCREAM_TRIGGER)) {
-                this.scream_client_timer = 6;
-            }
-        }
         if (pKey == SPIKED) {
             if (this.entityData.get(SPIKED)) {
                 spiked_client_timer = 0;
@@ -208,7 +212,9 @@ public class ImpalerEntity extends Monster implements GeoEntity {
             if (this.attackAnimTimer == 0) {
                 LivingEntity target = getTarget();
                 if (target != null && distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target)) {
-                    super.doHurtTarget(target);
+                    target.hurt(ModDamageTypes.causeImpaledDamage(
+                        this.level(), this),
+                        (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE));
                 }
             }
         }
@@ -237,7 +243,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
         if (this.isSpiked() && !source.is(DamageTypes.THORNS)) {
             if (source.getDirectEntity() instanceof LivingEntity livingEntity) {
-                livingEntity.hurt(this.damageSources().thorns(this), THORN_DAMAGE);
+                livingEntity.hurt(ModDamageTypes.causeImpaledDamage(
+                    this.level(), this), THORN_DAMAGE);
             }
         }
         return result;
@@ -284,7 +291,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(SPIKED, false);
-        entityData.define(SCREAM_TRIGGER, true);
+        entityData.define(SCREAM_START_TICK, -1);
         entityData.define(TEXTURE, getBiomeTextureType());
     }
 

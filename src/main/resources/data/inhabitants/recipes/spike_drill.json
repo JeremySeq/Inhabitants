@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " ii",
+    "cri",
+    "cc "
+  ],
+  "key": {
+    "i": {
+      "item": "inhabitants:impaler_spike"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "c": {
+      "item": "minecraft:copper_ingot"
+    }
+  },
+  "result": {
+    "item": "inhabitants:spike_drill",
+    "count": 1
+  }
+}
