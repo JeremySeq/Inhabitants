@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.debug;
 
-import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 
 import net.minecraft.commands.CommandSourceStack;
@@ -27,13 +26,11 @@ public class DebugCommands {
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
-        if (!DevMode.isEnabled()) return;
+        if (!DevMode.bogre()) return;
         register(event.getDispatcher());
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        if (!DevMode.isEnabled()) return;
-
         dispatcher.register(registerBogreCommands());
         dispatcher.register(registerCauldronCommands());
         dispatcher.register(registerDevCommands());
@@ -108,8 +105,6 @@ public class DebugCommands {
     }
 
     private static void spawnCauldron(CommandSourceStack source, Vec3 pos) {
-        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
-        
         Entity cauldron = ModEntities.BOGRE_CAULDRON.get().create(source.getLevel());
         if (cauldron != null) {
             double cx = Math.floor(pos.x) + 1.0D;
@@ -123,22 +118,16 @@ public class DebugCommands {
     }
 
     private static void enableStateDebug(CommandSourceStack source, boolean enabled) {
-        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
-        
-        DevMode.setShowStates(enabled);
-        log("Bogre state debug: " + DevMode.isShowStates(), source);
+        DevMode.showStates = enabled;
+        log("Bogre state debug: " + DevMode.showStates, source);
     }
 
     private static void enablePathfindingDebug(CommandSourceStack source, boolean enabled) {
-        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
-        
-        DevMode.setShowPathfinding(enabled);
-        log("Bogre path debug: " + DevMode.isShowPathfinding(), source);
+        DevMode.showPathfinding = enabled;
+        log("Bogre path debug: " + DevMode.showPathfinding, source);
     }
 
     private static void applyTankMode(CommandSourceStack source, boolean enabled) {
-        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
-        
         Entity entity = source.getEntity();
         if (entity instanceof Player player) {
             if (enabled) {
@@ -154,8 +143,6 @@ public class DebugCommands {
     }
 
     private static void applyFly(CommandSourceStack source, boolean enabled) {
-        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
-        
         Entity entity = source.getEntity();
         if (entity instanceof Player player) {
             player.getAbilities().mayfly = enabled;
@@ -166,7 +153,6 @@ public class DebugCommands {
     }
 
     private static void spawnMob(CommandSourceStack source, EntityType<? extends Mob> entityType) {
-        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
         Mob mob = entityType.create(source.getLevel());
         if (mob != null) {
 
@@ -179,7 +165,6 @@ public class DebugCommands {
     }
 
     private static void killMob(CommandSourceStack source, EntityType<? extends Mob> entityType) {
-        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
         int count = 0;
         Vec3 pos = source.getPosition();
         AABB area = new AABB(
@@ -195,7 +180,6 @@ public class DebugCommands {
     }
 
     private static void log(String message, CommandSourceStack source) {
-        if (!DevMode.isEnabled()) return;
         source.sendSuccess(() -> Component.literal(message), true);
     }
 }
