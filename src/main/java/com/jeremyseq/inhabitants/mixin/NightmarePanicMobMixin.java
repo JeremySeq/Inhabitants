@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PathfinderMob.class)
-public class NightmarePanicMixin {
+public class NightmarePanicMobMixin {
     @Unique
     private boolean inhabitants$panicGoalAdded;
 

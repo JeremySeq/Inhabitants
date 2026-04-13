@@ -14,7 +14,8 @@
     "ImmaterialMixin$Physics",
     "ConcussionMixins$Movement",
     "NoteBlockMixin",
-    "NightmarePanicMixin"
+    "NightmarePanicMobMixin",
+    "NightmarePanicPlayerMixin"
   ],
   "client": [
     "SubtitleOverlayMixin",
