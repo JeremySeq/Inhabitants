@@ -1,0 +1,135 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.Bulltoad - Converted",
+				"texture_width": 256,
+				"texture_height": 256,
+				"visible_bounds_width": 5,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "Bulltoad",
+					"pivot": [0, 0, -3]
+				},
+				{
+					"name": "body",
+					"parent": "Bulltoad",
+					"pivot": [0, 6, 9],
+					"cubes": [
+						{"origin": [-10.5, 3, -15], "size": [21, 9, 27], "uv": [0, 0]},
+						{"origin": [-10.5, 9, -15], "size": [21, 0, 27], "uv": [0, 72]}
+					]
+				},
+				{
+					"name": "head",
+					"parent": "body",
+					"pivot": [0, 11, 12],
+					"cubes": [
+						{"origin": [-10.5, 15, -15], "size": [21, 0, 27], "uv": [96, 0]},
+						{"origin": [-10.5, 9, -15], "size": [21, 9, 27], "uv": [0, 36]}
+					]
+				},
+				{
+					"name": "eyes",
+					"parent": "head",
+					"pivot": [-1.5, 12, 12]
+				},
+				{
+					"name": "right_eye",
+					"parent": "eyes",
+					"pivot": [-6, 21, -7.5],
+					"cubes": [
+						{"origin": [-10.5, 18, -12], "size": [9, 6, 9], "uv": [126, 133]}
+					]
+				},
+				{
+					"name": "left_eye",
+					"parent": "eyes",
+					"pivot": [6, 21, -7.5],
+					"cubes": [
+						{"origin": [1.5, 18, -12], "size": [9, 6, 9], "uv": [0, 144]}
+					]
+				},
+				{
+					"name": "horns",
+					"parent": "head",
+					"pivot": [0, 0, -3]
+				},
+				{
+					"name": "lefthorn",
+					"parent": "horns",
+					"pivot": [0, 0, -3],
+					"cubes": [
+						{"origin": [2.5, 18, -3.75], "size": [7, 6, 14.75], "pivot": [6, 18, 0.5], "rotation": [0, 90, 0], "uv": [84, 133]},
+						{"origin": [13.5, 18, -1], "size": [7, 9, 2], "pivot": [17.5, 20, 0], "rotation": [0, 90, 0], "uv": [66, 144]}
+					]
+				},
+				{
+					"name": "righthorn",
+					"parent": "horns",
+					"pivot": [0, 0, -3],
+					"cubes": [
+						{"origin": [-9.5, 18, -3.75], "size": [7, 6, 14.75], "pivot": [-6, 18, 0.5], "rotation": [0, -90, 0], "uv": [84, 133], "mirror": true},
+						{"origin": [-20.5, 18, -1], "size": [7, 9, 2], "pivot": [-17.5, 20, 0], "rotation": [0, -90, 0], "uv": [66, 144], "mirror": true}
+					]
+				},
+				{
+					"name": "croaking_body",
+					"parent": "body",
+					"pivot": [0, 9, -6],
+					"cubes": [
+						{"origin": [-10.3, 3.5, -14.5], "size": [20.6, 5.6, 8.6], "inflate": -0.1, "uv": [96, 120]}
+					]
+				},
+				{
+					"name": "tongue",
+					"parent": "body",
+					"pivot": [0, 9.3, 12],
+					"cubes": [
+						{"origin": [-6, 9.3, -9.3], "size": [12, 0, 21], "uv": [96, 99]}
+					]
+				},
+				{
+					"name": "left_leg",
+					"parent": "Bulltoad",
+					"pivot": [10.5, 6, 10],
+					"cubes": [
+						{"origin": [7.5, 0, 3], "size": [9, 9, 12], "uv": [0, 123]},
+						{"origin": [4.5, -0.03, -3], "size": [24, 0, 24], "uv": [96, 27]}
+					]
+				},
+				{
+					"name": "right_leg",
+					"parent": "Bulltoad",
+					"pivot": [-10.5, 6, 10],
+					"cubes": [
+						{"origin": [-16.5, 0, 3], "size": [9, 9, 12], "uv": [42, 123]},
+						{"origin": [-28.5, -0.03, -3], "size": [24, 0, 24], "uv": [96, 51]}
+					]
+				},
+				{
+					"name": "left_arm",
+					"parent": "Bulltoad",
+					"pivot": [11.5, 7, -8.5],
+					"cubes": [
+						{"origin": [9.5, 0, -13.5], "size": [6, 9, 9], "uv": [36, 144]},
+						{"origin": [0.5, -0.03, -25.5], "size": [24, 0, 24], "uv": [96, 75]}
+					]
+				},
+				{
+					"name": "right_arm",
+					"parent": "Bulltoad",
+					"pivot": [-11.5, 7, -8.5],
+					"cubes": [
+						{"origin": [-15.5, 0, -13.5], "size": [6, 9, 9], "uv": [126, 148]},
+						{"origin": [-24.5, -0.03, -25.5], "size": [24, 0, 24], "uv": [0, 99]}
+					]
+				}
+			]
+		}
+	]
+}

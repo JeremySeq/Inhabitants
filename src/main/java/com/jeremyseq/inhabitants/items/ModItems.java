@@ -79,6 +79,9 @@ public class ModItems {
             new Item.Properties().rarity(Rarity.UNCOMMON),
             Direction.DOWN));
 
+    public static final RegistryObject<Item> BULLTOAD_SPAWN_EGG = ITEMS.register("bulltoad_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.BULLTOAD, 0x993728, 0xC4AA2B, new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

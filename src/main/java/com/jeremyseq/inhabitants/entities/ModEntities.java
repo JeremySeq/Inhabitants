@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.entities;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
+import com.jeremyseq.inhabitants.entities.bulltoad.BulltoadEntity;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
@@ -15,7 +16,6 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -27,12 +27,12 @@ public class ModEntities {
     public static final RegistryObject<EntityType<BogreEntity>> BOGRE =
             REGISTRY.register("bogre",
                     () -> EntityType.Builder.of(BogreEntity::new, MobCategory.MONSTER)
-                            .sized(1.75f, 3.5f)
+                            .sized(2f, 3.5f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre").toString()));
 
     public static final RegistryObject<EntityType<BogreCauldronEntity>> BOGRE_CAULDRON =
             REGISTRY.register("bogre_cauldron",
-                    () -> EntityType.Builder.of(BogreCauldronEntity::new, MobCategory.MISC)
+                    () -> EntityType.Builder.of(BogreCauldronEntity::new, MobCategory.MONSTER)
                             .sized(2f, 1.3f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre_cauldron").toString()));
 
@@ -65,10 +65,17 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "javelin").toString()));
 
+    public static final RegistryObject<EntityType<BulltoadEntity>> BULLTOAD =
+            REGISTRY.register("bulltoad",
+                    () -> EntityType.Builder.of(BulltoadEntity::new, MobCategory.CREATURE)
+                            .sized(2, 1.6f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bulltoad").toString()));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
+        event.put(ModEntities.BULLTOAD.get(), BulltoadEntity.setAttributes());
     }
 }

@@ -37,6 +37,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.SPIKE_DRILL.get());
                         pOutput.accept(ModItems.IMPALER_HEAD.get());
                         pOutput.accept(ModItems.DRIPSTONE_IMPALER_HEAD.get());
+                        pOutput.accept(ModItems.BULLTOAD_SPAWN_EGG.get());
 
                         //ench
                         addEnchantedBook(ModEnchantments.DIAMOND_TIP.get(), 1, pOutput);

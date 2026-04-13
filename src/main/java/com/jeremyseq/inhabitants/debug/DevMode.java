@@ -19,4 +19,10 @@ public final class DevMode {
 
     // --- Clam ---
 
+    // --- Bulltoad ---
+    public static boolean showBulltoad = true;
+    public static boolean showJumpTarget = true;
+
+    public static boolean bulltoad()            { return IN_DEV && showBulltoad; }
+    public static boolean bulltoadJumpTarget()      { return bulltoad() && showJumpTarget; }
 }
