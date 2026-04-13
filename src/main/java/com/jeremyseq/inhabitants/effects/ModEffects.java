@@ -27,6 +27,9 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> IMMATERIAL =
             EFFECTS.register("immaterial", ImmaterialEffect::new);
 
+    public static final RegistryObject<MobEffect> PANIC =
+            EFFECTS.register("panic", PanicEffect::new);
+
     public static void register(IEventBus bus) {
         EFFECTS.register(bus);
     }
