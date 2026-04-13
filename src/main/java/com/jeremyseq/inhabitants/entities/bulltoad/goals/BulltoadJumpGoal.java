@@ -207,11 +207,10 @@ public class BulltoadJumpGoal extends Goal {
         double d1 = vec32.subtract(0.0D, vec32.y, 0.0D).lengthSqr();
         double d2 = Math.sqrt(d1);
         double d3 = vec32.y;
-        double d4 = Math.sin((double)(2.0F * f));
-        double d5 = 0.08D;
-        double d6 = Math.pow(Math.cos((double)f), 2.0D);
-        double d7 = Math.sin((double)f);
-        double d8 = Math.cos((double)f);
+        double d4 = Math.sin(2.0F * f);
+        double d6 = Math.pow(Math.cos(f), 2.0D);
+        double d7 = Math.sin(f);
+        double d8 = Math.cos(f);
         double d9 = Math.sin(d0);
         double d10 = Math.cos(d0);
         double d11 = d1 * 0.08D / (d2 * d4 - 2.0D * d3 * d6);
@@ -242,14 +241,14 @@ public class BulltoadJumpGoal extends Goal {
                     vec33 = vec34;
                 }
 
-                return (new Vec3(d13 * d10, d14, d13 * d9)).scale((double)0.95F);
+                return (new Vec3(d13 * d10, d14, d13 * d9)).scale(0.95F);
             }
         }
     }
 
     private boolean isClearTransition(Mob pMob, EntityDimensions pDimensions, Vec3 pStart, Vec3 pEnd) {
         Vec3 vec3 = pEnd.subtract(pStart);
-        double d0 = (double)Math.min(pDimensions.width, pDimensions.height);
+        double d0 = Math.min(pDimensions.width, pDimensions.height);
         int i = Mth.ceil(vec3.length() / d0);
         Vec3 vec31 = vec3.normalize();
         Vec3 vec32 = pStart;

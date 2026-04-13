@@ -7,19 +7,12 @@ import com.jeremyseq.inhabitants.items.food.*;
 import com.jeremyseq.inhabitants.items.javelin.JavelinItem;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.Level;
 import net.minecraft.core.Direction;
 
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.*;
-
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Inhabitants.MODID);
