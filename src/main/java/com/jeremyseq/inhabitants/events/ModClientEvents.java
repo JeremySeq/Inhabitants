@@ -20,6 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionHand;
 
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -350,5 +351,15 @@ public class ModClientEvents {
             }
         }
         return false;
+    }
+
+    // Nightmare Panic Effect - invert player controls
+    @SubscribeEvent
+    public static void invertPlayerControls(MovementInputUpdateEvent event) {
+        Player player = Minecraft.getInstance().player;
+        if (player != null && player.hasEffect(ModEffects.PANIC.get())) {
+            event.getInput().leftImpulse *= -1;
+            event.getInput().forwardImpulse *= -1;
+        }
     }
 }
