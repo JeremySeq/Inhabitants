@@ -1,5 +1,7 @@
 package com.jeremyseq.inhabitants.entities.nightmare;
 
+import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -8,8 +10,10 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
@@ -61,7 +65,7 @@ public class NightmareEntity extends Monster implements GeoEntity {
     public static AttributeSupplier setAttributes() {
         return Monster.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 30f)
-                .add(Attributes.ATTACK_DAMAGE, 10f)
+                .add(Attributes.ATTACK_DAMAGE, 8f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.FOLLOW_RANGE, 30f)
@@ -70,8 +74,15 @@ public class NightmareEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean doHurtTarget(@NotNull Entity pEntity) {
+        Inhabitants.LOGGER.debug("NightmareEntity attacked {}", pEntity.getName());
         if (!level().isClientSide) {
             this.triggerAnim("attack", "melee");
+        }
+        // random chance to apply panic effect on hit
+        if (random.nextFloat() < 0.5f) {
+            if (pEntity instanceof LivingEntity livingEntity) {
+                livingEntity.addEffect(new MobEffectInstance(ModEffects.PANIC.get(), 200, 0));
+            }
         }
         return super.doHurtTarget(pEntity);
     }
@@ -131,7 +142,7 @@ public class NightmareEntity extends Monster implements GeoEntity {
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "movement", 10, this::predicate));
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
-                .triggerableAnim("melee", RawAnimation.begin().then("melee", Animation.LoopType.PLAY_ONCE)));
+                .triggerableAnim("melee", RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "death", 0, state -> PlayState.STOP)
                 .triggerableAnim("death", RawAnimation.begin().then("death", Animation.LoopType.HOLD_ON_LAST_FRAME)));
     }
