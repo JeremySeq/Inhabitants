@@ -46,6 +46,11 @@
   "effect.inhabitants.immaterial": "Immaterial",
   "effect.inhabitants.panic": "Panic",
 
+  "item.minecraft.tipped_arrow.effect.panic": "Tipped Arrow of Panic",
+  "item.minecraft.potion.effect.panic": "Potion of Panic",
+  "item.minecraft.splash_potion.effect.panic": "Splash Potion of Panic",
+  "item.minecraft.lingering_potion.effect.panic": "Lingering Potion of Panic",
+
   "advancement.inhabitants.david_and_goliath.title": "David and Goliath",
   "advancement.inhabitants.david_and_goliath.description": "Defeat the mighty Bogre.",
   "advancement.inhabitants.ate_fish_snot_chowder.title": "Is this even edible?",

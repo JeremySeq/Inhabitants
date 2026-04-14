@@ -121,6 +121,7 @@ public class Inhabitants
             event.enqueueWork(() -> {
                 MenuScreens.register(ModMenuTypes.CAULDRON_MENU.get(),
                 CauldronScreen::new);
+                ModPotions.registerBrewingRecipes();
             });
 
             ItemProperties.register(Items.CROSSBOW, ResourceLocation.fromNamespaceAndPath(MODID,"spike_loaded"), (stack, level, entity, seed) -> {
