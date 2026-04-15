@@ -241,12 +241,17 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
         }
-        if (this.isSpiked() && !source.is(DamageTypes.THORNS)) {
+
+        if (this.isSpiked() &&
+            !source.is(DamageTypes.THORNS) &&
+            !source.is(ModDamageTypes.IMPALED)) {
+            
             if (source.getDirectEntity() instanceof LivingEntity livingEntity) {
                 livingEntity.hurt(ModDamageTypes.causeImpaledDamage(
                     this.level(), this), THORN_DAMAGE);
             }
         }
+
         return result;
     }
 

@@ -18,6 +18,8 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class InvisibleCauldronBlock extends Block {
     private static final VoxelShape topPart = Block.box(-10, 17, -10, 26, 20, 26);
     private static final VoxelShape bottomPart = Block.box(-8, 0, -8, 24, 17, 24);
@@ -34,33 +36,56 @@ public class InvisibleCauldronBlock extends Block {
     }
 
     @Override
-    public @NotNull VoxelShape getShape(@NotNull BlockState state,
-    @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
+    public @NotNull VoxelShape getShape(
+        @NotNull BlockState state,
+        @NotNull BlockGetter world,
+        @NotNull BlockPos pos,
+        @NotNull CollisionContext context
+    ) {
+        return bottomPart;
+    }
+
+    @Override
+    public @NotNull VoxelShape getInteractionShape(
+        @NotNull BlockState state,
+        @NotNull BlockGetter world,
+        @NotNull BlockPos pos
+    ) {
         return colShape;
     }
 
     @Override
-    public @NotNull VoxelShape getCollisionShape(@NotNull BlockState state,
-    @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
+    public @NotNull VoxelShape getCollisionShape(
+        @NotNull BlockState state,
+        @NotNull BlockGetter world,
+        @NotNull BlockPos pos,
+        @NotNull CollisionContext context
+    ) {
         return colShape;
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos,
-        Player player, InteractionHand hand, BlockHitResult hit) {
-
+    public @NotNull InteractionResult use(
+        @NotNull BlockState state,
+        @NotNull Level level,
+        @NotNull BlockPos pos,
+        @NotNull Player player,
+        @NotNull InteractionHand hand,
+        @NotNull BlockHitResult hit
+    ) {
         if (!level.isClientSide) {
-            java.util.List<BogreCauldronEntity> cauldrons = level.getEntitiesOfClass(
+            List<BogreCauldronEntity> cauldrons = level.getEntitiesOfClass(
                 BogreCauldronEntity.class, 
-                new AABB(pos).inflate(2.0D)
+                new AABB(pos).inflate(3.0D)
             );
             
             for (BogreCauldronEntity cauldron : cauldrons) {
-                if (cauldron.blockPosition().closerThan(pos, 2.0D)) {
+                if (cauldron.blockPosition().closerThan(pos, 3.0D)) {
                     return cauldron.interact(player, hand);
                 }
             }
         }
+        
         return InteractionResult.SUCCESS;
     }
 }
