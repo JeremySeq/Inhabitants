@@ -59,6 +59,13 @@ public class ModClientEvents {
     public static void onClientTick(ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             Minecraft mc = Minecraft.getInstance();
+            if (mc.player == null) {
+                if (muffleLerp > 0.0F) {
+                    muffleLerp = Math.max(0.0F, muffleLerp - 0.1F);
+                    InhabitantsAudio.updateFilter(muffleLerp);
+                }
+                return;
+            }
             handleImmaterialEffect(mc);
             handleConcussionEffect(mc);
             handleGhostTracking(mc);

@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.events;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.skill.BogreSkills;
 import com.jeremyseq.inhabitants.effects.ModEffects;
+import com.jeremyseq.inhabitants.items.SpikeDrillItem;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
@@ -25,6 +26,8 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.RedStoneOreBlock;
 
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -33,6 +36,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.village.VillagerTradesEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.Event;
 
 import java.util.*;
 import javax.annotation.Nullable;
@@ -203,5 +208,17 @@ public class ModEvents {
         }
 
         return false;
+    }
+
+    @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (event.getItemStack().getItem() instanceof SpikeDrillItem) {
+            BlockState state = event.getLevel().getBlockState(event.getPos());
+            
+            // stupid glowing particles
+            if (state.getBlock() instanceof RedStoneOreBlock) {
+                event.setUseBlock(Event.Result.DENY);
+            }
+        }
     }
 }

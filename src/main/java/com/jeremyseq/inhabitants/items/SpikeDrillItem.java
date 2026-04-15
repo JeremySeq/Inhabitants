@@ -342,6 +342,15 @@ public class SpikeDrillItem extends PickaxeItem {
     }
 
     @Override
+    public boolean hurtEnemy(
+            @NotNull ItemStack stack,
+            @NotNull LivingEntity target,
+            @NotNull LivingEntity attacker
+    ) {
+        return true;
+    }
+
+    @Override
     public boolean overrideOtherStackedOnMe(
             @NotNull ItemStack stack,
             @NotNull ItemStack other,

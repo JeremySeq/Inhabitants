@@ -72,7 +72,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
     private final ItemStackHandler itemHandler = new ItemStackHandler(5) {
         @Override
         public int getSlotLimit(int slot) {
-            return 1;
+            return 16;
         }
     };
     private final LazyOptional<IItemHandler> optionalItemHandler =
@@ -374,19 +374,23 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
                 this.position(),
                 10,
                 bogre -> {
-                    boolean isSkillingAtThisCauldron = bogre.getAIState() == BogreAi.State.SKILLING && 
-                            bogre.cauldronPos != null && bogre.cauldronPos.distSqr(this.blockPosition()) < 4;
-                    return isSkillingAtThisCauldron || bogre.getAIState() == BogreAi.State.NEUTRAL;
+                    if (bogre.getAIState() != BogreAi.State.SKILLING) return false;
+                    if (bogre.cauldronPos == null || !bogre.cauldronPos.equals(this.blockPosition())) return false;
+                    
+                    BogreAi.SkillingState state = bogre.getCraftingState();
+                    return state == BogreAi.SkillingState.COOKING || state == BogreAi.SkillingState.MOVING_TO_TARGET;
                 }
         );
 
         if (closest.isPresent()) {
             BogreEntity bogre = closest.get();
+            BogreAi.SkillingState prevState = bogre.getCraftingState();
+
             if (bogre.getAIState() == BogreAi.State.SKILLING) {
                 bogre.getAi().interruptSkilling();
             }
 
-            if (!player.isCreative() && !player.isSpectator()) {
+            if (prevState == BogreAi.SkillingState.COOKING && !player.isCreative()) {
                 var attackGoal = bogre.getAttackGoal();
                 if (attackGoal != null) {
                     attackGoal.getAttackedByPlayers().add(player.getUUID());
@@ -412,20 +416,21 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
         
         if (recipeOpt.isPresent()) {
             CookingRecipe recipe = recipeOpt.get();
-            result = recipe.result().copy();
-
-            // consume ingredients 0-3
-            for (int i = 0; i < 4; i++) {
-                itemHandler.getStackInSlot(i).shrink(1);
-            }
-            // consume container 4
-            itemHandler.getStackInSlot(4).shrink(1);
-
-            // put result in container slot 4, replaces the consumed container
-            itemHandler.setStackInSlot(4, result);
+            ItemStack container = itemHandler.getStackInSlot(4);
             
-            level().playSound(null, blockPosition(), SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT,
-            SoundSource.BLOCKS, 1.0F, 0.8F);
+            if (!container.isEmpty() && container.is(recipe.container())) {
+                result = recipe.result().copy();
+
+                // consume ingredients 0-3
+                for (int i = 0; i < 4; i++) {
+                    itemHandler.getStackInSlot(i).shrink(1);
+                }
+                // consume container 4
+                itemHandler.getStackInSlot(4).shrink(1);
+                
+                level().playSound(null, blockPosition(), SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT,
+                SoundSource.BLOCKS, 1.0F, 0.8F);
+            }
         }
 
         entityData.set(COOKING_PROGRESS, 0);

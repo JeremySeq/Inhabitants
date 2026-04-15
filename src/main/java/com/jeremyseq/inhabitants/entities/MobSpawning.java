@@ -35,7 +35,8 @@ public class MobSpawning {
                     && level.getBrightness(LightLayer.BLOCK, pos) < 8
                     && (isFlat(level) ? level.getMaxLocalRawBrightness(pos) < 8 : true)
                     && spawnChance(level, random, "impaler")
-                    && !level.getBiome(pos).is(Biomes.DEEP_DARK),
+                    && !level.getBiome(pos).is(Biomes.DEEP_DARK)
+                    && !level.getBiome(pos).is(Biomes.MUSHROOM_FIELDS),
                 SpawnPlacementRegisterEvent.Operation.REPLACE
         );
 
