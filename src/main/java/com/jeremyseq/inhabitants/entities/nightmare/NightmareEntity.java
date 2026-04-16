@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.entities.nightmare;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.effects.ModEffects;
+import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -48,6 +49,11 @@ public class NightmareEntity extends Monster implements GeoEntity {
 
     public NightmareEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        this.moveControl = new FlyingMoveControl(this, 20, true);
+    }
+
+    public NightmareEntity(Level pLevel) {
+        super(ModEntities.NIGHTMARE.get(), pLevel);
         this.moveControl = new FlyingMoveControl(this, 20, true);
     }
 

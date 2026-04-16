@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.events;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.skill.BogreSkills;
 import com.jeremyseq.inhabitants.effects.ModEffects;
+import com.jeremyseq.inhabitants.entities.nightmare.NightmareEntity;
 import com.jeremyseq.inhabitants.items.SpikeDrillItem;
 
 import net.minecraft.world.entity.player.Player;
@@ -31,6 +32,7 @@ import net.minecraft.world.level.block.RedStoneOreBlock;
 
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.event.level.BlockEvent;
@@ -240,6 +242,17 @@ public class ModEvents {
             if (state.getBlock() instanceof RedStoneOreBlock) {
                 event.setUseBlock(Event.Result.DENY);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onSleepSpawnNightmare(PlayerSleepInBedEvent event) {
+        Player player = event.getEntity();
+        if (player.level().getRandom().nextFloat() < 0.02f) {
+            event.setResult(Player.BedSleepingProblem.NOT_SAFE);
+            NightmareEntity nightmare = new NightmareEntity(player.level());
+            nightmare.setPos(event.getPos().getCenter());
+            player.level().addFreshEntity(nightmare);
         }
     }
 }

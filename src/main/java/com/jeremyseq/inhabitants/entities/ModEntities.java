@@ -65,7 +65,7 @@ public class ModEntities {
 
     public static final RegistryObject<EntityType<NightmareEntity>> NIGHTMARE =
             REGISTRY.register("nightmare",
-                    () -> EntityType.Builder.of(NightmareEntity::new, MobCategory.MONSTER)
+                    () -> EntityType.Builder.<NightmareEntity>of(NightmareEntity::new, MobCategory.MONSTER)
                             .sized(1, 2.4f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "nightmare").toString()));
 
