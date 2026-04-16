@@ -1,0 +1,47 @@
+{
+  "conditions": [
+    {
+      "condition": "minecraft:any_of",
+      "terms": [
+        {
+          "condition": "minecraft:loot_table_id",
+          "loot_table_id": "minecraft:chests/abandoned_mineshaft"
+        },
+        {
+          "condition": "minecraft:loot_table_id",
+          "loot_table_id": "minecraft:chests/stronghold_crossing"
+        },
+        {
+          "condition": "minecraft:loot_table_id",
+          "loot_table_id": "minecraft:chests/stronghold_corridor"
+        },
+        {
+          "condition": "minecraft:loot_table_id",
+          "loot_table_id": "minecraft:chests/stronghold_library"
+        },
+        {
+          "condition": "minecraft:loot_table_id",
+          "loot_table_id": "minecraft:chests/village/village_toolsmith"
+        },
+        {
+          "condition": "minecraft:loot_table_id",
+          "loot_table_id": "minecraft:chests/desert_pyramid"
+        },
+        {
+          "condition": "minecraft:loot_table_id",
+          "loot_table_id": "inhabitants:chests/bogre_lair"
+        }
+      ]
+    },
+    {
+      "condition": "minecraft:random_chance",
+      "chance": 0.1
+    }
+  ],
+  "itemStack": {
+    "item": "minecraft:enchanted_book",
+    "count": 1,
+    "tag": "{StoredEnchantments:[{id:\"inhabitants:thermal_capacity\",lvl:1s}]}"
+  },
+  "type": "inhabitants:add_item_loot_modifier"
+}

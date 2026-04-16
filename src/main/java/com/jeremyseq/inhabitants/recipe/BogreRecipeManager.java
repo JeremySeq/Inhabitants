@@ -136,6 +136,9 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
                     if (container == null) container = Items.BOWL;
 
                     int time_ticks = GsonHelper.getAsInt(json, "time_ticks", GsonHelper.getAsInt(json, "timeTicks", 160));
+                    // ensure at least 80 ticks
+                    if (time_ticks < 80) time_ticks = 80;
+
                     cookingList.add(new CookingRecipe(ingredients, tagIngredients, container, result, time_ticks));
                 }
                 case "transformation" -> {
@@ -194,19 +197,19 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
 
             addCookingFallback(cookingList, 
                 List.of(Items.SPIDER_EYE, Items.FERMENTED_SPIDER_EYE, Items.SLIME_BALL),
-                ModItems.MARINATED_SPIDER, 30);
+                ModItems.MARINATED_SPIDER, 200);
                 
             addCookingFallback(cookingList,
                 List.of(Items.POISONOUS_POTATO, Items.FERMENTED_SPIDER_EYE, Items.BONE),
-                ModItems.UNCANNY_POTTAGE, 100);
+                ModItems.UNCANNY_POTTAGE, 200);
                 
             addCookingFallback(cookingList,
                 List.of(Items.GUNPOWDER, Items.ROTTEN_FLESH, Items.ROTTEN_FLESH),
-                ModItems.BAKED_BRAINS, 100);
+                ModItems.BAKED_BRAINS, 200);
                 
             addCookingFallback(cookingList,
                 List.of(Items.PHANTOM_MEMBRANE, Items.PHANTOM_MEMBRANE,
-                Items.ENDER_PEARL), ModItems.DIMENSIONAL_SERVING, 100);
+                Items.ENDER_PEARL), ModItems.DIMENSIONAL_SERVING, 200);
         }
     }
 
@@ -355,6 +358,6 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
             List.of(fishTag, fishTag, fishTag),
             Items.BOWL,
             new ItemStack(ModItems.FISH_SNOT_CHOWDER.get(), 1),
-            100));
+            200));
     }
 }

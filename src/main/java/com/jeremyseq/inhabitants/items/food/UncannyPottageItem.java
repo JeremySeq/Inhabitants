@@ -48,7 +48,7 @@ public class UncannyPottageItem extends BowlFoodItem {
                 }
             }
         }
-        entity.addEffect(new MobEffectInstance(ModEffects.REVERSE_GROWTH.get(), 2400, 0, false, true, true));
+        entity.addEffect(new MobEffectInstance(ModEffects.REVERSE_GROWTH.get(), 1800, 0, false, true, true));
         return super.finishUsingItem(stack, level, entity);
     }
 }

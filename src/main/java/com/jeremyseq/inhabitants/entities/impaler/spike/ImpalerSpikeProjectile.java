@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.entities.impaler.spike;
 
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.damagesource.ModDamageTypes;
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
@@ -78,6 +79,9 @@ public class ImpalerSpikeProjectile extends AbstractArrow implements GeoAnimatab
     @Override
     protected void onHitEntity(EntityHitResult pResult) {
         Entity entity = pResult.getEntity();
+        
+        if (entity instanceof ImpalerEntity) return;
+
         float f = (float)this.getDeltaMovement().length();
         int i = Mth.ceil(Mth.clamp((double)f * this.getBaseDamage(), 0.0D, Integer.MAX_VALUE));
 

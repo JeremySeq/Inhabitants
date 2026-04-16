@@ -235,7 +235,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
     
     @Override
     public void clearCraftingContent() {
-        for (int i = 0; i < INGREDIENT_SLOTS; i++) {
+        for (int i = 0; i < CAULDRON_SLOTS; i++) {
             ItemStack stack = this.itemHandler.extractItem(i, 64, false);
             if (!stack.isEmpty()) {
                 if (!this.player.getInventory().add(stack)) {

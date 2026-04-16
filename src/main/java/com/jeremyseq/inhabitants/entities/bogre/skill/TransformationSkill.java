@@ -193,7 +193,6 @@ public class TransformationSkill extends BogreSkills.Skill {
                 bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
                 setTransformationTicks(bogre, 0);
                 bogre.resetCookingTicks();
-                BogreAi.playAnimation(bogre, "grab");
                 bogre.getEntityData().set(BogreEntity.TARGET_POS, BlockPos.ZERO);
                 bogre.getEntityData().set(BogreEntity.TARGET_ENTITY_ID, -1);
                 bogre.getEntityData().set(BogreEntity.IS_TRANSFORMING_DISC, false);

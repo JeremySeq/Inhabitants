@@ -232,6 +232,10 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
+
+        // prevent impaler's from hurting each other
+        if (source.getEntity() instanceof ImpalerEntity) return false;
+
         // immune to stalactite + stalagmite damage
         if (source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.STALAGMITE)) {
             return false;
@@ -253,6 +257,11 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
 
         return result;
+    }
+
+    @Override
+    public boolean canAttack(LivingEntity target) {
+        return !(target instanceof ImpalerEntity) && super.canAttack(target);
     }
 
     @Override
