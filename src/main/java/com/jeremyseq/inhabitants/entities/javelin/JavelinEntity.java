@@ -161,6 +161,8 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         float yRot = this.getYRot();
         float xRot = this.getXRot();
         
+        if (Math.abs(xRot) > 60.0f) return;
+        
         Vec3 tipRel = rotateJavelinVector(new Vec3(0, 0.5, 0), xRot, yRot);
         Vec3 tailRel = rotateJavelinVector(new Vec3(0, -1.25, 0), xRot, yRot);
         
