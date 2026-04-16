@@ -25,7 +25,7 @@ public class DimensionalServingItem extends BowlFoodItem {
     @Override
     public @NotNull ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level level, @NotNull LivingEntity entity) {
         if (!level.isClientSide) {
-            entity.addEffect(new MobEffectInstance(ModEffects.IMMATERIAL.get(), 2400));
+            entity.addEffect(new MobEffectInstance(ModEffects.IMMATERIAL.get(), 1800));
         }
         return super.finishUsingItem(stack, level, entity);
     }

@@ -24,6 +24,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.client.gui.screens.Screen;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -392,7 +393,7 @@ public class CauldronRecipeBook extends AbstractWidget {
         return true;
     }
 
-    private void handleRecipeClick(@NotNull CookingRecipe recipe) {
+    private void handleRecipeClick(@NotNull CookingRecipe recipe, boolean shift) {
         this.minecraft.getSoundManager()
             .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
         
@@ -402,7 +403,7 @@ public class CauldronRecipeBook extends AbstractWidget {
         int index = allRecipes.indexOf(recipe);
 
         if (index != -1) {
-            ModNetworking.sendToServer(new BogreRecipePacketC2S(index));
+            ModNetworking.sendToServer(new BogreRecipePacketC2S(index, shift));
         }
     }
 
@@ -454,11 +455,14 @@ public class CauldronRecipeBook extends AbstractWidget {
         }
         
         int startIndex = currentPage * itemsPerPage;
+        boolean shift = Screen.hasShiftDown();
+
         for (int i = 0; i < itemsPerPage && startIndex + i < filteredRecipes.size(); i++) {
             int[] pos = getGridSlotPosition(i);
             GuiLayout slotBounds = new GuiLayout(pos[0], pos[1], slotSize, slotSize);
+            
             if (slotBounds.isHovered(mouseX, mouseY)) {
-                handleRecipeClick(filteredRecipes.get(startIndex + i));
+                handleRecipeClick(filteredRecipes.get(startIndex + i), shift);
                 return true;
             }
         }

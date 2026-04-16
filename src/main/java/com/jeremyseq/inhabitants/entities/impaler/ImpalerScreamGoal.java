@@ -97,6 +97,7 @@ public class ImpalerScreamGoal extends Goal {
             
             for (LivingEntity target : targets) {
                 if (target != mob &&
+                !(target instanceof ImpalerEntity) &&
                 !target.isSpectator() &&
                 target.isAlive() &&
                 !hitEntities.contains(target.getUUID())) {

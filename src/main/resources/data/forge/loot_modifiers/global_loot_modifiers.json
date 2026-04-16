@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-
+    "inhabitants:diamond_tip_in_chests",
+    "inhabitants:thermal_capacity_in_chests"
   ]
 }

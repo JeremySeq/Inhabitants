@@ -89,5 +89,12 @@ public class ModNetworking {
                 BogreRecipePacketS2C::decode,
                 BogreRecipePacketS2C::handle
         );
+        CHANNEL.registerMessage(
+                packetId++,
+                JavelinBounceSyncPacketS2C.class,
+                JavelinBounceSyncPacketS2C::encode,
+                JavelinBounceSyncPacketS2C::decode,
+                JavelinBounceSyncPacketS2C::handle
+        );
     }
 }

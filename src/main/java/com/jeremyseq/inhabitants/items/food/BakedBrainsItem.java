@@ -17,7 +17,7 @@ public class BakedBrainsItem extends Item {
                 new FoodProperties.Builder()
                 .nutrition(4)
                 .saturationMod(0.3f)
-                .effect(() -> new MobEffectInstance(ModEffects.UNDEAD_DISGUISE.get(), 2400, 0), 1.0f)
+                .effect(() -> new MobEffectInstance(ModEffects.UNDEAD_DISGUISE.get(), 1800, 0), 1.0f)
                 .alwaysEat()
                 .build()));
     }

@@ -37,15 +37,9 @@ public class CookingSkill extends BogreSkills.Skill {
     public int getDuration(BogreEntity bogre) {
         IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
         if (activeRecipe instanceof CookingRecipe cooking) {
-            return BogreSkillingGoal.COOKING_START_OFFSET +
-            getAnimationDuration(Animation.START) +
-            cooking.time_ticks() +
-            getAnimationDuration(Animation.END);
+            return cooking.time_ticks();
         }
-        return BogreSkillingGoal.COOKING_START_OFFSET +
-        getAnimationDuration(Animation.START) +
-        55 +
-        getAnimationDuration(Animation.END);
+        return 160;
     }
 
     @Override
@@ -186,14 +180,16 @@ public class CookingSkill extends BogreSkills.Skill {
             //notify cauldron is no longer cooking
             ItemStack result = bogreCauldron_final.finishCooking();
             if (!result.isEmpty()) {
-                bogre.setItemHeld(result);
+                bogre.getAi().setStoredSkillResult(result);
             }
 
             bogreCauldron_final.setCooking(false);
 
         } else if (bogre.getCookingTicks() >= getDuration(bogre) - BogreSkillingGoal.COOKING_START_OFFSET) {
             //grab the item from the container slot 4
-            if (!bogre.getItemHeld().isEmpty()) {
+            ItemStack result = bogre.getAi().getStoredSkillResult();
+            if (!result.isEmpty()) {
+                bogre.setItemHeld(result);
                 bogre.getEntityData().set(BogreEntity.COOKING_ANIM, false);
                 BogreAi.playAnimation(bogre, "grab");
                 

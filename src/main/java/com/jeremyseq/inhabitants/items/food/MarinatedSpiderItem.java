@@ -24,7 +24,7 @@ public class MarinatedSpiderItem extends BowlFoodItem {
 
     @Override
     public @NotNull ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level level, LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(ModEffects.STICKY_LEGS.get(), 2400, 0, false, true, true));
+        entity.addEffect(new MobEffectInstance(ModEffects.STICKY_LEGS.get(), 1800, 0, false, true, true));
         return super.finishUsingItem(stack, level, entity);
     }
 }
