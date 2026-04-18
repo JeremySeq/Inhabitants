@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -42,8 +43,7 @@ public class NightmareEntity extends Monster implements GeoEntity {
 
     public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(NightmareEntity.class, EntityDataSerializers.INT);
 
-
-    public static final int MAX_DYING_TICKS = 120;
+    public static final int INITIAL_DEATH_ANIM_TICKS = 86;
 
     public int dyingTicks = 0;
 
@@ -92,14 +92,29 @@ public class NightmareEntity extends Monster implements GeoEntity {
 
     @Override
     public void die(@NotNull DamageSource pDamageSource) {
-        this.triggerAnim("death", "death");
+        this.triggerAnim("death", "death_initial");
         this.dead = true;
     }
 
     @Override
     public void tickDeath() {
         ++this.dyingTicks;
-        if (this.dyingTicks >= MAX_DYING_TICKS) {
+
+        // only start dropping entity after initial death anim is done; initial death anim moves nightmare downwards anyway
+        if (this.dyingTicks >= INITIAL_DEATH_ANIM_TICKS) {
+            // spiral down: fall downwards while moving forwards and rotating
+            Vec3 normal = Vec3.atCenterOf(this.getDirection().getNormal());
+            this.setDeltaMovement(new Vec3(0, -0.1, 0).add(normal.scale(0.05)));
+            this.setYRot(this.getYRot() + 2);
+            // trigger looping drop anim after initial death anim
+            this.triggerAnim("death", "death_looping");
+        } else {
+            // cancel out movement during intial death anim
+            this.setDeltaMovement(new Vec3(0, 0, 0));
+        }
+
+        // actually kill entity when it hits the ground and has played initial death anim
+        if (this.onGround() && this.dyingTicks >= INITIAL_DEATH_ANIM_TICKS) {
             this.remove(Entity.RemovalReason.KILLED);
             this.playSound(SoundEvents.ITEM_PICKUP);
             this.spawnAtLocation(new ItemStack(ModItems.DREAD_CLOTH.get(), new Random().nextInt(1, 2)));
@@ -130,6 +145,7 @@ public class NightmareEntity extends Monster implements GeoEntity {
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("texture", entityData.get(TEXTURE));
+        tag.putBoolean("dying", dead);
     }
 
     @Override
@@ -139,6 +155,15 @@ public class NightmareEntity extends Monster implements GeoEntity {
         if (tag.contains("texture")) {
             entityData.set(TEXTURE, tag.getInt("texture"));
         }
+
+        if (tag.contains("dying")) {
+            dead = tag.getBoolean("dying");
+            if (dead) {
+                /* TODO: doesnt seem to play animation correctly, but switches to death_looping after time done
+                    setting dead works but not triggerAnim, check client/server, when anim gets triggered compared to registerControllers */
+                this.triggerAnim("death", "death_initial");
+            }
+        }
     }
 
     @Override
@@ -147,7 +172,8 @@ public class NightmareEntity extends Monster implements GeoEntity {
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
                 .triggerableAnim("melee", RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "death", 0, state -> PlayState.STOP)
-                .triggerableAnim("death", RawAnimation.begin().then("death", Animation.LoopType.HOLD_ON_LAST_FRAME)));
+                .triggerableAnim("death_initial", RawAnimation.begin().then("death_initial", Animation.LoopType.PLAY_ONCE))
+                .triggerableAnim("death_looping", RawAnimation.begin().then("death_looping", Animation.LoopType.LOOP)));
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
