@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.nightmare;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModItems;
@@ -10,7 +9,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -77,7 +75,6 @@ public class NightmareEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean doHurtTarget(@NotNull Entity pEntity) {
-        Inhabitants.LOGGER.debug("NightmareEntity attacked {}", pEntity.getName());
         if (!level().isClientSide) {
             this.triggerAnim("attack", "melee");
         }
@@ -91,14 +88,12 @@ public class NightmareEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    public void die(@NotNull DamageSource pDamageSource) {
-        this.triggerAnim("death", "death_initial");
-        this.dead = true;
-    }
-
-    @Override
     public void tickDeath() {
         ++this.dyingTicks;
+
+        if (this.dyingTicks == 1) {
+            this.triggerAnim("death", "death_initial");
+        }
 
         // only start dropping entity after initial death anim is done; initial death anim moves nightmare downwards anyway
         if (this.dyingTicks >= INITIAL_DEATH_ANIM_TICKS) {
@@ -158,11 +153,6 @@ public class NightmareEntity extends Monster implements GeoEntity {
 
         if (tag.contains("dying")) {
             dead = tag.getBoolean("dying");
-            if (dead) {
-                /* TODO: doesnt seem to play animation correctly, but switches to death_looping after time done
-                    setting dead works but not triggerAnim, check client/server, when anim gets triggered compared to registerControllers */
-                this.triggerAnim("death", "death_initial");
-            }
         }
     }
 
