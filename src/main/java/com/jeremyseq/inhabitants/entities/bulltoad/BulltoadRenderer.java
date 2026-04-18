@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.bulltoad;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +12,11 @@ public class BulltoadRenderer extends GeoEntityRenderer<BulltoadEntity> {
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull BulltoadEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bulltoad/bulltoad.png");
+        if (animatable.getBreedStage() == 1) {
+            return ResourceLocation.fromNamespaceAndPath("inhabitants", "textures/entity/bulltoad/withtoads_0.png");
+        } else if (animatable.getBreedStage() == 2) {
+            return ResourceLocation.fromNamespaceAndPath("inhabitants", "textures/entity/bulltoad/withtoads_1.png");
+        }
+        return ResourceLocation.fromNamespaceAndPath("inhabitants", "textures/entity/bulltoad/bulltoad.png");
     }
 }
