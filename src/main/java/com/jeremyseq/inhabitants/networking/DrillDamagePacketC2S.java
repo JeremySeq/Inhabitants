@@ -263,7 +263,11 @@ public class DrillDamagePacketC2S {
         data.progress = 0f;
 
         if (drill.getItem() instanceof SpikeDrillItem) {
-            SpikeDrillItem.addTemperature(drill, 1, level.getGameTime());
+            if (!player.isCreative()) {
+                SpikeDrillItem.addTemperature(drill, 1, level.getGameTime());
+            }
+            
+            drill.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
 
             if (SpikeDrillItem.getTemperature(drill) >=
                 SpikeDrillItem.getTemperatureMax(drill)) {

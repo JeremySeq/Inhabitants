@@ -66,7 +66,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
                 }
                 super.set(stack);
             }
-            @Override public int getMaxStackSize() { return 1; }
+            @Override public int getMaxStackSize() { return 16; }
         });
         // slot 1
         this.addSlot(new SlotItemHandler(itemHandler, 1, 62, 19) {
@@ -80,7 +80,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
                 }
                 super.set(stack);
             }
-            @Override public int getMaxStackSize() { return 1; }
+            @Override public int getMaxStackSize() { return 16; }
         });
         // slot 2
         this.addSlot(new SlotItemHandler(itemHandler, 2, 44, 37) {
@@ -94,7 +94,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
                 }
                 super.set(stack);
             }
-            @Override public int getMaxStackSize() { return 1; }
+            @Override public int getMaxStackSize() { return 16; }
         });
         // slot 3
         this.addSlot(new SlotItemHandler(itemHandler, 3, 62, 37) {
@@ -108,14 +108,14 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
                 }
                 super.set(stack);
             }
-            @Override public int getMaxStackSize() { return 1; }
+            @Override public int getMaxStackSize() { return 16; }
         });
         // slot 4 (bowl/output)
         this.addSlot(new SlotItemHandler(itemHandler, CONTAINER_SLOT, 98, 28) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
                 return BogreRecipeManager.isContainer(stack.getItem());
             }
-            @Override public int getMaxStackSize() { return 1; }
+            @Override public int getMaxStackSize() { return 16; }
         });
         // player inventory slots
         for (int row = 0; row < 3; ++row) {
@@ -139,19 +139,23 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
 
     @Override
     public void clicked(int slotId, int button, @NotNull ClickType clickType, @NotNull Player player) {
-        // triggers Bogre to get angry if player try to remove ingredints while cooking
-        if (slotId >= 0 && slotId < CONTAINER_SLOT + 1) { // 0-4 (ingredients + bowl)
-            BogreCauldronEntity cauldron = getCauldronEntity();
-            if (cauldron != null && cauldron.isCooking()) {
-                boolean isRemoval = clickType == ClickType.PICKUP
-                        || clickType == ClickType.QUICK_MOVE
-                        || clickType == ClickType.THROW;
-                if (isRemoval) {
+        // ehm ehm... Bogre only gets angry if a slot that had items is now empty :D
+        boolean wasEmpty = true;
+        if (slotId >= 0 && slotId < CAULDRON_SLOTS) {
+            wasEmpty = this.getSlot(slotId).getItem().isEmpty();
+        }
+
+        super.clicked(slotId, button, clickType, player);
+
+        if (slotId >= 0 && slotId < CAULDRON_SLOTS) {
+            boolean isEmptyNow = this.getSlot(slotId).getItem().isEmpty();
+            if (!wasEmpty && isEmptyNow) {
+                BogreCauldronEntity cauldron = getCauldronEntity();
+                if (cauldron != null) {
                     cauldron.notifyTheft(player);
                 }
             }
         }
-        super.clicked(slotId, button, clickType, player);
     }
 
     @Override
@@ -231,7 +235,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
     
     @Override
     public void clearCraftingContent() {
-        for (int i = 0; i < INGREDIENT_SLOTS; i++) {
+        for (int i = 0; i < CAULDRON_SLOTS; i++) {
             ItemStack stack = this.itemHandler.extractItem(i, 64, false);
             if (!stack.isEmpty()) {
                 if (!this.player.getInventory().add(stack)) {

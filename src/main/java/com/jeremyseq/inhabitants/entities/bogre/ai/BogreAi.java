@@ -190,6 +190,7 @@ public class BogreAi {
             }
 
             stopAnimation("all");
+            bogre.getNavigation().stop();
             if (!bogre.getItemHeld().isEmpty()) {
                 bogre.throwHeldItem();
             }

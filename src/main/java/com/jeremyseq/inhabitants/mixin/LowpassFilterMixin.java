@@ -51,8 +51,10 @@ public class LowpassFilterMixin {
             if (!InhabitantsAudio.efxSupported ||
                 InhabitantsAudio.lowpassFilterId == -1) return;
             
-            AL10.alSourcei(this.source, EXTEfx.AL_DIRECT_FILTER,
-                InhabitantsAudio.lowpassFilterId);
+            if (ModClientEvents.muffleLerp > 0.0F) {
+                AL10.alSourcei(this.source, EXTEfx.AL_DIRECT_FILTER,
+                    InhabitantsAudio.lowpassFilterId);
+            }
         }
     }
 

@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -16,10 +15,6 @@ public class ImpalerRenderer extends GeoEntityRenderer<ImpalerEntity> {
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull ImpalerEntity animatable) {
-        if (animatable.getTextureType() == 0) {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler.png");
-        } else {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler_dripstone.png");
-        }
+        return this.getGeoModel().getTextureResource(animatable);
     }
 }

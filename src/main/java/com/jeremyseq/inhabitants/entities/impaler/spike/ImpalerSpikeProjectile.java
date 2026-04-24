@@ -1,10 +1,15 @@
 package com.jeremyseq.inhabitants.entities.impaler.spike;
 
+import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.damagesource.ModDamageTypes;
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -78,6 +83,9 @@ public class ImpalerSpikeProjectile extends AbstractArrow implements GeoAnimatab
     @Override
     protected void onHitEntity(EntityHitResult pResult) {
         Entity entity = pResult.getEntity();
+        
+        if (entity instanceof ImpalerEntity) return;
+
         float f = (float)this.getDeltaMovement().length();
         int i = Mth.ceil(Mth.clamp((double)f * this.getBaseDamage(), 0.0D, Integer.MAX_VALUE));
 
@@ -89,12 +97,26 @@ public class ImpalerSpikeProjectile extends AbstractArrow implements GeoAnimatab
         DamageSource damagesource =
             ModDamageTypes.causeImpaledDamage(this.level(), this, shooter);
 
-        if (entity.hurt(damagesource, (float)i)) {
-            this.discard();
-        } else {
-            this.setDeltaMovement(this.getDeltaMovement().scale(-0.1D));
-            this.setYRot(this.getYRot() + 180.0F);
-            this.yRotO += 180.0F;
+        if (entity instanceof Player player) {
+            player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 100, 0));
+        }
+
+        if (entity instanceof LivingEntity livingEntity) {
+            if (this.getKnockback() > 0) {
+                double d0 = Math.max(0.0D, 1.0D - livingEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
+                Vec3 vec3 = this.getDeltaMovement().multiply(1.0D, 0.0D, 1.0D).normalize().scale((double) this.getKnockback() * 0.6D * d0);
+                if (vec3.lengthSqr() > 0.0D) {
+                    entity.push(vec3.x, 0.1D, vec3.z);
+                }
+            }
+
+            if (entity.hurt(damagesource, (float) i)) {
+                this.discard();
+            } else {
+                this.setDeltaMovement(this.getDeltaMovement().scale(-0.1D));
+                this.setYRot(this.getYRot() + 180.0F);
+                this.yRotO += 180.0F;
+            }
         }
     }
 }

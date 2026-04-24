@@ -10,6 +10,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.Slot;
 
 import net.minecraftforge.network.NetworkEvent;
 
@@ -19,17 +20,24 @@ import java.util.function.Supplier;
 public class BogreRecipePacketC2S {
 
     private final int recipeIndex;
+    private final boolean isShiftDown;
 
     public BogreRecipePacketC2S(int recipeIndex) {
+        this(recipeIndex, false);
+    }
+
+    public BogreRecipePacketC2S(int recipeIndex, boolean isShiftDown) {
         this.recipeIndex = recipeIndex;
+        this.isShiftDown = isShiftDown;
     }
 
     public static void encode(BogreRecipePacketC2S packet, FriendlyByteBuf buf) {
         buf.writeInt(packet.recipeIndex);
+        buf.writeBoolean(packet.isShiftDown);
     }
 
     public static BogreRecipePacketC2S decode(FriendlyByteBuf buf) {
-        return new BogreRecipePacketC2S(buf.readInt());
+        return new BogreRecipePacketC2S(buf.readInt(), buf.readBoolean());
     }
 
     public static void handle(BogreRecipePacketC2S packet, Supplier<NetworkEvent.Context> supplier) {
@@ -45,58 +53,95 @@ public class BogreRecipePacketC2S {
             
             menu.clearCraftingContent();
             
-            boolean[] usedSlots = new boolean[player.getInventory().getContainerSize()];
+            int maxFills = packet.isShiftDown ? 16 : 1;
+            for (int f = 0; f < maxFills; f++) {
+                boolean success = true;
+                
+                // ingredients 0-3
+                for (int i = 0; i < recipe.ingredients().size(); i++) {
+                    if (recipe.hasTagIngredient(i)) {
 
-            for (int i = 0; i < recipe.ingredients().size(); i++) {
-                if (recipe.hasTagIngredient(i)) {
-                    findAndMoveTagItem(player, menu, recipe.getTagForSlot(i), i, usedSlots, recipe);
-                } else {
-                    Item needed = recipe.ingredients().get(i);
-                    if (needed != Items.AIR) {
-                        findAndMoveItem(player, menu, needed, i, usedSlots);
+                        if (!findAndMoveTagItem(player, menu, recipe.getTagForSlot(i), i, recipe)) {
+                            success = false;
+                            break;
+                        }
+                    } else {
+                        Item needed = recipe.ingredients().get(i);
+
+                        if (needed != Items.AIR) {
+                            if (!findAndMoveItem(player, menu, needed, i)) {
+                                success = false;
+                                break;
+                            }
+                        }
                     }
                 }
-            }
-
-            if (!menu.getSlot(4).hasItem()) {
-                findAndMoveItem(player, menu, recipe.container(), 4, usedSlots);
+                
+                // container slot 4
+                if (success) {
+                    if (!findAndMoveItem(player, menu, recipe.container(), 4)) {
+                        success = false;
+                    }
+                }
+                
+                if (!success) break;
             }
         });
+        
         context.setPacketHandled(true);
     }
 
-    private static void findAndMoveItem(ServerPlayer player, CauldronMenu menu, Item needed,
-        int slotIndex, boolean[] usedSlots) {
+    private static boolean findAndMoveItem(ServerPlayer player, CauldronMenu menu, Item needed, int slotIndex) {
+        Slot slot = menu.getSlot(slotIndex);
+        if (slot.getItem().getCount() >= slot.getMaxStackSize()) return true;
 
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            if (usedSlots[i]) continue;
-
             ItemStack stack = player.getInventory().getItem(i);
-            if (stack.getItem() == needed) {
-                ItemStack moved = player.getInventory().removeItem(i, 1);
-                menu.getSlot(slotIndex).set(moved);
 
-                if (stack.isEmpty()) usedSlots[i] = true;
-                return;
+            if (!stack.isEmpty() && stack.getItem() == needed) {
+                ItemStack moved = player.getInventory().removeItem(i, 1);
+                
+                if (slot.hasItem()) {
+                    slot.getItem().grow(1);
+                    slot.setChanged();
+                } else {
+                    slot.set(moved);
+                }
+
+                return true;
             }
         }
+
+        return false;
     }
 
-    private static void findAndMoveTagItem(ServerPlayer player, CauldronMenu menu,
-        TagKey<Item> tag, int slotIndex, boolean[] usedSlots, CookingRecipe recipe) {
+    private static boolean findAndMoveTagItem(ServerPlayer player, CauldronMenu menu,
+        TagKey<Item> tag, int slotIndex, CookingRecipe recipe) {
+        
+        Slot slot = menu.getSlot(slotIndex);
+        if (slot.getItem().getCount() >= slot.getMaxStackSize()) return true;
 
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            if (usedSlots[i]) continue;
-
             ItemStack stack = player.getInventory().getItem(i);
-            if (!stack.isEmpty() && stack.is(tag) && !recipe.isForbiddenCookedIngredient(stack.getItem())) {
-                ItemStack moved = player.getInventory().removeItem(i, 1);
-                menu.getSlot(slotIndex).set(moved);
 
-                if (stack.isEmpty()) usedSlots[i] = true;
-                return;
+            if (!stack.isEmpty() &&
+                stack.is(tag) &&
+                !recipe.isForbiddenCookedIngredient(stack.getItem())) {
+                
+                ItemStack moved = player.getInventory().removeItem(i, 1);
+
+                if (slot.hasItem()) {
+                    slot.getItem().grow(1);
+                    slot.setChanged();
+                } else {
+                    slot.set(moved);
+                }
+
+                return true;
             }
         }
+        
+        return false;
     }
 }
 

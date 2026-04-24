@@ -1,7 +1,5 @@
 package com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron;
 
-import com.jeremyseq.inhabitants.Inhabitants;
-
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 
@@ -16,6 +14,6 @@ public class BogreCauldronRenderer extends GeoEntityRenderer<BogreCauldronEntity
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull BogreCauldronEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre_cauldron.png");
+        return this.model.getTextureResource(animatable);
     }
 }

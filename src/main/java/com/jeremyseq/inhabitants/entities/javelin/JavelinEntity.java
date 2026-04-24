@@ -3,6 +3,10 @@ package com.jeremyseq.inhabitants.entities.javelin;
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.events.ModEvents;
+import com.jeremyseq.inhabitants.networking.ModNetworking;
+import com.jeremyseq.inhabitants.networking.*;
+import com.jeremyseq.inhabitants.items.javelin.JavelinClient;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -16,9 +20,8 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerPlayer;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.*;
@@ -34,6 +37,9 @@ import com.mojang.math.Axis;
 
 import org.joml.*;
 
+/* i believe u can flyyy
+* but i don't believe u'll ever touch the sky
+*/
 public class JavelinEntity extends AbstractArrow implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     
@@ -43,6 +49,10 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
     private int bounceCooldown = 0;
     private int lastBounceIndex = 0;
     private BlockPos stuckBlockPos = null;
+    
+    private double startY = -999.0;
+    private static final double maxHeightOffset = 1.5;
+    private static final double liftForce = 0.025;
 
     private float charge = 0.0f;
     private float baseDamage = 4.0f;
@@ -55,6 +65,7 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         this.setBaseDamage(baseDamage);
         this.setKnockback(baseKnockback);
         this.pickup = Pickup.DISALLOWED;
+        this.startY = this.getY();
     }
 
     public JavelinEntity(Level level, LivingEntity shooter, ItemStack stack) {
@@ -62,6 +73,7 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         this.setBaseDamage(3.0d);
         this.setKnockback(2);
         this.pickup = Pickup.DISALLOWED;
+        this.startY = this.getY();
     }
 
     @Override
@@ -85,6 +97,10 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
 
     @Override
     public void tick() {
+        if (this.startY == -999.0) {
+            this.startY = this.getY();
+        }
+
         if (!this.level().isClientSide &&
             this.inGround) {
             if (stuckBlockPos == null) {
@@ -112,6 +128,20 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
 
         super.tick();
 
+        if (!this.inGround &&
+            !this.isNoGravity()) {
+            double diff = (this.startY + maxHeightOffset) - this.getY();
+
+            if (diff > 0) {
+                double currentLift = Math.min(liftForce, diff * 0.1);
+                Vec3 movement = this.getDeltaMovement();
+
+                if (movement.y < 0.15) {
+                    this.setDeltaMovement(movement.add(0, currentLift, 0));
+                }
+            }
+        }
+
         if (this.inGround) {
             if (bounceCooldown > 0) {
                 if (!this.level().isClientSide) bounceCooldown--;
@@ -130,27 +160,51 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         float yRot = this.getYRot();
         float xRot = this.getXRot();
         
+        if (Math.abs(xRot) > 60.0f) return;
+        
         Vec3 tipRel = rotateJavelinVector(new Vec3(0, 0.5, 0), xRot, yRot);
         Vec3 tailRel = rotateJavelinVector(new Vec3(0, -1.25, 0), xRot, yRot);
         
         Vec3 start = this.position().add(tipRel);
         Vec3 end = this.position().add(tailRel);
         
-        AABB broadBox = new AABB(start, end).inflate(1.2);
+        AABB broadBox = new AABB(start, end).inflate(1.2).expandTowards(0, -2.0, 0);
         List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, broadBox);
         
         for (LivingEntity entity : entities) {
-            double dist = getDistanceToLine(entity.position(), start, end);
+            Vec3 currentPos = entity.position();
+            Vec3 prevPos = new Vec3(entity.xo, entity.yo, entity.zo);
+            Vec3 midPos = currentPos.add(prevPos).scale(0.5);
+
+            double dist = Math.min(getDistanceToLine(currentPos, start, end),
+                          Math.min(getDistanceToLine(prevPos, start, end),
+                                   getDistanceToLine(midPos, start, end)));
             
-            if (dist < 0.75) {
-                if (entity.getDeltaMovement().y < 0) {
-                    if (!this.level().isClientSide) {
-                        launch(entity);
+            if (dist < 0.45) {
+                if (!entity.isCrouching() &&
+                (entity.getDeltaMovement().y < 0 || entity.onGround())) {
+                    
+                    if (this.level().isClientSide) {
+                        // client
+                        if (JavelinClient.isLocalPlayer(entity)) {
+                            launch(entity);
+                            ModNetworking.sendToServer(new JavelinBounceTriggerPacketC2S(this.getId()));
+                        }
+                    } else {
+                        // server
+                        if (!(entity instanceof Player)) {
+                            launch(entity);
+                        }
                     }
                     break;
                 }
             }
         }
+    }
+
+    public void serverLaunch(ServerPlayer player) {
+        if (this.bounceCooldown > 0) return;
+        launch(player);
     }
 
     private Vec3 rotateJavelinVector(Vec3 v, float xRot, float yRot) {
@@ -174,7 +228,15 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
     }
 
     private void launch(LivingEntity entity) {
-        entity.setDeltaMovement(entity.getDeltaMovement().x, 0.85, entity.getDeltaMovement().z);
+        int currentBounce = ModEvents.BOUNCE_COMBOS.getOrDefault(entity.getUUID(), 0);
+        double verticalVelocity = 0.55 + (currentBounce * 0.15);
+        if (verticalVelocity > 1.25) verticalVelocity = 1.25;
+
+        entity.setDeltaMovement(
+            entity.getDeltaMovement().x, 
+            verticalVelocity, 
+            entity.getDeltaMovement().z
+        );
 
         if (entity instanceof Player player) {
             player.hurtMarked = true;
@@ -185,13 +247,25 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
 
         entity.resetFallDistance();
         
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-            ModSoundEvents.JAVELIN_BOUNCE.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
-        
-        this.bounceCooldown = 10;
-        
+        ModEvents.BOUNCE_COMBOS.put(entity.getUUID(), currentBounce + 1);
+        ModEvents.LAST_BOUNCE_TICKS.put(entity.getUUID(), this.level().getGameTime());
+
         if (!this.level().isClientSide) {
+            if (entity instanceof ServerPlayer serverPlayer) {
+                serverPlayer.connection.aboveGroundTickCount = 0;
+            }
+
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                ModSoundEvents.JAVELIN_BOUNCE.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
+            
+            this.bounceCooldown = 10;
             this.entityData.set(bounceIndex, this.entityData.get(bounceIndex) + 1);
+            
+            if (entity instanceof ServerPlayer serverPlayer) {
+
+                ModNetworking.sendToPlayer(new JavelinBounceSyncPacketS2C(
+                    currentBounce + 1, this.level().getGameTime()), serverPlayer);
+            }
         }
     }
 
@@ -299,9 +373,11 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
             pCompound.putInt("StuckY", this.stuckBlockPos.getY());
             pCompound.putInt("StuckZ", this.stuckBlockPos.getZ());
         }
+
         pCompound.putFloat("XRotStored", this.getXRot());
         pCompound.putFloat("YRotStored", this.getYRot());
         pCompound.putFloat("Charge", this.getCharge());
+        pCompound.putDouble("StartY", this.startY);
     }
 
     @Override
@@ -318,6 +394,9 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         }
         if (pCompound.contains("Charge")) {
             this.setCharge(pCompound.getFloat("Charge"));
+        }
+        if (pCompound.contains("StartY")) {
+            this.startY = pCompound.getDouble("StartY");
         }
     }
 

@@ -13,6 +13,7 @@ public class ModLootModifiers {
             DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, Inhabitants.MODID);
 
     public static final RegistryObject<Codec<ReplaceWithItemLootModifier>> REPLACE_ITEM = LOOT_MODIFIERS.register("replace_item_loot_modifier", () -> ReplaceWithItemLootModifier.CODEC);
+    public static final RegistryObject<Codec<AddItemLootModifier>> ADD_ITEM = LOOT_MODIFIERS.register("add_item_loot_modifier", () -> AddItemLootModifier.CODEC);
 
     public static void register(IEventBus bus) {
         LOOT_MODIFIERS.register(bus);

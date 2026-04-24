@@ -9,6 +9,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.util.RandomSource;
+import net.minecraft.core.particles.ParticleTypes;
 
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -47,17 +49,15 @@ public class RoarEffectRenderer {
             double speedMultiplier) {
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(
-                ModParticles.ROAR_EFFECT.get(),
+                ParticleTypes.ANGRY_VILLAGER,
                 sourcePos.x, sourcePos.y, sourcePos.z,
-                0,
-                lookDirection.x * speedMultiplier, lookDirection.y * speedMultiplier,
-                lookDirection.z * speedMultiplier,
-                1.0D);
+                1,
+                0, 0, 0,
+                0.0D);
         } else if (level.isClientSide) {
-            level.addParticle(ModParticles.ROAR_EFFECT.get(),
+            level.addParticle(ParticleTypes.ANGRY_VILLAGER,
                 sourcePos.x, sourcePos.y, sourcePos.z,
-                lookDirection.x * speedMultiplier, lookDirection.y * speedMultiplier,
-                lookDirection.z * speedMultiplier);
+                0, 0, 0);
         }
     }
     
@@ -154,11 +154,41 @@ public class RoarEffectRenderer {
             }
 
             if (this.ticksAlive % 3 == 0) {
-                sendParticles(ModParticles.ROAR_EFFECT.get());
+                this.sendAngryVillagerParticles();
             }
 
             if (this.ticksAlive % 6 == 0) {
                 sendParticles(ModParticles.SONIC_WAVE.get());
+            }
+        }
+
+        private void sendAngryVillagerParticles() {
+            RandomSource random = level.getRandom();
+            double ox = (random.nextDouble() - 0.5) * 1.5;
+            double oy = (random.nextDouble() - 0.5) * 0.5;
+            double oz = (random.nextDouble() - 0.5) * 1.5;
+
+            double px = sourcePos.x;
+            double py = sourcePos.y;
+            double pz = sourcePos.z;
+
+            if (entity != null) {
+                px = entity.getX();
+                py = entity.getY() + entity.getBbHeight() + 0.5;
+                pz = entity.getZ();
+            }
+
+            if (level instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(
+                    ParticleTypes.ANGRY_VILLAGER,
+                    px + ox, py + oy, pz + oz,
+                    1,
+                    0, 0, 0,
+                    0.0D);
+            } else if (level.isClientSide) {
+                level.addParticle(ParticleTypes.ANGRY_VILLAGER,
+                    px + ox, py + oy, pz + oz,
+                    0, 0, 0);
             }
         }
 

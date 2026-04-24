@@ -232,6 +232,10 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
+
+        // prevent impaler's from hurting each other
+        if (source.getEntity() instanceof ImpalerEntity) return false;
+
         // immune to stalactite + stalagmite damage
         if (source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.STALAGMITE)) {
             return false;
@@ -241,13 +245,23 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
         }
-        if (this.isSpiked() && !source.is(DamageTypes.THORNS)) {
+
+        if (this.isSpiked() &&
+            !source.is(DamageTypes.THORNS) &&
+            !source.is(ModDamageTypes.IMPALED)) {
+            
             if (source.getDirectEntity() instanceof LivingEntity livingEntity) {
                 livingEntity.hurt(ModDamageTypes.causeImpaledDamage(
                     this.level(), this), THORN_DAMAGE);
             }
         }
+
         return result;
+    }
+
+    @Override
+    public boolean canAttack(LivingEntity target) {
+        return !(target instanceof ImpalerEntity) && super.canAttack(target);
     }
 
     @Override
