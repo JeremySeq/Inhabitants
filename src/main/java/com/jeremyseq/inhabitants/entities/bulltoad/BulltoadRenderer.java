@@ -12,11 +12,6 @@ public class BulltoadRenderer extends GeoEntityRenderer<BulltoadEntity> {
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull BulltoadEntity animatable) {
-        if (animatable.getBreedStage() == 1) {
-            return ResourceLocation.fromNamespaceAndPath("inhabitants", "textures/entity/bulltoad/withtoads_0.png");
-        } else if (animatable.getBreedStage() == 2) {
-            return ResourceLocation.fromNamespaceAndPath("inhabitants", "textures/entity/bulltoad/withtoads_1.png");
-        }
-        return ResourceLocation.fromNamespaceAndPath("inhabitants", "textures/entity/bulltoad/bulltoad.png");
+        return this.model.getTextureResource(animatable);
     }
 }

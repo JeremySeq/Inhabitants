@@ -39,11 +39,10 @@ public class BulltoadEntity extends Animal implements GeoEntity {
 
     public static final Ingredient TEMPTATION_ITEM = Ingredient.of(Items.SLIME_BALL);
 
-    public static final EntityDataAccessor<Boolean> CROAKING = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> JUMPING = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
 
-    // 0 = not breeded, 1 = stage 1, 2 = stage 2
-    public static final EntityDataAccessor<Integer> BREED_STAGE = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.INT);
+    // -1 = baby, 0 = not breeded, 1 = stage 1, 2 = stage 2
+    public static final EntityDataAccessor<Integer> STAGE = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.INT);
 
     private static final String BREED_STAGE_KEY = "BreedStage";
     private static final String BREED_TICKS_KEY = "BreedTicks";
@@ -88,6 +87,8 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 5, this::animationPredicate));
         controllers.add(new AnimationController<>(this, "jump", 0, this::jumpPredicate));
+        controllers.add(new AnimationController<>(this, "croaking", 0, state -> PlayState.STOP)
+                .triggerableAnim("croaking", RawAnimation.begin().then("croaking", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState jumpPredicate(AnimationState<T> state) {
@@ -104,15 +105,6 @@ public class BulltoadEntity extends Animal implements GeoEntity {
 
         if (entityData.get(JUMPING)) {
             controller.setAnimation(RawAnimation.begin().then("jumping", Animation.LoopType.HOLD_ON_LAST_FRAME));
-            return PlayState.CONTINUE;
-        }
-
-        if (entityData.get(CROAKING)) {
-            controller.setAnimation(RawAnimation.begin().then("croaking", Animation.LoopType.PLAY_ONCE));
-            if (controller.hasAnimationFinished()) {
-                entityData.set(CROAKING, false);
-                controller.forceAnimationReset();
-            }
             return PlayState.CONTINUE;
         }
 
@@ -133,9 +125,8 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define(CROAKING, false);
         entityData.define(JUMPING, false);
-        entityData.define(BREED_STAGE, 0);
+        entityData.define(STAGE, 0);
     }
 
     @Override
@@ -144,14 +135,12 @@ public class BulltoadEntity extends Animal implements GeoEntity {
 
         if (!level().isClientSide) {
             // occasional croak when idle
-            if (this.onGround() && !this.getNavigation().isDone() && this.random.nextInt(400) == 0) {
-                this.entityData.set(CROAKING, true);
-            } else if (this.onGround() && this.random.nextInt(1000) == 0) {
-                this.entityData.set(CROAKING, true);
+            if (this.random.nextInt(400) == 0) {
+                this.triggerAnim("croaking", "croaking");
             }
 
             // breed ticking
-            if (this.getBreedStage() != 0) {
+            if (this.getBreedStage() > 0) {
                 this.breed_ticks++;
             }
             if (this.breed_ticks >= TICKS_PER_BREED_STAGE) {
@@ -187,25 +176,25 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     }
 
     public void setBreedStage(int stage) {
-        this.entityData.set(BREED_STAGE, Math.min(Math.max(stage, 0), 2));
+        this.entityData.set(STAGE, Math.min(Math.max(stage, 0), 2));
         breed_ticks = 0;
     }
 
     public int getBreedStage() {
-        return this.entityData.get(BREED_STAGE);
+        return this.entityData.get(STAGE);
     }
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
-        pCompound.putInt(BREED_STAGE_KEY, entityData.get(BREED_STAGE));
+        pCompound.putInt(BREED_STAGE_KEY, entityData.get(STAGE));
         pCompound.putInt(BREED_TICKS_KEY, this.breed_ticks);
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
-        entityData.set(BREED_STAGE, pCompound.getInt(BREED_STAGE_KEY));
+        entityData.set(STAGE, pCompound.getInt(BREED_STAGE_KEY));
         this.breed_ticks = pCompound.getInt(BREED_TICKS_KEY);
     }
 }
