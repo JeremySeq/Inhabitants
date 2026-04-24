@@ -5,7 +5,7 @@ import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.debug.DebugCommands;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
-import com.jeremyseq.inhabitants.entities.concher.ConcherRenderer;
+import com.jeremyseq.inhabitants.entities.concher.render.ConcherRenderer;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
 import com.jeremyseq.inhabitants.items.*;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;

@@ -1,6 +1,7 @@
-package com.jeremyseq.inhabitants.entities.concher;
+package com.jeremyseq.inhabitants.entities.concher.render;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.entities.concher.ConcherEntity;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 
