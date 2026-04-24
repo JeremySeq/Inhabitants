@@ -10,7 +10,7 @@
     "ReverseGrowthMixin$Physics",
     "GiantBoneSpecialAttackMixin",
     "LivingEntityMixin",
-    "LivingEntityMixin$LivingEntityAccessor",
+    "LivingEntityAccessor",
     "ImmaterialMixin$Physics",
     "ConcussionMixins$Movement",
     "NoteBlockMixin"

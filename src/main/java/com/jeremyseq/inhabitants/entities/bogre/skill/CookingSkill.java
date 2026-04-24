@@ -235,8 +235,8 @@ public class CookingSkill extends BogreSkills.Skill {
             Direction direction = bogreCauldron.getDirection();
             Direction dirLeft = direction.getCounterClockWise(Direction.Axis.Y);
 
-            final float forwardDist = 4;
-            final float rightDist = 11;
+            final float forwardDist = 13;
+            final float rightDist = 1;
 
             Vec3i forwardI = direction.getNormal();
             Vec3i rightI = dirLeft.getNormal();

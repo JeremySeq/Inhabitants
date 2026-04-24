@@ -1,6 +1,8 @@
 package com.jeremyseq.inhabitants.items.javelin;
 
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.client.Minecraft;
 
 import net.minecraftforge.api.distmarker.*;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
@@ -21,5 +23,9 @@ public class JavelinClient {
                 return this.renderer;
             }
         });
+    }
+
+    public static boolean isLocalPlayer(Entity entity) {
+        return entity == Minecraft.getInstance().player;
     }
 }

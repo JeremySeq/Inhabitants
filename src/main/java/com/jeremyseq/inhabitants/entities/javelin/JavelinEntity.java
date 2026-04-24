@@ -5,7 +5,8 @@ import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.events.ModEvents;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
-import com.jeremyseq.inhabitants.networking.JavelinBounceSyncPacketS2C;
+import com.jeremyseq.inhabitants.networking.*;
+import com.jeremyseq.inhabitants.items.javelin.JavelinClient;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -19,8 +20,6 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -181,15 +180,31 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
                           Math.min(getDistanceToLine(prevPos, start, end),
                                    getDistanceToLine(midPos, start, end)));
             
-            if (dist < 0.75) {
+            if (dist < 0.45) {
                 if (!entity.isCrouching() &&
                 (entity.getDeltaMovement().y < 0 || entity.onGround())) {
                     
-                    launch(entity);
+                    if (this.level().isClientSide) {
+                        // client
+                        if (JavelinClient.isLocalPlayer(entity)) {
+                            launch(entity);
+                            ModNetworking.sendToServer(new JavelinBounceTriggerPacketC2S(this.getId()));
+                        }
+                    } else {
+                        // server
+                        if (!(entity instanceof Player)) {
+                            launch(entity);
+                        }
+                    }
                     break;
                 }
             }
         }
+    }
+
+    public void serverLaunch(ServerPlayer player) {
+        if (this.bounceCooldown > 0) return;
+        launch(player);
     }
 
     private Vec3 rotateJavelinVector(Vec3 v, float xRot, float yRot) {
@@ -236,6 +251,10 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         ModEvents.LAST_BOUNCE_TICKS.put(entity.getUUID(), this.level().getGameTime());
 
         if (!this.level().isClientSide) {
+            if (entity instanceof ServerPlayer serverPlayer) {
+                serverPlayer.connection.aboveGroundTickCount = 0;
+            }
+
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                 ModSoundEvents.JAVELIN_BOUNCE.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
             

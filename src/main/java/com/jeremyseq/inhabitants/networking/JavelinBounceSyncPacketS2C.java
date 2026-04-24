@@ -6,6 +6,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.Minecraft;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -30,16 +33,19 @@ public class JavelinBounceSyncPacketS2C {
 
     public static void handle(JavelinBounceSyncPacketS2C packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.handle(packet)));
+        context.setPacketHandled(true);
+    }
 
+    @OnlyIn(Dist.CLIENT)
+    public static class ClientHandler {
+        public static void handle(JavelinBounceSyncPacketS2C packet) {
             Player player = Minecraft.getInstance().player;
             if (player != null) {
 
                 ModEvents.BOUNCE_COMBOS.put(player.getUUID(), packet.combo);
                 ModEvents.LAST_BOUNCE_TICKS.put(player.getUUID(), packet.lastBounceTick);
             }
-        });
-        
-        context.setPacketHandled(true);
+        }
     }
 }
