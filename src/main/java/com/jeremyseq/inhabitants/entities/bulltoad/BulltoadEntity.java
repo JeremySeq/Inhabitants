@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.entities.bulltoad;
 
-import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadBreedGoal;
 import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadJumpGoal;
 import net.minecraft.nbt.CompoundTag;
@@ -22,6 +22,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -33,6 +34,8 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.core.animation.RawAnimation;
 
+import java.util.Objects;
+
 public class BulltoadEntity extends Animal implements GeoEntity {
 
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -41,14 +44,17 @@ public class BulltoadEntity extends Animal implements GeoEntity {
 
     public static final EntityDataAccessor<Boolean> JUMPING = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
 
-    // -1 = baby, 0 = not breeded, 1 = stage 1, 2 = stage 2
+    // 0 = not breeded, 1 = stage 1, 2 = stage 2
     public static final EntityDataAccessor<Integer> STAGE = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.INT);
 
     private static final String BREED_STAGE_KEY = "BreedStage";
     private static final String BREED_TICKS_KEY = "BreedTicks";
 
     private int breed_ticks = 0;
-    private static final int TICKS_PER_BREED_STAGE = 600; // 30 seconds per stage
+    private static final int TICKS_PER_BREED_STAGE = 20; // 30 seconds per stage
+
+    private static final float ADULT_SPEED = .18f;
+    private static final float BABY_SPEED = .1f;
 
     public BulltoadEntity(EntityType<? extends Animal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -63,7 +69,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.FOLLOW_RANGE, 30f)
-                .add(Attributes.MOVEMENT_SPEED, 0.2f).build();
+                .add(Attributes.MOVEMENT_SPEED, ADULT_SPEED).build();
     }
 
     protected void registerGoals() {this.goalSelector.addGoal(0, new FloatGoal(this));
@@ -108,7 +114,11 @@ public class BulltoadEntity extends Animal implements GeoEntity {
             return PlayState.CONTINUE;
         }
 
-        if (state.isMoving()) {
+        boolean isMoving = state.isMoving()
+                || Math.abs(this.getDeltaMovement().x) > 0.01
+                || Math.abs(this.getDeltaMovement().z) > 0.01;
+
+        if (isMoving) {
             controller.setAnimation(RawAnimation.begin().then("walking", Animation.LoopType.LOOP));
         } else {
             controller.setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.LOOP));
@@ -146,7 +156,15 @@ public class BulltoadEntity extends Animal implements GeoEntity {
             if (this.breed_ticks >= TICKS_PER_BREED_STAGE) {
                 if (this.getBreedStage() == 2) {
                     // TODO: spawn babies
-                    Inhabitants.LOGGER.debug("spawn babies");
+                    for (int i = 0; i < 3; ++i) {
+                        BulltoadEntity baby = ModEntities.BULLTOAD.get().create(level());
+                        if (baby != null) {
+                            baby.setBaby(true);
+                            baby.moveTo(this.getX() + (this.random.nextDouble() - 0.5) * 2, this.getY(), this.getZ() + (this.random.nextDouble() - 0.5) * 2, 0, 0);
+                            level().addFreshEntity(baby);
+                        }
+                    }
+
                     this.setBreedStage(0);
                 } else {
                     this.setBreedStage(this.getBreedStage() + 1);
@@ -196,5 +214,27 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         super.readAdditionalSaveData(pCompound);
         entityData.set(STAGE, pCompound.getInt(BREED_STAGE_KEY));
         this.breed_ticks = pCompound.getInt(BREED_TICKS_KEY);
+    }
+
+    @Override
+    public boolean isInWall() {
+        AABB box = this.makeBoundingBox().deflate(0.001D);
+        return !this.level().noCollision(this, box);
+    }
+
+    @Override
+    protected @NotNull AABB makeBoundingBox() {
+        float width = this.isBaby() ? .5f : 2f;
+        float height = this.isBaby() ? .5f : 1.6f;
+        double half = width / 2.0;
+        return new AABB(getX() - half, getY(), getZ() - half, getX() + half, getY() + height, getZ() + half);
+    }
+
+    @Override
+    public void setBaby(boolean baby) {
+        super.setBaby(baby);
+        if (this.getAttribute(Attributes.MOVEMENT_SPEED) != null) {
+            Objects.requireNonNull(this.getAttribute(Attributes.MOVEMENT_SPEED)).setBaseValue(baby ? BABY_SPEED : ADULT_SPEED);
+        }
     }
 }
