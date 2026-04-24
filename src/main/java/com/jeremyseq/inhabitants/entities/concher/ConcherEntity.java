@@ -1,5 +1,7 @@
 package com.jeremyseq.inhabitants.entities.concher;
 
+import com.jeremyseq.inhabitants.entities.concher.ai.ConcherAi;
+
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -20,7 +22,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+
 import org.jetbrains.annotations.NotNull;
+
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
@@ -31,8 +35,13 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
 
     private static final EntityDataAccessor<Integer> STAGE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> GROWTH_INHIBITED = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Integer> AI_STATE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> SLEEPING_STATE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Boolean> BLINKING = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static boolean stopGrowth = true; // temporary for testing, TODO: remove stopGrowth after testing
+
+    private ConcherAi ai;
 
     // growth (server side)
     private int growTimer = 0; // in seconds
@@ -55,6 +64,9 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         super.defineSynchedData();
         this.entityData.define(STAGE, 0);
         this.entityData.define(GROWTH_INHIBITED, false);
+        this.entityData.define(AI_STATE, 0);
+        this.entityData.define(SLEEPING_STATE, 0);
+        this.entityData.define(BLINKING, false);
     }
 
     public int getStage() {
@@ -92,8 +104,12 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     @Override
     public void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(2, new PanicGoal(this, 1.5D));
-        this.goalSelector.addGoal(5, new RandomSwimmingGoal(this, 1.0D, 40));
+        if (this.ai == null) {
+            this.ai = new ConcherAi(this);
+        }
+        this.ai.registerGoals();
+        // this.goalSelector.addGoal(2, new PanicGoal(this, 1.5D));
+        // this.goalSelector.addGoal(5, new RandomSwimmingGoal(this, 1.0D, 40));
     }
 
     @Override
@@ -101,6 +117,8 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         super.tick();
 
         if (!this.level().isClientSide()) {
+            this.ai.aiStep();
+
             // increment growTimer once per second and attempt growth
             if (this.tickCount % TICKS_PER_GROW_CHECK == 0) {
                 if (!stopGrowth && !isGrowthInhibited() && this.getStage() < 3) { // TODO: remove stopGrowth after testing
@@ -236,6 +254,8 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         tag.putInt("ConcherStage", this.getStage());
         tag.putBoolean("ConcherGrowthInhibited", this.isGrowthInhibited());
         tag.putInt("ConcherGrowTimer", this.growTimer);
+        tag.putInt("ConcherAIState", this.entityData.get(AI_STATE));
+        tag.putInt("ConcherSleepingState", this.entityData.get(SLEEPING_STATE));
     }
 
     @Override
@@ -244,6 +264,8 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         if (tag.contains("ConcherStage")) this.setStage(tag.getInt("ConcherStage"));
         if (tag.contains("ConcherGrowthInhibited")) this.entityData.set(GROWTH_INHIBITED, tag.getBoolean("ConcherGrowthInhibited"));
         if (tag.contains("ConcherGrowTimer")) this.growTimer = tag.getInt("ConcherGrowTimer");
+        if (tag.contains("ConcherAIState")) this.entityData.set(AI_STATE, tag.getInt("ConcherAIState"));
+        if (tag.contains("ConcherSleepingState")) this.entityData.set(SLEEPING_STATE, tag.getInt("ConcherSleepingState"));
     }
 
     @Override
@@ -266,6 +288,14 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     public float[] getCurrentSize() {
         float[][] sizes = {{.85f, .3f}, {1f, .5f}, {1.5f, 1.25f}, {2f, 2.1f}};
         return sizes[this.getStage()];
+    }
+
+    public boolean isBlinking() {
+        return this.entityData.get(BLINKING);
+    }
+
+    public ConcherAi getAI() {
+        return this.ai;
     }
 
     @Override
