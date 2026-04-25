@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.entities.concher;
 
 import com.jeremyseq.inhabitants.entities.concher.ai.ConcherAi;
 import com.jeremyseq.inhabitants.entities.concher.render.ConcherAnimationHandler;
+import com.jeremyseq.inhabitants.entities.concher.ai.ConcherPathfinding;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -23,6 +24,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.MoverType;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +43,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     public static final EntityDataAccessor<Integer> AI_STATE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> SLEEPING_STATE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Boolean> BLINKING = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> WALK_PAUSING = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static boolean stopGrowth = true; // temporary for testing, TODO: remove stopGrowth after testing
 
@@ -51,6 +56,13 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
 
     public ConcherEntity(EntityType<? extends WaterAnimal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        this.moveControl = new ConcherPathfinding.ConcherMoveControl(this);
+        this.setMaxUpStep(1.0F);
+    }
+
+    @Override
+    protected @NotNull PathNavigation createNavigation(@NotNull Level level) {
+        return new ConcherPathfinding.ConcherPathNavigation(this, level);
     }
 
     public static AttributeSupplier setAttributes() {
@@ -68,6 +80,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         this.entityData.define(AI_STATE, 0);
         this.entityData.define(SLEEPING_STATE, 0);
         this.entityData.define(BLINKING, false);
+        this.entityData.define(WALK_PAUSING, true);
     }
 
     public int getStage() {
@@ -133,8 +146,8 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
                 }
             }
 
-            // sinking behavior
-            if (this.isInWater() && !this.onGround()) {
+            // sinking behavior for stages 1-3
+            if (this.isInWater() && !this.onGround() && this.getStage() > 0) {
                 double y = this.getDeltaMovement().y - 0.02D;
                 if (y < -0.5D) y = -0.5D;
                 this.setDeltaMovement(this.getDeltaMovement().x, y, this.getDeltaMovement().z);
@@ -145,6 +158,17 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     @Override
     protected void handleAirSupply(int pAirSupply) {
         // prevent Concher from drying outside the water
+    }
+
+    @Override
+    public void travel(@NotNull Vec3 travelVector) {
+        if (this.isControlledByLocalInstance() && this.isInWater() && this.getStage() == 0) {
+            this.moveRelative(this.getSpeed(), travelVector);
+            this.move(MoverType.SELF, this.getDeltaMovement());
+            this.setDeltaMovement(this.getDeltaMovement().scale(0.9D));
+        } else {
+            super.travel(travelVector);
+        }
     }
 
     @Override
@@ -257,8 +281,20 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         return sizes[this.getStage()];
     }
 
+    public void setBlinking(boolean blinking) {
+        this.entityData.set(BLINKING, blinking);
+    }
+
     public boolean isBlinking() {
         return this.entityData.get(BLINKING);
+    }
+
+    public boolean isWalkPausing() {
+        return this.entityData.get(WALK_PAUSING);
+    }
+
+    public void setWalkPausing(boolean pausing) {
+        this.entityData.set(WALK_PAUSING, pausing);
     }
 
     public ConcherAi getAI() {

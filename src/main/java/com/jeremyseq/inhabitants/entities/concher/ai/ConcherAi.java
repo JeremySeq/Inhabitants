@@ -5,30 +5,37 @@ import com.jeremyseq.inhabitants.debug.DevMode;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.entity.ai.util.DefaultRandomPos;
-import net.minecraft.util.Mth;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
 
 public class ConcherAi {
     private final ConcherEntity concher;
     
     private boolean hasShell;
-    private float currentWeight;
     private int blinkTimer = 0;
 
     private int stateTimer = 0;
     private int stateTicks = 0;
     private BlockPos targetPos = null;
 
+    // [speed, waterSpeed, rotationSpeed, rotationWaterSpeed]
+    private static final float[][] SPEEDS = {
+        {1.0f,  2.0f,  0.4f, 0.35f}, // Stage 0
+        {0.8f,  1.6f,  0.3f, 0.25f}, // Stage 1
+        {0.75f, 1.55f,  0.2f, 0.15f}, // Stage 2
+        {0.70f, 1.5f,  0.15f, 0.1f}  // Stage 3
+    };
+
+    private static final double[] speedModifiers = {1.2, 1.0, 0.9, 0.8};
+
     public enum State {
         IDLE,
         WANDERING,
         PANIC, // for non-shell concher is fleeing, for shell concher is hiding inside its shell
-        SLEEPING
+        SLEEPING,
+        PAUSING
     }
 
     public enum SleepingState {
@@ -82,13 +89,13 @@ public class ConcherAi {
         ServerLevel level = (ServerLevel) concher.level();
 
         for (int i = 0; i < path.getNodeCount(); i++) {
-            Node node = path.getNode(i);
+            Vec3 pos = path.getEntityPosAtNode(concher, i);
 
             level.sendParticles(
-                ParticleTypes.FLAME,
-                node.x + 0.5,
-                node.y + 0.2,
-                node.z + 0.5,
+                ParticleTypes.GLOW,
+                pos.x,
+                pos.y + 0.2d,
+                pos.z,
                 1,
                 0, 0.02, 0, 0
             );
@@ -99,19 +106,13 @@ public class ConcherAi {
         stateTimer--;
 
         if (stateTimer <= 0) {
-            Vec3 pos = DefaultRandomPos.getPos(concher, 5, 4);
+            Vec3 pos = ConcherPathfinding.findValidWanderTarget(concher);
 
             if (pos != null) {
                 targetPos = BlockPos.containing(pos);
-                setState(State.WANDERING);
+                setState(State.WANDERING); 
+                moveTo(targetPos);
 
-                concher.getNavigation().moveTo(
-                    targetPos.getX() + 0.5,
-                    targetPos.getY(),
-                    targetPos.getZ() + 0.5,
-                    getSpeed()
-                );
-                
                 if (!hasShell) {
                     stateTimer = 200;
                 } else {
@@ -127,13 +128,17 @@ public class ConcherAi {
     private void wandering() {
         stateTimer--;
 
-        boolean reached = targetPos == null ||
-            concher.getNavigation().isDone() || 
+        if (targetPos == null) {
+            setState(State.IDLE);
+            return;
+        }
+
+        boolean reached = concher.getNavigation().isDone() || 
             concher.distanceToSqr(
-                targetPos.getX() + 0.5,
+                targetPos.getX(),
                 targetPos.getY(),
-                targetPos.getZ() + 0.5
-            ) < 0.5;
+                targetPos.getZ()
+            ) < 0.1;
         
         boolean timeout = stateTimer <= -800;
 
@@ -145,50 +150,19 @@ public class ConcherAi {
             return;
         }
         
-        Path path = concher.getNavigation().getPath();
-        double lookX, lookZ;
-        if (path != null && !path.isDone()) {
-            Node nextNode = path.getNextNode();
-            lookX = nextNode.x + 0.5;
-            lookZ = nextNode.z + 0.5;
-        } else {
-            lookX = targetPos.getX() + 0.5;
-            lookZ = targetPos.getZ() + 0.5;
+        if (concher.getNavigation().isDone()) {
+            moveTo(targetPos);
         }
+    }
 
-        double dx = lookX - concher.getX();
-        double dz = lookZ - concher.getZ();
-        float targetYaw = (float)(Math.atan2(dz, dx) * (180D / Math.PI)) - 90.0F;
-        float yawDiff = Mth.wrapDegrees(targetYaw - concher.getYRot());
-
-        if (hasShell) {
-            concher.setYRot(concher.getYRot() + yawDiff * 0.15f);
-            concher.yBodyRot = concher.getYRot();
-            concher.yHeadRot = concher.getYRot();
-        }
-
-        // snail walk
-        boolean isPausing;
-        if (!hasShell) {
-            isPausing = (stateTicks % 40) < 20;
-        } else {
-            isPausing = (stateTicks % 60) < 30;
-        }
-        
-        if (isPausing) {
-            concher.getNavigation().setSpeedModifier(0.0D);
-        } else {
-            concher.getNavigation().setSpeedModifier(getSpeed());
-            
-            if (concher.getNavigation().isDone() && targetPos != null) {
-                concher.getNavigation().moveTo(
-                    targetPos.getX() + 0.5,
-                    targetPos.getY(),
-                    targetPos.getZ() + 0.5,
-                    getSpeed()
-                );
-            }
-        }
+    private void moveTo(BlockPos pos) {
+        if (pos == null) return;
+        concher.getNavigation().moveTo(
+            pos.getX(),
+            pos.getY(),
+            pos.getZ(),
+            getSpeed()
+        );
     }
 
     private void handleBlinking() {
@@ -225,10 +199,6 @@ public class ConcherAi {
 
     public void setSleepingState(SleepingState state) {
         concher.getEntityData().set(ConcherEntity.SLEEPING_STATE, state.ordinal());
-    }
-
-    public boolean hasShell() {
-        return hasShell;
     }
 
     public void onGrowStage(int oldStage, int newStage) {
@@ -274,18 +244,30 @@ public class ConcherAi {
         }
     }
 
-    private float getWeightOfStage(GrowthStage stage) {
-        // TODO: weights of stages
-        return 0f;
+    public float getSpeed() {
+        int stage = Math.max(0, Math.min(3, concher.getStage()));
+        return concher.isInWater() ? SPEEDS[stage][1] : SPEEDS[stage][0];
     }
 
-    public float getSpeed() {
-        return switch (concher.getStage()) {
-            case 0 -> 1f;
-            case 1 -> 0.8f;
-            case 2 -> 0.75f;
-            case 3 -> 0.7f;
-            default -> 0.7f;
-        };
+    public float getRotationSpeed() {
+        int stage = Math.max(0, Math.min(3, concher.getStage()));
+        return concher.isInWater() ? SPEEDS[stage][3] : SPEEDS[stage][2];
+    }
+
+    public double getAnimationSpeedModifier() {
+        int stage = Math.max(0, Math.min(3, concher.getStage()));
+        return speedModifiers[stage];
+    }
+
+    public int getPreWalkTicks() {
+        return concher.getStage() == 0 ?
+            (int) (20 / getAnimationSpeedModifier()) :
+            (int) (15 / getAnimationSpeedModifier());
+    }
+
+    public int getWalkTicks() {
+        return concher.getStage() == 0 ?
+            (int) (20 / getAnimationSpeedModifier()) :
+            (int) (21 / getAnimationSpeedModifier());
     }
 }

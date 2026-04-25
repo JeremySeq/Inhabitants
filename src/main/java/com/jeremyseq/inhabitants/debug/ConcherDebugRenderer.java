@@ -26,7 +26,6 @@ public class ConcherDebugRenderer {
 
         stateText += " | Walking: " + isWalking;
         stateText += " | Rotating: " + isRotating;
-        stateText += " | Targeting: " + entity.getAI().isTargeting();
 
         Component label = Component.literal(stateText);
         float height = entity.getBbHeight() + 0.5F;

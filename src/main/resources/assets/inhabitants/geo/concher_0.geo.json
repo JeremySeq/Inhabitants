@@ -1,5 +1,5 @@
 {
-	"format_version": "1.12.0",
+	"format_version": "1.21.0",
 	"minecraft:geometry": [
 		{
 			"description": {
@@ -13,33 +13,58 @@
 			"bones": [
 				{
 					"name": "Slug",
-					"pivot": [0, 0, -6]
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "body",
+					"parent": "Slug",
+					"pivot": [0, 0, -8]
+				},
+				{
+					"name": "p1",
+					"parent": "body",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{
+							"origin": [-5, 0, -9],
+							"size": [10, 5, 9],
+							"inflate": 0.001,
+							"uv": {
+								"north": {"uv": [20, 0], "uv_size": [10, 5]},
+								"east": {"uv": [9, 18], "uv_size": [9, 5]},
+								"south": {"uv": [20, 5], "uv_size": [10, 5]},
+								"west": {"uv": [18, 18], "uv_size": [9, 5]},
+								"up": {"uv": [0, 18], "uv_size": [10, -9], "uv_rotation": 180},
+								"down": {"uv": [10, 18], "uv_size": [10, -9]}
+							}
+						}
+					]
 				},
 				{
 					"name": "antennaes",
-					"parent": "Slug",
-					"pivot": [0.09524, 4.16692, -6.96429]
+					"parent": "p1",
+					"pivot": [0.09524, 4.16692, -8.96429]
 				},
 				{
 					"name": "left",
 					"parent": "antennaes",
-					"pivot": [2.09524, 4.16667, -6.96429],
+					"pivot": [2.09524, 4.16667, -8.96429],
 					"rotation": [-20, 0, 0],
 					"cubes": [
 						{
-							"origin": [1.09524, 4.16667, -17.71429],
-							"size": [2, 0, 11],
+							"origin": [1.09524, 4.16667, -19.71429],
+							"size": [2, 0.01, 11],
 							"uv": {
 								"north": {"uv": [0, 0], "uv_size": [2, 0]},
 								"east": {"uv": [0, 0], "uv_size": [11, 0]},
 								"south": {"uv": [0, 0], "uv_size": [2, 0]},
 								"west": {"uv": [0, 0], "uv_size": [11, 0]},
-								"up": {"uv": [0, 23], "uv_size": [2, 11]},
+								"up": {"uv": [2, 23], "uv_size": [2, 11]},
 								"down": {"uv": [2, 34], "uv_size": [2, -11]}
 							}
 						},
 						{
-							"origin": [1.09524, 4.16767, -17.71429],
+							"origin": [1.09524, 4.16767, -19.71429],
 							"size": [2, 3, 3],
 							"uv": {
 								"north": {"uv": [11, 23], "uv_size": [2, 3]},
@@ -55,23 +80,23 @@
 				{
 					"name": "right",
 					"parent": "antennaes",
-					"pivot": [-1.90476, 4.16717, -6.96429],
+					"pivot": [-1.90476, 4.16717, -8.96429],
 					"rotation": [-20, 0, 0],
 					"cubes": [
 						{
-							"origin": [-2.90476, 4.16667, -17.71429],
-							"size": [2, 0, 11],
+							"origin": [-2.90476, 4.16667, -19.71429],
+							"size": [2, 0.01, 11],
 							"uv": {
 								"north": {"uv": [0, 0], "uv_size": [2, 0]},
 								"east": {"uv": [0, 0], "uv_size": [11, 0]},
 								"south": {"uv": [0, 0], "uv_size": [2, 0]},
 								"west": {"uv": [0, 0], "uv_size": [11, 0]},
-								"up": {"uv": [4, 23], "uv_size": [2, 11]},
-								"down": {"uv": [6, 34], "uv_size": [2, -11]}
+								"up": {"uv": [2, 23], "uv_size": [2, 11]},
+								"down": {"uv": [2, 34], "uv_size": [2, -11]}
 							}
 						},
 						{
-							"origin": [-2.90476, 4.16767, -17.71429],
+							"origin": [-2.90476, 4.16767, -19.71429],
 							"size": [2, 3, 3],
 							"uv": {
 								"north": {"uv": [17, 23], "uv_size": [2, 3]},
@@ -85,20 +110,20 @@
 					]
 				},
 				{
-					"name": "body",
-					"parent": "Slug",
-					"pivot": [0, 0, -6],
+					"name": "p2",
+					"parent": "body",
+					"pivot": [0, 0, 0],
 					"cubes": [
 						{
-							"origin": [-5, 0, -7],
-							"size": [10, 5, 18],
+							"origin": [-5, 0, 0],
+							"size": [10, 5, 9],
 							"uv": {
-								"north": {"uv": [20, 0], "uv_size": [10, 5]},
-								"east": {"uv": [0, 18], "uv_size": [18, 5]},
+								"north": {"uv": [20, 5], "uv_size": [10, 5]},
+								"east": {"uv": [0, 18], "uv_size": [9, 5]},
 								"south": {"uv": [20, 5], "uv_size": [10, 5]},
-								"west": {"uv": [18, 18], "uv_size": [18, 5]},
-								"up": {"uv": [0, 0], "uv_size": [10, 18]},
-								"down": {"uv": [10, 18], "uv_size": [10, -18]}
+								"west": {"uv": [27, 18], "uv_size": [9, 5]},
+								"up": {"uv": [0, 0], "uv_size": [10, 9]},
+								"down": {"uv": [10, 9], "uv_size": [10, -9]}
 							}
 						}
 					]
