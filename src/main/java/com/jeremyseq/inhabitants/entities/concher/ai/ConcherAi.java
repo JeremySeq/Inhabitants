@@ -9,6 +9,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.entity.ai.goal.TemptGoal;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 
 public class ConcherAi {
     private final ConcherEntity concher;
@@ -35,7 +38,8 @@ public class ConcherAi {
         WANDERING,
         PANIC, // for non-shell concher is fleeing, for shell concher is hiding inside its shell
         SLEEPING,
-        PAUSING
+        PAUSING,
+        TEMPTING
     }
 
     public enum SleepingState {
@@ -56,10 +60,36 @@ public class ConcherAi {
     }
 
     public void registerGoals() {
-        
+        concher.goalSelector.addGoal(3, new TemptGoal(concher, 1.0D, Ingredient.of(Items.KELP), false) {
+            @Override
+            public boolean canUse() {
+                return !concher.isSheddingActive() && super.canUse();
+            }
+
+            @Override
+            public void start() {
+                super.start();
+                setState(State.TEMPTING);
+            }
+
+            @Override
+            public void stop() {
+                super.stop();
+                if (getState() == State.TEMPTING) {
+                    setState(State.IDLE);
+                }
+            }
+        });
     }
 
     public void aiStep() {
+        if (concher.isSheddingActive()) {
+            if (!concher.getNavigation().isDone()) {
+                concher.getNavigation().stop();
+            }
+            return;
+        }
+
         stateTicks++;
         if (!concher.level().isClientSide()) {
             spawnPathParticles();
@@ -73,6 +103,10 @@ public class ConcherAi {
             idle();
         } else if (currentState == State.WANDERING) {
             wandering();
+        } else if (currentState == State.TEMPTING) {
+            if (concher.getStage() > 0) {
+                setState(State.IDLE);
+            }
         } else {
             setState(State.IDLE);
             stateTimer = 20;

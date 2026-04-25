@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "inhabitants:concher_shell_block_stage_1",
+    "inhabitants:concher_shell_block_stage_2",
+    "inhabitants:concher_shell_block_stage_3"
+  ]
+}

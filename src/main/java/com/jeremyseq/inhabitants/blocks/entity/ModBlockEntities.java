@@ -19,6 +19,13 @@ public class ModBlockEntities {
                 ModBlocks.IMPALER_HEAD.get(), ModBlocks.DRIPSTONE_IMPALER_HEAD.get(),
                 ModBlocks.IMPALER_WALL_HEAD.get(), ModBlocks.DRIPSTONE_IMPALER_WALL_HEAD.get()).build(null));
 
+    public static final RegistryObject<BlockEntityType<ConcherShellBlockEntity>> CONCHER_SHELL_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("concher_shell_block_entity",
+                    () -> BlockEntityType.Builder.of(ConcherShellBlockEntity::new,
+                            ModBlocks.CONCHER_SHELL_BLOCK_STAGE_1.get(),
+                            ModBlocks.CONCHER_SHELL_BLOCK_STAGE_2.get(),
+                            ModBlocks.CONCHER_SHELL_BLOCK_STAGE_3.get()).build(null));
+
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

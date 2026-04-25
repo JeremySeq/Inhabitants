@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "inhabitants:block/concher_shell_block_stage_2"
+    },
+    "facing=east": {
+      "model": "inhabitants:block/concher_shell_block_stage_2",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "inhabitants:block/concher_shell_block_stage_2",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "inhabitants:block/concher_shell_block_stage_2",
+      "y": 270
+    }
+  }
+}

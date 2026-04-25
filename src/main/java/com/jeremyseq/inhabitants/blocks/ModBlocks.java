@@ -47,6 +47,21 @@ public class ModBlocks
             .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
     );
 
+    public static final RegistryObject<Block> CONCHER_SHELL_BLOCK_STAGE_1 = registerBlock(
+            "concher_shell_block_stage_1",
+            () -> new ConcherShellBlock(Block.Properties.of().strength(3f, 3f).noOcclusion().requiresCorrectToolForDrops())
+    );
+
+    public static final RegistryObject<Block> CONCHER_SHELL_BLOCK_STAGE_2 = registerBlock(
+            "concher_shell_block_stage_2",
+            () -> new ConcherShellBlock(Block.Properties.of().strength(4f, 4f).noOcclusion().requiresCorrectToolForDrops())
+    );
+
+    public static final RegistryObject<Block> CONCHER_SHELL_BLOCK_STAGE_3 = registerBlock(
+            "concher_shell_block_stage_3",
+            () -> new ConcherShellBlock(Block.Properties.of().strength(5f, 5f).noOcclusion().requiresCorrectToolForDrops())
+    );
+
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         return BLOCKS.register(name, block);
     }

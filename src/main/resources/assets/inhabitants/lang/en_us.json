@@ -27,9 +27,16 @@
   "item.inhabitants.spike_drill": "Spike Drill",
   "item.inhabitants.impaler_head": "Impaler Head",
   "item.inhabitants.dripstone_impaler_head": "Dripstone Impaler Head",
+  "item.inhabitants.concher_shell_shard": "Concher Shell Shard",
+  "item.inhabitants.concher_shell_block_stage_1": "Concher Shell Block",
+  "item.inhabitants.concher_shell_block_stage_2": "Concher Shell Block",
+  "item.inhabitants.concher_shell_block_stage_3": "Concher Shell Block",
 
   "block.inhabitants.impaler_head": "Impaler Head",
   "block.inhabitants.dripstone_impaler_head": "Dripstone Impaler Head",
+  "block.inhabitants.concher_shell_block_stage_1": "Concher Shell Block",
+  "block.inhabitants.concher_shell_block_stage_2": "Concher Shell Block",
+  "block.inhabitants.concher_shell_block_stage_3": "Concher Shell Block",
 
 
   "tooltip.inhabitants.special_effect": "Special Ability",

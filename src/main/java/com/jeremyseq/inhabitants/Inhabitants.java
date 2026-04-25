@@ -27,6 +27,7 @@ import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
 import com.jeremyseq.inhabitants.entities.javelin.JavelinRenderer;
 import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadRenderer;
+import com.jeremyseq.inhabitants.blocks.entity.render.ConcherShellRenderer;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -187,6 +188,8 @@ public class Inhabitants
 
             event.registerBlockEntityRenderer(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(),
                     context -> new ImpalerHeadRenderer());
+            event.registerBlockEntityRenderer(ModBlockEntities.CONCHER_SHELL_BLOCK_ENTITY.get(),
+                    ConcherShellRenderer::new);
         }
     }
 

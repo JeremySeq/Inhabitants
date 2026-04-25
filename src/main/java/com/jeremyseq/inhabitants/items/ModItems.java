@@ -75,6 +75,18 @@ public class ModItems {
     public static final RegistryObject<Item> CONCHER_SPAWN_EGG = ITEMS.register("concher_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.CONCHER, 0x91C8C7, 0x527499, new Item.Properties()));
 
+    public static final RegistryObject<Item> CONCHER_SHELL_BLOCK_STAGE_1 = ITEMS.register("concher_shell_block_stage_1",
+            () -> new BlockItem(ModBlocks.CONCHER_SHELL_BLOCK_STAGE_1.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> CONCHER_SHELL_BLOCK_STAGE_2 = ITEMS.register("concher_shell_block_stage_2",
+            () -> new BlockItem(ModBlocks.CONCHER_SHELL_BLOCK_STAGE_2.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> CONCHER_SHELL_BLOCK_STAGE_3 = ITEMS.register("concher_shell_block_stage_3",
+            () -> new BlockItem(ModBlocks.CONCHER_SHELL_BLOCK_STAGE_3.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> CONCHER_SHELL_SHARD = ITEMS.register("concher_shell_shard",
+            () -> new Item(new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

@@ -26,9 +26,11 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
+                        pOutput.accept(ModItems.CONCHER_SPAWN_EGG.get());
 
                         // mob drops / materials
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
+                        pOutput.accept(ModItems.CONCHER_SHELL_SHARD.get());
 
                         // weapons / tools
                         pOutput.accept(ModItems.GIANT_BONE.get());
@@ -45,6 +47,9 @@ public class ModCreativeModeTabs {
                         // decorative
                         pOutput.accept(ModItems.IMPALER_HEAD.get());
                         pOutput.accept(ModItems.DRIPSTONE_IMPALER_HEAD.get());
+                        pOutput.accept(ModItems.CONCHER_SHELL_BLOCK_STAGE_1.get());
+                        pOutput.accept(ModItems.CONCHER_SHELL_BLOCK_STAGE_2.get());
+                        pOutput.accept(ModItems.CONCHER_SHELL_BLOCK_STAGE_3.get());
 
                         // misc special items
                         pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
@@ -56,7 +61,6 @@ public class ModCreativeModeTabs {
                         // paintings
                         addPainting(new ItemStack(Items.PAINTING), ModPaintings.MY_PRECIOUS.getId().toString(), pOutput);
                         addPainting(new ItemStack(Items.PAINTING), ModPaintings.ENDERMANS_LAST_DAY.getId().toString(), pOutput);
-                        pOutput.accept(ModItems.CONCHER_SPAWN_EGG.get());
                     })
                     .build());
 
