@@ -51,7 +51,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     private static final String BREED_TICKS_KEY = "BreedTicks";
 
     private int breed_ticks = 0;
-    private static final int TICKS_PER_BREED_STAGE = 20; // 30 seconds per stage
+    private static final int TICKS_PER_BREED_STAGE = 600; // 30 seconds per stage
 
     private static final float ADULT_SPEED = .18f;
     private static final float BABY_SPEED = .1f;
@@ -155,7 +155,6 @@ public class BulltoadEntity extends Animal implements GeoEntity {
             }
             if (this.breed_ticks >= TICKS_PER_BREED_STAGE) {
                 if (this.getBreedStage() == 2) {
-                    // TODO: spawn babies
                     for (int i = 0; i < 3; ++i) {
                         BulltoadEntity baby = ModEntities.BULLTOAD.get().create(level());
                         if (baby != null) {
