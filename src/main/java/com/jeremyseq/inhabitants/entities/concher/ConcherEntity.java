@@ -21,6 +21,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -73,8 +75,13 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     }
 
     public void setStage(int stage) {
+        int old = this.getStage();
         int clamped = Math.max(0, Math.min(3, stage));
         this.entityData.set(STAGE, clamped);
+        
+        if (old != clamped) {
+            this.refreshDimensions();
+        }
     }
 
     public boolean isGrowthInhibited() {
@@ -113,8 +120,6 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         super.tick();
 
         if (!this.level().isClientSide()) {
-            this.getAI().aiStep();
-
             // increment growTimer once per second and attempt growth
             if (this.tickCount % TICKS_PER_GROW_CHECK == 0) {
                 if (!stopGrowth && !isGrowthInhibited() && this.getStage() < 3) { // TODO: remove stopGrowth after testing
@@ -142,7 +147,11 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         // prevent Concher from drying outside the water
     }
 
-
+    @Override
+    protected void customServerAiStep() {
+        super.customServerAiStep();
+        this.getAI().aiStep();
+    }
 
     public void spawnInhibitParticles(ServerLevel serverLevel) {
         for (int i = 0; i < 8; i++) {
@@ -218,6 +227,12 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         if (tag.contains("ConcherGrowTimer")) this.growTimer = tag.getInt("ConcherGrowTimer");
         if (tag.contains("ConcherAIState")) this.entityData.set(AI_STATE, tag.getInt("ConcherAIState"));
         if (tag.contains("ConcherSleepingState")) this.entityData.set(SLEEPING_STATE, tag.getInt("ConcherSleepingState"));
+    }
+
+    @Override
+    public @NotNull EntityDimensions getDimensions(@NotNull Pose pose) {
+        float[] size = this.getCurrentSize();
+        return EntityDimensions.scalable(size[0], size[1]);
     }
 
     @Override

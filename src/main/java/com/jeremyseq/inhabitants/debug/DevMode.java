@@ -18,8 +18,10 @@ public final class DevMode {
     // --- Concher ---
     public static boolean showConcher = true;
     public static boolean showConcherStates = true;
+    public static boolean showConcherPathfinding = true;
 
     public static boolean concher() { return IN_DEV && showConcher; }
     public static boolean concherStates() { return concher() && showConcherStates; }
+    public static boolean concherPathfinding() { return concher() && showConcherPathfinding; }
 
 }
