@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.concher;
 
 import com.jeremyseq.inhabitants.entities.concher.ai.ConcherAi;
+import com.jeremyseq.inhabitants.entities.concher.render.ConcherAnimationHandler;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -14,8 +15,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.WaterAnimal;
-import net.minecraft.world.entity.ai.goal.RandomSwimmingGoal;
-import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
@@ -44,7 +43,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     private ConcherAi ai;
 
     // growth (server side)
-    private int growTimer = 0; // in seconds
+    public int growTimer = 0; // in seconds
     private static final int TICKS_PER_GROW_CHECK = 20; // check growth once per second
     private static final int GROW_THRESHOLD_SECONDS = 30; // time to grow
 
@@ -98,16 +97,13 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-
+        ConcherAnimationHandler.registerControllers(this, controllerRegistrar);
     }
 
     @Override
     public void registerGoals() {
         super.registerGoals();
-        if (this.ai == null) {
-            this.ai = new ConcherAi(this);
-        }
-        this.ai.registerGoals();
+        this.getAI().registerGoals();
         // this.goalSelector.addGoal(2, new PanicGoal(this, 1.5D));
         // this.goalSelector.addGoal(5, new RandomSwimmingGoal(this, 1.0D, 40));
     }
@@ -117,7 +113,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         super.tick();
 
         if (!this.level().isClientSide()) {
-            this.ai.aiStep();
+            this.getAI().aiStep();
 
             // increment growTimer once per second and attempt growth
             if (this.tickCount % TICKS_PER_GROW_CHECK == 0) {
@@ -127,7 +123,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
                         int old = this.getStage();
                         this.setStage(old + 1);
                         growTimer = 0;
-                        this.onGrowStage(old, this.getStage());
+                        this.getAI().onGrowStage(old, this.getStage());
                     }
                 }
             }
@@ -141,58 +137,14 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         }
     }
 
-    protected void onGrowStage(int oldStage, int newStage) {
-        // prevent entity from being stuck inside blocks when
-        // if new bounding box collides, find a nearby safe position, if none, revert stage
-
-        if (this.level().isClientSide()) return;
-        ServerLevel serverLevel = (ServerLevel) this.level();
-
-        AABB newBox = this.makeBoundingBox();
-        // no issue
-        if (serverLevel.noCollision(this, newBox)) {
-            spawnGrowthParticles(serverLevel);
-            return;
-        }
-
-        // try to find a nearby safe location using small offsets
-        double baseX = this.getX();
-        double baseY = this.getY();
-        double baseZ = this.getZ();
-        boolean found = false;
-        double[] vertSteps = {0.25D, 0.5D, 0.75D, 1.0D, 1.25D, 1.5D, 1.75D, 2.0D};
-        double[] horizSteps = {0.0D, 0.5D, -0.5D, 1.0D, -1.0D};
-
-        for (double vy : vertSteps) {
-            for (double dx : horizSteps) {
-                for (double dz : horizSteps) {
-                    AABB moved = newBox.move(dx, vy, dz);
-                    if (serverLevel.noCollision(this, moved)) {
-                        // move entity to safe location and finalize growth
-                        this.setPos(baseX + dx, baseY + vy, baseZ + dz);
-                        this.refreshDimensions();
-                        spawnGrowthParticles(serverLevel);
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) break;
-            }
-            if (found) break;
-        }
-
-        if (!found) {
-            // could not find room for the larger size -> revert stage and postpone growth
-            this.setStage(oldStage);
-            this.refreshDimensions();
-            // shorten the retry so it will try again after some time
-            this.growTimer = Math.max(0, GROW_THRESHOLD_SECONDS / 2);
-            // spawn inhibit particles to show growth failed
-            spawnInhibitParticles(serverLevel);
-        }
+    @Override
+    protected void handleAirSupply(int pAirSupply) {
+        // prevent Concher from drying outside the water
     }
 
-    private void spawnInhibitParticles(ServerLevel serverLevel) {
+
+
+    public void spawnInhibitParticles(ServerLevel serverLevel) {
         for (int i = 0; i < 8; i++) {
             double px = this.getX() + (this.random.nextDouble() - 0.5D) * (double)this.getCurrentSize()[0];
             double py = this.getY() + this.random.nextDouble() * (double)this.getCurrentSize()[1];
@@ -201,7 +153,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         }
     }
 
-    private void spawnGrowthParticles(ServerLevel serverLevel) {
+    public void spawnGrowthParticles(ServerLevel serverLevel) {
         for (int i = 0; i < 8; i++) {
             double px = this.getX() + (this.random.nextDouble() - 0.5D) * (double)this.getCurrentSize()[0];
             double py = this.getY() + this.random.nextDouble() * (double)this.getCurrentSize()[1];
@@ -219,7 +171,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
                 int old = this.getStage();
                 this.setStage(old + 1);
                 this.growTimer = 0;
-                this.onGrowStage(old, this.getStage());
+                this.getAI().onGrowStage(old, this.getStage());
             }
 
             return InteractionResult.sidedSuccess(this.level().isClientSide());
@@ -269,7 +221,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     }
 
     @Override
-    protected @NotNull AABB makeBoundingBox() {
+    public @NotNull AABB makeBoundingBox() {
         float width = this.getCurrentSize()[0];
         float height = this.getCurrentSize()[1];
         double half = width / 2.0;
@@ -295,7 +247,14 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     }
 
     public ConcherAi getAI() {
+        if (this.ai == null) {
+            this.ai = new ConcherAi(this);
+        }
         return this.ai;
+    }
+
+    public ConcherAi.State getAIState() {
+        return ConcherAi.State.values()[this.entityData.get(AI_STATE)];
     }
 
     @Override

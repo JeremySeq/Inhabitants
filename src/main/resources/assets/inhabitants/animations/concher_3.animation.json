@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"moving": {
+		"walk": {
 			"animation_length": 3,
 			"bones": {
 				"Escarcone": {

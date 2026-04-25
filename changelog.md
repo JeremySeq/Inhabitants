@@ -1,4 +1,8 @@
 # Inhabitants Changelogs
+## v2.0.0 Update
+
+### Concher
+
 
 ## v1.1.0 Update
 

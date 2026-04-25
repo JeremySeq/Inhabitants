@@ -2,6 +2,8 @@ package com.jeremyseq.inhabitants.entities.concher.render;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.concher.ConcherEntity;
+import com.jeremyseq.inhabitants.debug.DevMode;
+import com.jeremyseq.inhabitants.debug.ConcherDebugRenderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -29,6 +31,29 @@ public class ConcherRenderer extends GeoEntityRenderer<ConcherEntity> {
     public @NotNull ResourceLocation getTextureLocation(@NotNull ConcherEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
             String.format("textures/entity/concher_%d.png", animatable.getStage()));
+    }
+
+    @Override
+    public void render(
+        @NotNull ConcherEntity entity,
+        float entityYaw,
+        float partialTick,
+        @NotNull PoseStack poseStack,
+        @NotNull MultiBufferSource bufferSource,
+        int packedLight
+    ) {
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+
+        if (DevMode.concherStates()) {
+            ConcherDebugRenderer.renderStateLabel(
+                entity,
+                poseStack,
+                bufferSource,
+                this.entityRenderDispatcher,
+                this.getFont(),
+                packedLight
+            );
+        }
     }
 
     private static class ConcherEyesLayer extends GeoRenderLayer<ConcherEntity> {

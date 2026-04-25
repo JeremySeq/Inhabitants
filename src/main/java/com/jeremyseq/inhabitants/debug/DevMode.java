@@ -7,16 +7,19 @@ public final class DevMode {
     private static final boolean IN_DEV = !FMLEnvironment.production;
 
     // --- Bogre ---
-    public static boolean showBogre = true;
-    public static boolean showStates = true;
-    public static boolean showPathfinding = true;
+    public static boolean showBogre = false;
+    public static boolean showStates = false;
+    public static boolean showPathfinding = false;
 
     public static boolean bogre()            { return IN_DEV && showBogre; }
     public static boolean bogreStates()      { return bogre() && showStates; }
     public static boolean bogrePathfinding() { return bogre() && showPathfinding; }
 
-    // --- Impaler ---
+    // --- Concher ---
+    public static boolean showConcher = true;
+    public static boolean showConcherStates = true;
 
-    // --- Clam ---
+    public static boolean concher() { return IN_DEV && showConcher; }
+    public static boolean concherStates() { return concher() && showConcherStates; }
 
 }
