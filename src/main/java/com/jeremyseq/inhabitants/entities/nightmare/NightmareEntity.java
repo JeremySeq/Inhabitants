@@ -133,7 +133,7 @@ public class NightmareEntity extends Monster implements GeoEntity {
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define(TEXTURE, random.nextInt(1, 5));
+        entityData.define(TEXTURE, random.nextInt(0, 4));
     }
 
     @Override
