@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.entities.bulltoad;
 
 import com.jeremyseq.inhabitants.entities.ModEntities;
+import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadAttackGoal;
 import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadBreedGoal;
 import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadJumpGoal;
 import net.minecraft.nbt.CompoundTag;
@@ -23,8 +24,10 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -43,6 +46,9 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     public static final Ingredient TEMPTATION_ITEM = Ingredient.of(Items.SLIME_BALL);
 
     public static final EntityDataAccessor<Boolean> JUMPING = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> TONGUE_OUT = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Vector3f> TONGUE_LENGTH = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.VECTOR3);
+    public static final EntityDataAccessor<Boolean> SNAP_YAW = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
 
     // 0 = not breeded, 1 = stage 1, 2 = stage 2
     public static final EntityDataAccessor<Integer> STAGE = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.INT);
@@ -72,7 +78,9 @@ public class BulltoadEntity extends Animal implements GeoEntity {
                 .add(Attributes.MOVEMENT_SPEED, ADULT_SPEED).build();
     }
 
-    protected void registerGoals() {this.goalSelector.addGoal(0, new FloatGoal(this));
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new BulltoadAttackGoal(this));
         this.goalSelector.addGoal(2, new BulltoadBreedGoal(this, 1.0D));
         this.goalSelector.addGoal(3, new TemptGoal(this, 1f, TEMPTATION_ITEM, false));
         this.goalSelector.addGoal(7, new BulltoadJumpGoal(this));
@@ -137,6 +145,9 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         super.defineSynchedData();
         entityData.define(JUMPING, false);
         entityData.define(STAGE, 0);
+        entityData.define(TONGUE_OUT, false);
+        entityData.define(TONGUE_LENGTH, new Vector3f(0, 0, 0));
+        entityData.define(SNAP_YAW, false);
     }
 
     @Override
@@ -144,6 +155,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         super.tick();
 
         if (!level().isClientSide) {
+
             // occasional croak when idle
             if (this.random.nextInt(400) == 0) {
                 this.triggerAnim("croaking", "croaking");
@@ -235,5 +247,32 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         if (this.getAttribute(Attributes.MOVEMENT_SPEED) != null) {
             Objects.requireNonNull(this.getAttribute(Attributes.MOVEMENT_SPEED)).setBaseValue(baby ? BABY_SPEED : ADULT_SPEED);
         }
+    }
+
+    public Vec3 getTongueTarget() {
+        Vector3f vec3f = this.entityData.get(TONGUE_LENGTH);
+        return new Vec3(vec3f.x, vec3f.y, vec3f.z);
+    }
+
+    public boolean isTongueOut() {
+        return this.entityData.get(TONGUE_OUT);
+    }
+
+    public void setTongueTarget(Vec3 target) {
+        this.entityData.set(TONGUE_OUT, true);
+        this.entityData.set(TONGUE_LENGTH, new Vector3f((float) target.x, (float) target.y, (float) target.z));
+    }
+
+    public void clearTongueTarget() {
+        this.entityData.set(TONGUE_OUT, false);
+        this.entityData.set(TONGUE_LENGTH, new Vector3f(0, 0, 0));
+    }
+
+    public void setSnapYaw(boolean snapYaw) {
+        this.entityData.set(SNAP_YAW, snapYaw);
+    }
+
+    public boolean shouldSnapYaw() {
+        return this.entityData.get(SNAP_YAW);
     }
 }
