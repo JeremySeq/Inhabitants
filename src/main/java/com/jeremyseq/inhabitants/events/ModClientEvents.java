@@ -311,7 +311,7 @@ public class ModClientEvents {
         if (event.getCamera().getEntity() instanceof Player player) {
             if (player.hasEffect(ModEffects.CONCUSSION.get()) && muffleLerp > 0.1F) {
                 float ticks = (float) ((double) Minecraft.getInstance().level.getGameTime() +
-                    (double) event.getPartialTick());
+                        event.getPartialTick());
                 
                 float fov = Mth.sin(ticks * 0.08F) * 3.0F * muffleLerp;
                 event.setFOV(event.getFOV() + fov);
