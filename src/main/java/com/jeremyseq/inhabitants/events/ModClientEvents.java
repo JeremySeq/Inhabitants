@@ -369,4 +369,13 @@ public class ModClientEvents {
             event.getInput().forwardImpulse *= -1;
         }
     }
+
+    // Nightmare Panic Effect - reduce field of view to minimum
+    @SubscribeEvent
+    public static void onComputeFovForPanicEffect(ViewportEvent.ComputeFov event) {
+        Player player = Minecraft.getInstance().player;
+        if (player != null && player.hasEffect(ModEffects.PANIC.get())) {
+            event.setFOV(30.0F);
+        }
+    }
 }
