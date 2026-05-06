@@ -9,8 +9,11 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BulltoadModel extends GeoModel<BulltoadEntity> {
-    private float currentTongueScale = 0f;
+    private final Map<Integer, Float> tongueScales = new HashMap<>();
 
     @Override
     public ResourceLocation getModelResource(BulltoadEntity animatable) {
@@ -43,29 +46,37 @@ public class BulltoadModel extends GeoModel<BulltoadEntity> {
     @Override
     public void setCustomAnimations(BulltoadEntity animatable, long instanceId, AnimationState<BulltoadEntity> animationState) {
         CoreGeoBone head = getAnimationProcessor().getBone("Bulltoad");
-
-        if (head != null && animatable.shouldSnapYaw()) {
-            EntityModelData entityData = animationState.getData(DataTickets.ENTITY_MODEL_DATA);
-            head.setRotX(entityData.headPitch() * Mth.DEG_TO_RAD);
-            head.setRotY(entityData.netHeadYaw() * Mth.DEG_TO_RAD);
+        if (head != null) {
+            if (animatable.shouldSnapYaw()) {
+                EntityModelData entityData = animationState.getData(DataTickets.ENTITY_MODEL_DATA);
+                head.setRotX(entityData.headPitch() * Mth.DEG_TO_RAD);
+                head.setRotY(entityData.netHeadYaw() * Mth.DEG_TO_RAD);
+            }
         }
 
+        CoreGeoBone tongue = getAnimationProcessor().getBone("tongue");
+        if (tongue != null) {
+            tongue.setScaleZ(1f);
+            tongue.setRotX(0f);
 
-        if (animatable.isTongueOut()) {
-            CoreGeoBone tongue = getAnimationProcessor().getBone("tongue");
-            if (tongue == null) return;
+            if (animatable.isTongueOut()) {
+                Vec3 targetVec = animatable.getTongueTarget();
+                Vec3 eyePos = animatable.getEyePosition();
 
-            Vec3 targetVec = animatable.getTongueTarget();
-            Vec3 eyePos = animatable.getEyePosition();
+                Vec3 diff = targetVec.subtract(eyePos);
+                float targetDistance = (float) diff.length();
 
-            Vec3 diff = targetVec.subtract(eyePos);
-            float targetDistance = (float) diff.length();
-            float speed = targetDistance > currentTongueScale ? 0.4f : 0.2f;
-            currentTongueScale += (targetDistance - currentTongueScale) * speed;
+                float current = tongueScales.getOrDefault(animatable.getId(), 0f);
+                float speed = targetDistance > current ? 0.4f : 0.2f;
+                current += (targetDistance - current) * speed;
+                tongueScales.put(animatable.getId(), current);
 
-            float pitch = (float) Math.toDegrees(Math.atan2(diff.y, Math.sqrt(diff.x * diff.x + diff.z * diff.z)));
-            tongue.setRotX((float) Math.toRadians(pitch));
-            tongue.setScaleZ(currentTongueScale);
+                float pitch = (float) Math.toDegrees(Math.atan2(diff.y, Math.sqrt(diff.x * diff.x + diff.z * diff.z)));
+                tongue.setRotX((float) Math.toRadians(pitch));
+                tongue.setScaleZ(current);
+            } else {
+                tongueScales.put(animatable.getId(), 0f);
+            }
         }
     }
 }
