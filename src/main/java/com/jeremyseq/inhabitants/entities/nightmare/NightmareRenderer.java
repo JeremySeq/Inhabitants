@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.cache.object.GeoBone;
+import software.bernie.geckolib.cache.texture.AutoGlowingTexture;
 import software.bernie.geckolib.renderer.DynamicGeoEntityRenderer;
 
 import javax.annotation.Nullable;
@@ -31,11 +32,11 @@ public class NightmareRenderer extends DynamicGeoEntityRenderer<NightmareEntity>
     }
 
     @Override
-    protected @org.jetbrains.annotations.Nullable RenderType getRenderTypeOverrideForBone(GeoBone bone, NightmareEntity animatable, ResourceLocation texturePath, MultiBufferSource bufferSource, float partialTick) {
+    protected @Nullable RenderType getRenderTypeOverrideForBone(GeoBone bone, NightmareEntity animatable, ResourceLocation texturePath, MultiBufferSource bufferSource, float partialTick) {
         if (bone.getName().equals("headOutline")) {
-            return RenderType.entityTranslucentCull(texturePath);
+            return AutoGlowingTexture.getRenderType(texturePath);
         } else if (bone.getName().equals("headGlow")) {
-            return RenderType.entityTranslucentCull(texturePath);
+            return AutoGlowingTexture.getRenderType(texturePath);
         }
 
         return super.getRenderTypeOverrideForBone(bone, animatable, texturePath, bufferSource, partialTick);
