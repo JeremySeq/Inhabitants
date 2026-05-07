@@ -7,12 +7,7 @@ import com.jeremyseq.inhabitants.entities.bogre.skill.CookingSkill;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.pathfinder.Node;
-import net.minecraft.world.level.pathfinder.Path;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.client.Minecraft;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -20,31 +15,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Matrix4f;
 
 public class BogreDebugRenderer {
-
-    /**
-     * Called by BogrePathNavigation.tick() to visualize the path.
-     */
-    public static void renderPath(ServerLevel level, Path path, Vec3 preciseTarget, Vec3 entityPos) {
-        if (path != null && !path.isDone()) {
-            
-            for (int i = path.getNextNodeIndex(); i < path.getNodeCount(); i++) {
-                Node node = path.getNode(i);
-                double x = node.x + 0.5;
-                double y = node.y + 0.5;
-                double z = node.z + 0.5;
-                
-                if (entityPos != null && entityPos.closerThan(new Vec3(x, entityPos.y, z), 1.0)) {
-                    continue;
-                }
-                
-                level.sendParticles(ParticleTypes.GLOW, x, y, z, 1, 0, 0, 0, 0);
-            }
-        }
-
-        if (preciseTarget != null) {
-            level.sendParticles(ParticleTypes.ENCHANTED_HIT, preciseTarget.x, preciseTarget.y + 0.2, preciseTarget.z, 5, 0.1, 0.1, 0.1, 0.02);
-        }
-    }
 
     /**
      * Called by BogreRenderer.render() to visualize the state.

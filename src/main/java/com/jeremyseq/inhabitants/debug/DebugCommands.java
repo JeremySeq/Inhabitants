@@ -118,13 +118,13 @@ public class DebugCommands {
     }
 
     private static void enableStateDebug(CommandSourceStack source, boolean enabled) {
-        DevMode.showStates = enabled;
-        log("Bogre state debug: " + DevMode.showStates, source);
+        DevMode.showBogreStates = enabled;
+        log("Bogre state debug: " + DevMode.showBogreStates, source);
     }
 
     private static void enablePathfindingDebug(CommandSourceStack source, boolean enabled) {
-        DevMode.showPathfinding = enabled;
-        log("Bogre path debug: " + DevMode.showPathfinding, source);
+        DevMode.showBogrePathfinding = enabled;
+        log("Bogre path debug: " + DevMode.showBogrePathfinding, source);
     }
 
     private static void applyTankMode(CommandSourceStack source, boolean enabled) {
