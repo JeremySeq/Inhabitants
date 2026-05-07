@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 
+// SlashProjectile requires a renderer. This is really just a placeholder that doesn't render anything but prevents the error.
 public class SlashProjectileRenderer extends EntityRenderer<SlashProjectile> {
 
     public SlashProjectileRenderer(EntityRendererProvider.Context pContext) {

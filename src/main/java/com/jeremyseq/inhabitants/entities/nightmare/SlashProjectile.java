@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.nightmare;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -25,7 +24,6 @@ public class SlashProjectile extends AbstractHurtingProjectile {
     private static final int MAX_DISTANCE = 10;
     private static final float DAMAGE = 4.0F;
     private static final double SPEED = 1.0D;
-
 
     public SlashProjectile(EntityType<? extends AbstractHurtingProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -52,6 +50,38 @@ public class SlashProjectile extends AbstractHurtingProjectile {
 
     public boolean hurt(DamageSource pSource, float pAmount) {
         return false;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        // discarded after traveling 4 blocks origin
+        if (distanceToSqr(this.getOrigin()) > MAX_DISTANCE * MAX_DISTANCE) {
+            this.discard();
+        }
+        if (this.level().isClientSide && this.tickCount % 2 == 0) {
+            this.level().addParticle(ParticleTypes.SWEEP_ATTACK, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
+        }
+    }
+
+    @Override
+    protected void onHitEntity(@NotNull EntityHitResult pResult) {
+        super.onHitEntity(pResult);
+
+        super.onHitEntity(pResult);
+        Entity entity = this.getOwner();
+        if (entity instanceof LivingEntity livingentity) {
+            pResult.getEntity().hurt(this.damageSources().mobProjectile(this, livingentity), DAMAGE);
+        }
+    }
+
+    @Override
+    protected void onHitBlock(@NotNull BlockHitResult pResult) {
+        super.onHitBlock(pResult);
+        if (!this.level().isClientSide) {
+            this.discard();
+        }
     }
 
     @Override
@@ -86,39 +116,6 @@ public class SlashProjectile extends AbstractHurtingProjectile {
             setOrigin(new Vec3(x, y, z));
         } else {
             setOrigin(this.position());
-        }
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        // discarded after traveling 4 blocks origin
-        if (distanceToSqr(this.getOrigin()) > MAX_DISTANCE * MAX_DISTANCE) {
-            this.discard();
-        }
-        Inhabitants.LOGGER.debug("Level: " + this.level() + ", X: " + this.getX() + ", Y: " + this.getY() + ", Z: " + this.getZ());
-        if (this.level().isClientSide) {
-            this.level().addParticle(ParticleTypes.SWEEP_ATTACK, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
-        }
-    }
-
-    @Override
-    protected void onHitEntity(@NotNull EntityHitResult pResult) {
-        super.onHitEntity(pResult);
-
-        super.onHitEntity(pResult);
-        Entity entity = this.getOwner();
-        if (entity instanceof LivingEntity livingentity) {
-            pResult.getEntity().hurt(this.damageSources().mobProjectile(this, livingentity), DAMAGE);
-        }
-    }
-
-    @Override
-    protected void onHitBlock(@NotNull BlockHitResult pResult) {
-        super.onHitBlock(pResult);
-        if (!this.level().isClientSide) {
-            this.discard();
         }
     }
 }
