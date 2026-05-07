@@ -78,6 +78,9 @@ public class ModItems {
     public static final RegistryObject<Item> DREAD_CLOTH = ITEMS.register("dread_cloth",
             () -> new Item(new Item.Properties()));
 
+    public static final RegistryObject<Item> RIFTBLADE = ITEMS.register("riftblade",
+            RiftbladeItem::new);
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

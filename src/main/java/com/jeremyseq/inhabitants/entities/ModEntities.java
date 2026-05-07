@@ -6,6 +6,7 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.nightmare.NightmareEntity;
+import com.jeremyseq.inhabitants.entities.nightmare.SlashProjectile;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.javelin.JavelinEntity;
 import net.minecraft.resources.ResourceLocation;
@@ -68,6 +69,15 @@ public class ModEntities {
                     () -> EntityType.Builder.<NightmareEntity>of(NightmareEntity::new, MobCategory.MONSTER)
                             .sized(1, 2.4f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "nightmare").toString()));
+
+    public static final RegistryObject<EntityType<SlashProjectile>> SLASH_PROJECTILE =
+            REGISTRY.register("slash_projectile",
+                    () -> EntityType.Builder.<SlashProjectile>of(
+                                    SlashProjectile::new, MobCategory.MISC)
+                            .sized(0.5f, 0.5f)
+                            .clientTrackingRange(4)
+                            .updateInterval(20)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "slash_projectile").toString()));
 
 
     @SubscribeEvent
