@@ -38,6 +38,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.DRIPSTONE_IMPALER_HEAD.get());
                         pOutput.accept(ModItems.NIGHTMARE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.DREAD_CLOTH.get());
+                        pOutput.accept(ModItems.RIFTBLADE.get());
 
                         //ench
                         addEnchantedBook(ModEnchantments.DIAMOND_TIP.get(), 1, pOutput);
