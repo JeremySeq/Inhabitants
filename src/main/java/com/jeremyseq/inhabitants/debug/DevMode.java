@@ -21,8 +21,8 @@ public final class DevMode {
 
     // --- Bulltoad ---
     public static boolean showBulltoad = true;
-    public static boolean showJumpTarget = true;
+    public static boolean showBulltoadPathfinding = true;
 
-    public static boolean bulltoad()            { return IN_DEV && showBulltoad; }
-    public static boolean bulltoadJumpTarget()      { return bulltoad() && showJumpTarget; }
+    public static boolean bulltoad() { return IN_DEV && showBulltoad; }
+    public static boolean showBulltoadPathfinding() { return bulltoad() && showBulltoadPathfinding; }
 }

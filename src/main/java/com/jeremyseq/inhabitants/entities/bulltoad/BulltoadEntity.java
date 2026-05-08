@@ -1,5 +1,7 @@
 package com.jeremyseq.inhabitants.entities.bulltoad;
 
+import com.jeremyseq.inhabitants.debug.DefaultDebugRenderer;
+import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadAttackGoal;
 import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadBreedGoal;
@@ -158,6 +160,11 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         super.tick();
 
         if (!level().isClientSide) {
+
+            // render pathfinding in dev mode
+            if (DevMode.showBulltoadPathfinding()) {
+                DefaultDebugRenderer.renderPath((ServerLevel) this.level(), this.getNavigation().getPath(), null, this.position());
+            }
 
             // occasional croak when idle
             if (this.random.nextInt(400) == 0) {

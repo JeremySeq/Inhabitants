@@ -53,6 +53,25 @@ public class DebugCommands {
                         .build()
         );
 
+        dispatcher.register(
+                MobCommandBuilder.forMob("bulltoad", ModEntities.BULLTOAD)
+                        .requires(DevMode::bulltoad)
+                        .withPathDebug(() -> DevMode.showBulltoadPathfinding, v -> DevMode.showBulltoadPathfinding = v)
+                        .withSpawn()
+                        .withKill()
+                        .withExtra("spawnbaby", (source, type) -> {
+                            Mob baby = ModEntities.BULLTOAD.get().create(source.getLevel());
+                            if (baby != null) {
+                                baby.setBaby(true);
+                                baby.moveTo(source.getPosition().x, source.getPosition().y, source.getPosition().z,
+                                        source.getRotation().y, source.getRotation().x);
+                                source.getLevel().addFreshEntity(baby);
+                                source.sendSuccess(() -> Component.literal("Spawned baby Bulltoad"), true);
+                            }
+                        })
+                        .build()
+        );
+
         dispatcher.register(registerCauldronCommands());
         dispatcher.register(registerDevCommands());
     }

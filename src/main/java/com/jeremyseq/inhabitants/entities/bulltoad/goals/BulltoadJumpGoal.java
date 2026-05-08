@@ -1,10 +1,10 @@
 package com.jeremyseq.inhabitants.entities.bulltoad.goals;
 
 import com.google.common.collect.Lists;
+import com.jeremyseq.inhabitants.debug.BulltoadDebugRenderer;
 import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.entities.bulltoad.BulltoadEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Mob;
@@ -149,14 +149,7 @@ public class BulltoadJumpGoal extends Goal {
         bulltoad.setDeltaMovement(optimalJumpVector);
         bulltoad.getEntityData().set(BulltoadEntity.JUMPING, true);
 
-        if (DevMode.bulltoadJumpTarget()) spawnTargetParticle(targetPos);
-    }
-
-    private void spawnTargetParticle(Vec3 pos) {
-        if (bulltoad.level() instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, pos.x, pos.y, pos.z,
-                    8, 0.3, 0.3,0.3,0.0);
-        }
+        if (DevMode.showBulltoadPathfinding()) BulltoadDebugRenderer.renderJumpTarget(this.bulltoad, targetPos);
     }
 
     /**
