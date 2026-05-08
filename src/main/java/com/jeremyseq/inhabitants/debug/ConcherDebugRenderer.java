@@ -14,9 +14,13 @@ import org.joml.Matrix4f;
 
 public class ConcherDebugRenderer {
 
-    public static void renderStateLabel(ConcherEntity entity, PoseStack poseStack,
-    MultiBufferSource bufferSource, 
-    EntityRenderDispatcher dispatcher, Font font, int packedLight) {
+    public static void renderStateLabel(
+            ConcherEntity entity,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            EntityRenderDispatcher dispatcher,
+            Font font,
+            int packedLight) {
 
         String stateText = "State: " + entity.getAIState();
         stateText += " | Stage: " + entity.getStage();
@@ -36,14 +40,14 @@ public class ConcherDebugRenderer {
         poseStack.scale(-0.025F, -0.025F, 0.025F);
 
         Matrix4f matrix4f = poseStack.last().pose();
-        
+
         float backgroundOpacity = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
 
         int backgroundColor = (int) (backgroundOpacity * 255.0F) << 24;
         float textX = (float) (-font.width(label) / 2);
 
         font.drawInBatch(label, textX, 0, -1, false, matrix4f, bufferSource,
-            Font.DisplayMode.NORMAL, backgroundColor, packedLight);
+                Font.DisplayMode.NORMAL, backgroundColor, packedLight);
 
         poseStack.popPose();
     }
