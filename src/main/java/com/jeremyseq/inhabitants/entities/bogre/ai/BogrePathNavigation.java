@@ -1,8 +1,8 @@
 package com.jeremyseq.inhabitants.entities.bogre.ai;
 
+import com.jeremyseq.inhabitants.debug.DefaultDebugRenderer;
 import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
-import com.jeremyseq.inhabitants.debug.BogreDebugRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 
 import net.minecraft.world.level.block.Blocks;
@@ -171,7 +171,7 @@ public class BogrePathNavigation extends GroundPathNavigation {
         if (DevMode.bogrePathfinding() &&
         this.level instanceof ServerLevel serverLevel &&
         this.tick % 5 == 0) {
-            BogreDebugRenderer.renderPath(serverLevel,
+            DefaultDebugRenderer.renderPath(serverLevel,
             this.path, this.preciseTarget, this.mob.position());
         }
 
