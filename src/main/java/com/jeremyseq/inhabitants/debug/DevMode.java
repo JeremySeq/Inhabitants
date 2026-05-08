@@ -4,7 +4,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public final class DevMode {
 
-    private static final boolean IN_DEV = !FMLEnvironment.production;
+    public static final boolean IN_DEV = !FMLEnvironment.production;
 
     // --- Bogre ---
     public static boolean showBogre = true;
