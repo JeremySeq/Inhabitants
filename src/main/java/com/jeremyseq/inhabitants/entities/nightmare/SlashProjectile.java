@@ -32,8 +32,8 @@ public class SlashProjectile extends AbstractHurtingProjectile {
     public SlashProjectile(Level pLevel, LivingEntity pShooter) {
         super(ModEntities.SLASH_PROJECTILE.get(), pLevel);
         setOwner(pShooter);
-        this.setPos(pShooter.position());
-        this.setOrigin(pShooter.position());
+        this.setPos(pShooter.getEyePosition());
+        this.setOrigin(pShooter.getEyePosition());
         Vec3 lookVec = pShooter.getLookAngle();
         Vec3 velocity = lookVec.normalize().scale(SPEED);
         this.setDeltaMovement(velocity);
