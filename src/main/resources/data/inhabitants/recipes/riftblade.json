@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "combat",
+  "pattern": [
+    " d ",
+    " d ",
+    "dbd"
+  ],
+  "key": {
+    "d": {
+      "item": "inhabitants:dread_cloth"
+    },
+    "b": {
+      "item": "minecraft:bone"
+    }
+  },
+  "result": {
+    "item": "inhabitants:riftblade",
+    "count": 1
+  }
+}
