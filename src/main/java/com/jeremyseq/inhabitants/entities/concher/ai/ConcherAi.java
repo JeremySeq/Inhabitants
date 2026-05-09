@@ -14,6 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+import net.minecraft.world.damagesource.DamageSource;
 
 public class ConcherAi {
     private final ConcherEntity concher;
@@ -25,7 +26,7 @@ public class ConcherAi {
     private int stateTicks = 0;
     private BlockPos targetPos = null;
 
-    private double panicDistance = 8.0d;
+    private double dangerDistance = 10.0d;
 
     // [speed, waterSpeed, rotationSpeed, rotationWaterSpeed]
     private static final float[][] SPEEDS = {
@@ -103,7 +104,6 @@ public class ConcherAi {
         stateTicks++;
         if (!concher.level().isClientSide()) {
             spawnPathParticles();
-            checkPanic();
         }
 
         this.hasShell = concher.getStage() > 0;
@@ -150,12 +150,11 @@ public class ConcherAi {
         }
     }
 
-    private void checkPanic() {
-        if (getState() == State.PANIC || concher.isSheddingActive())
+    public void onHurt(DamageSource source) {
+        if (concher.isSheddingActive())
             return;
 
-        Player player = concher.level().getNearestPlayer(concher, panicDistance);
-        if (player != null && !player.isCreative() && !player.isSpectator()) {
+        if (getState() != State.PANIC) {
             setState(State.PANIC);
             concher.getNavigation().stop();
 
@@ -178,14 +177,9 @@ public class ConcherAi {
 
     private void flee() {
         stateTimer--;
-        if (stateTimer <= 0) {
-            setState(State.IDLE);
-            concher.getNavigation().stop();
-            return;
-        }
 
         if (concher.getNavigation().isDone()) {
-            Player player = concher.level().getNearestPlayer(concher, 10.0D);
+            Player player = concher.level().getNearestPlayer(concher, dangerDistance);
 
             if (player != null) {
                 Vec3 fleePos = DefaultRandomPos.getPosAway(concher, 10, 7, player.position());
@@ -194,6 +188,10 @@ public class ConcherAi {
                     float fleeSpeed = getSpeed() * 1.5f;
                     moveTo(BlockPos.containing(fleePos), fleeSpeed);
                 }
+            } else if (stateTimer <= 0) {
+                setState(State.IDLE);
+                concher.getNavigation().stop();
+                return;
             }
         }
     }
@@ -205,16 +203,14 @@ public class ConcherAi {
         if (phase == PanicPhase.HIDING_START) {
             if (stateTimer <= 0) {
                 setPanicPhase(PanicPhase.HIDING);
-                stateTimer = 60;
+                stateTimer = 100;
             }
         } else if (phase == PanicPhase.HIDING) {
-            if (stateTimer <= 0) {
-                Player player = concher.level().getNearestPlayer(concher, 10.0D);
+            Player player = concher.level().getNearestPlayer(concher, dangerDistance);
 
-                if (player == null || player.isCreative() || player.isSpectator()) {
-                    setPanicPhase(PanicPhase.HIDING_END);
-                    stateTimer = 20;
-                }
+            if (stateTimer <= 0 && player == null) {
+                setPanicPhase(PanicPhase.HIDING_END);
+                stateTimer = 20;
             }
         } else if (phase == PanicPhase.HIDING_END) {
             if (stateTimer <= 0) {

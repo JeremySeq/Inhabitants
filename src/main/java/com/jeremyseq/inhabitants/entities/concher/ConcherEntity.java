@@ -44,15 +44,24 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 public class ConcherEntity extends WaterAnimal implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
-    private static final EntityDataAccessor<Integer> STAGE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> GROWTH_INHIBITED = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Integer> AI_STATE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Integer> SLEEPING_STATE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Boolean> BLINKING = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> WALK_PAUSING = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> SHEDDING_ACTIVE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Float> SHEDDING_DIRECTION_Y = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Integer> PANIC_PHASE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> STAGE = SynchedEntityData.defineId(ConcherEntity.class,
+            EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> GROWTH_INHIBITED = SynchedEntityData.defineId(ConcherEntity.class,
+            EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Integer> AI_STATE = SynchedEntityData.defineId(ConcherEntity.class,
+            EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> SLEEPING_STATE = SynchedEntityData.defineId(ConcherEntity.class,
+            EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Boolean> BLINKING = SynchedEntityData.defineId(ConcherEntity.class,
+            EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> WALK_PAUSING = SynchedEntityData.defineId(ConcherEntity.class,
+            EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> SHEDDING_ACTIVE = SynchedEntityData.defineId(ConcherEntity.class,
+            EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Float> SHEDDING_DIRECTION_Y = SynchedEntityData
+            .defineId(ConcherEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> PANIC_PHASE = SynchedEntityData.defineId(ConcherEntity.class,
+            EntityDataSerializers.INT);
 
     public static boolean stopGrowth = true; // temporary for testing, TODO: remove stopGrowth after testing
 
@@ -62,7 +71,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     public int growTimer = 0; // in seconds
     private static final int TICKS_PER_GROW_CHECK = 20; // check growth once per second
     private static final int GROW_THRESHOLD_SECONDS = 30; // time to grow
-    
+
     private Vec3 sheddingTargetPos = null;
     private float sheddingRotation = 0f;
 
@@ -106,7 +115,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         int old = this.getStage();
         int clamped = Math.max(0, Math.min(3, stage));
         this.entityData.set(STAGE, clamped);
-        
+
         if (old != clamped) {
             this.refreshDimensions();
         }
@@ -150,7 +159,8 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         if (!this.level().isClientSide()) {
             // increment growTimer once per second and attempt growth
             if (this.tickCount % TICKS_PER_GROW_CHECK == 0) {
-                if (!stopGrowth && !isGrowthInhibited() && this.getStage() < 3) { // TODO: remove stopGrowth after testing
+                if (!stopGrowth && !isGrowthInhibited() && this.getStage() < 3) { // TODO: remove stopGrowth after
+                                                                                  // testing
                     growTimer++;
                     if (growTimer >= GROW_THRESHOLD_SECONDS) {
                         int old = this.getStage();
@@ -164,7 +174,8 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
             // sinking behavior for stages 1-3
             if (this.isInWater() && !this.onGround() && this.getStage() > 0) {
                 double y = this.getDeltaMovement().y - 0.02D;
-                if (y < -0.5D) y = -0.5D;
+                if (y < -0.5D)
+                    y = -0.5D;
                 this.setDeltaMovement(this.getDeltaMovement().x, y, this.getDeltaMovement().z);
             }
 
@@ -195,17 +206,16 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
             Vec3 currentPos = this.position();
             Vec3 direction = this.sheddingTargetPos.subtract(currentPos).normalize();
             Vec3 moveVec = direction.scale(0.08D);
-            
+
             this.setPos(
-                currentPos.x + moveVec.x, 
-                currentPos.y + moveVec.y, 
-                currentPos.z + moveVec.z
-            );
-            
+                    currentPos.x + moveVec.x,
+                    currentPos.y + moveVec.y,
+                    currentPos.z + moveVec.z);
+
             double distToTargetSqr = currentPos.distanceToSqr(this.sheddingTargetPos);
             if (distToTargetSqr < 0.01D ||
-                currentPos.subtract(this.sheddingTargetPos).dot(moveVec) >= 0) {
-                
+                    currentPos.subtract(this.sheddingTargetPos).dot(moveVec) >= 0) {
+
                 setSheddingActive(false);
             }
         } else {
@@ -222,48 +232,52 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     }
 
     private void triggerShedding(Player player) {
-        if (this.level().isClientSide()) return;
+        if (this.level().isClientSide())
+            return;
 
         BlockState shellState = ModBlocks.CONCHER_SHELL_BLOCK_STAGE_1
-            .get().defaultBlockState();
+                .get().defaultBlockState();
 
-        if (this.getStage() == 2) shellState = ModBlocks.CONCHER_SHELL_BLOCK_STAGE_2
-            .get().defaultBlockState();
+        if (this.getStage() == 2)
+            shellState = ModBlocks.CONCHER_SHELL_BLOCK_STAGE_2
+                    .get().defaultBlockState();
 
-        if (this.getStage() == 3) shellState = ModBlocks.CONCHER_SHELL_BLOCK_STAGE_3
-            .get().defaultBlockState();
-        
+        if (this.getStage() == 3)
+            shellState = ModBlocks.CONCHER_SHELL_BLOCK_STAGE_3
+                    .get().defaultBlockState();
+
         Direction facing = this.getDirection();
         shellState = shellState.setValue(ConcherShellBlock.FACING, facing);
         this.level().setBlock(this.blockPosition(), shellState, 3);
-        
+
         ConcherEntity newConcher = ModEntities.CONCHER.get().create(this.level());
         if (newConcher != null) {
 
             float snapRotation = facing.toYRot();
 
             newConcher.moveTo(
-                this.getX(), 
-                this.getY(), 
-                this.getZ(), 
-                snapRotation, 
-                this.getXRot()
-            );
+                    this.getX(),
+                    this.getY(),
+                    this.getZ(),
+                    snapRotation,
+                    this.getXRot());
 
             newConcher.setStage(0);
-            
+
             float distance = 1.5f;
-            if (this.getStage() == 2) distance = 2.5f;
-            if (this.getStage() == 3) distance = 2.75f;
-            
+            if (this.getStage() == 2)
+                distance = 2.5f;
+            if (this.getStage() == 3)
+                distance = 2.75f;
+
             Vec3 directionVec = Vec3.directionFromRotation(0, snapRotation);
             newConcher.sheddingTargetPos = this.position().add(directionVec.scale(distance));
             newConcher.sheddingRotation = snapRotation;
             newConcher.setSheddingActive(true);
-            
+
             this.level().addFreshEntity(newConcher);
         }
-        
+
         this.discard();
     }
 
@@ -273,7 +287,13 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
             return false;
         }
 
-        return super.hurt(source, amount);
+        boolean result = super.hurt(source, amount);
+
+        if (result && !this.level().isClientSide()) {
+            this.getAI().onHurt(source);
+        }
+
+        return result;
     }
 
     @Override
@@ -300,18 +320,18 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
 
     public void spawnInhibitParticles(ServerLevel serverLevel) {
         for (int i = 0; i < 8; i++) {
-            double px = this.getX() + (this.random.nextDouble() - 0.5D) * (double)this.getCurrentSize()[0];
-            double py = this.getY() + this.random.nextDouble() * (double)this.getCurrentSize()[1];
-            double pz = this.getZ() + (this.random.nextDouble() - 0.5D) * (double)this.getCurrentSize()[0];
+            double px = this.getX() + (this.random.nextDouble() - 0.5D) * (double) this.getCurrentSize()[0];
+            double py = this.getY() + this.random.nextDouble() * (double) this.getCurrentSize()[1];
+            double pz = this.getZ() + (this.random.nextDouble() - 0.5D) * (double) this.getCurrentSize()[0];
             serverLevel.sendParticles(ParticleTypes.CLOUD, px, py, pz, 1, 0.0D, 0.05D, 0.0D, 0.0D);
         }
     }
 
     public void spawnGrowthParticles(ServerLevel serverLevel) {
         for (int i = 0; i < 8; i++) {
-            double px = this.getX() + (this.random.nextDouble() - 0.5D) * (double)this.getCurrentSize()[0];
-            double py = this.getY() + this.random.nextDouble() * (double)this.getCurrentSize()[1];
-            double pz = this.getZ() + (this.random.nextDouble() - 0.5D) * (double)this.getCurrentSize()[0];
+            double px = this.getX() + (this.random.nextDouble() - 0.5D) * (double) this.getCurrentSize()[0];
+            double py = this.getY() + this.random.nextDouble() * (double) this.getCurrentSize()[1];
+            double pz = this.getZ() + (this.random.nextDouble() - 0.5D) * (double) this.getCurrentSize()[0];
             serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER, px, py, pz, 1, 0.0D, 0.05D, 0.0D, 0.0D);
         }
     }
@@ -319,7 +339,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     @Override
     public @NotNull InteractionResult mobInteract(Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        
+
         if (stack.getItem() == Items.IRON_INGOT) { // TODO: remove after testing
             if (!this.level().isClientSide() && this.getStage() < 3) {
                 int old = this.getStage();
@@ -336,7 +356,8 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
             if (!this.level().isClientSide()) {
                 // only consume honeycomb if inhibited state was changed
                 if (!this.isGrowthInhibited()) {
-                    if (!player.getAbilities().instabuild) stack.shrink(1);
+                    if (!player.getAbilities().instabuild)
+                        stack.shrink(1);
                 }
                 this.inhibitGrowth();
             }
@@ -363,7 +384,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         tag.putInt("ConcherAIState", this.entityData.get(AI_STATE));
         tag.putInt("ConcherSleepingState", this.entityData.get(SLEEPING_STATE));
         tag.putInt("PanicPhase", this.entityData.get(PANIC_PHASE));
-        
+
         tag.putBoolean("SheddingActive", isSheddingActive());
         tag.putFloat("SheddingRotation", this.sheddingRotation);
         if (this.sheddingTargetPos != null) {
@@ -376,22 +397,29 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.contains("ConcherStage")) this.setStage(tag.getInt("ConcherStage"));
-        if (tag.contains("ConcherGrowthInhibited")) this.entityData.set(GROWTH_INHIBITED, tag.getBoolean("ConcherGrowthInhibited"));
-        if (tag.contains("ConcherGrowTimer")) this.growTimer = tag.getInt("ConcherGrowTimer");
-        if (tag.contains("ConcherAIState")) this.entityData.set(AI_STATE, tag.getInt("ConcherAIState"));
-        if (tag.contains("ConcherSleepingState")) this.entityData.set(SLEEPING_STATE, tag.getInt("ConcherSleepingState"));
-        if (tag.contains("PanicPhase")) this.entityData.set(PANIC_PHASE, tag.getInt("PanicPhase"));
-        
-        if (tag.contains("SheddingActive")) setSheddingActive(tag.getBoolean("SheddingActive"));
-        if (tag.contains("SheddingRotation")) this.sheddingRotation = tag.getFloat("SheddingRotation");
-        
+        if (tag.contains("ConcherStage"))
+            this.setStage(tag.getInt("ConcherStage"));
+        if (tag.contains("ConcherGrowthInhibited"))
+            this.entityData.set(GROWTH_INHIBITED, tag.getBoolean("ConcherGrowthInhibited"));
+        if (tag.contains("ConcherGrowTimer"))
+            this.growTimer = tag.getInt("ConcherGrowTimer");
+        if (tag.contains("ConcherAIState"))
+            this.entityData.set(AI_STATE, tag.getInt("ConcherAIState"));
+        if (tag.contains("ConcherSleepingState"))
+            this.entityData.set(SLEEPING_STATE, tag.getInt("ConcherSleepingState"));
+        if (tag.contains("PanicPhase"))
+            this.entityData.set(PANIC_PHASE, tag.getInt("PanicPhase"));
+
+        if (tag.contains("SheddingActive"))
+            setSheddingActive(tag.getBoolean("SheddingActive"));
+        if (tag.contains("SheddingRotation"))
+            this.sheddingRotation = tag.getFloat("SheddingRotation");
+
         if (tag.contains("ShedTargetX")) {
             this.sheddingTargetPos = new Vec3(
-                tag.getDouble("ShedTargetX"), 
-                tag.getDouble("ShedTargetY"), 
-                tag.getDouble("ShedTargetZ")
-            );
+                    tag.getDouble("ShedTargetX"),
+                    tag.getDouble("ShedTargetY"),
+                    tag.getDouble("ShedTargetZ"));
         }
     }
 
@@ -419,7 +447,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
      * @return [width, height]
      */
     public float[] getCurrentSize() {
-        float[][] sizes = {{.85f, .3f}, {1f, .5f}, {1.5f, 1.25f}, {2f, 2.1f}};
+        float[][] sizes = { { .85f, .3f }, { 1f, .5f }, { 1.5f, 1.25f }, { 2f, 2.1f } };
         return sizes[this.getStage()];
     }
 
