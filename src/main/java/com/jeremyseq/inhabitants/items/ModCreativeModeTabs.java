@@ -21,30 +21,41 @@ public class ModCreativeModeTabs {
                     .title(Component.translatable("creativetab.inhabitants_tab"))
                     .displayItems((pParameters, pOutput) -> {
 
+                        // spawn eggs
                         pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
+                        pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
+                        pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
+
+                        // mob drops / materials
+                        pOutput.accept(ModItems.IMPALER_SPIKE.get());
+
+                        // weapons / tools
+                        pOutput.accept(ModItems.GIANT_BONE.get());
+                        pOutput.accept(ModItems.JAVELIN.get());
+                        pOutput.accept(ModItems.SPIKE_DRILL.get());
+
+                        // food
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
                         pOutput.accept(ModItems.UNCANNY_POTTAGE.get());
-                        pOutput.accept(ModItems.GIANT_BONE.get());
-                        pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
-                        pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
-                        pOutput.accept(ModItems.IMPALER_SPIKE.get());
-                        pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
                         pOutput.accept(ModItems.BAKED_BRAINS.get());
                         pOutput.accept(ModItems.MARINATED_SPIDER.get());
                         pOutput.accept(ModItems.DIMENSIONAL_SERVING.get());
-                        pOutput.accept(ModItems.JAVELIN.get());
-                        pOutput.accept(ModItems.SPIKE_DRILL.get());
+
+                        // decorative
                         pOutput.accept(ModItems.IMPALER_HEAD.get());
                         pOutput.accept(ModItems.DRIPSTONE_IMPALER_HEAD.get());
                         pOutput.accept(ModItems.NIGHTMARE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.DREAD_CLOTH.get());
                         pOutput.accept(ModItems.RIFTBLADE.get());
 
-                        //ench
+                        // misc special items
+                        pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
+
+                        // enchantments
                         addEnchantedBook(ModEnchantments.DIAMOND_TIP.get(), 1, pOutput);
                         addEnchantedBook(ModEnchantments.THERMAL_CAPACITY.get(), 1, pOutput);
 
-                        //paintings
+                        // paintings
                         addPainting(new ItemStack(Items.PAINTING), ModPaintings.MY_PRECIOUS.getId().toString(), pOutput);
                         addPainting(new ItemStack(Items.PAINTING), ModPaintings.ENDERMANS_LAST_DAY.getId().toString(), pOutput);
                     })

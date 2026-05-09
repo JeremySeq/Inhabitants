@@ -7,6 +7,9 @@ import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 
 public class BogreCauldronModel extends GeoModel<BogreCauldronEntity> {
+    private static final int FRAMES = 5; // number of frames in animation
+    private static final int FRAME_TIME = 4; // ticks per frame
+
     @Override
     public ResourceLocation getModelResource(BogreCauldronEntity object) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/bogre_cauldron.geo.json");
@@ -14,7 +17,9 @@ public class BogreCauldronModel extends GeoModel<BogreCauldronEntity> {
 
     @Override
     public ResourceLocation getTextureResource(BogreCauldronEntity object) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/bogre_cauldron.png");
+        int animationIndex = (object.tickCount / FRAME_TIME) % FRAMES;
+
+        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("textures/entity/bogre_cauldron/bogre_cauldron_%d.png", animationIndex));
     }
 
     @Override

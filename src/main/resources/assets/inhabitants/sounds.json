@@ -201,6 +201,7 @@
     "pitch": 1.0
   },
   "bogre.cauldron_gui_open": {
+    "subtitle": "subtitles.inhabitants.bogre.cauldron_gui_open",
     "sounds": [
       {
         "name": "inhabitants:gui/cauldron/cauldron_gui_open",
@@ -211,10 +212,36 @@
     "pitch": 1.0
   },
   "bogre.deposit_in_chest": {
+    "subtitle": "subtitles.inhabitants.bogre.deposit_in_chest",
     "sounds": [
       {
         "name": "inhabitants:entity/bogre/neutral/deposit_in_chest",
         "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.hammer_knock": {
+    "subtitle": "subtitles.inhabitants.bogre.hammer_knock",
+    "sounds": [
+      {
+        "name": "inhabitants:entity/bogre/skilling/hammer_knock1",
+        "weight": 1
+      },
+      {
+        "name": "inhabitants:entity/bogre/skilling/hammer_knock2",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.carving_finish": {
+    "subtitle": "subtitles.inhabitants.bogre.carving_finish",
+    "sounds": [
+      {
+        "name": "inhabitants:entity/bogre/skilling/carving_finish_sound"
       }
     ],
     "volume": 1.0,
@@ -374,31 +401,8 @@
     "volume": 1.0,
     "pitch": 1.0
   },
-  "bogre.hammer_knock": {
-    "sounds": [
-      {
-        "name": "inhabitants:entity/bogre/skilling/hammer_knock1",
-        "weight": 1
-      },
-      {
-        "name": "inhabitants:entity/bogre/skilling/hammer_knock2",
-        "weight": 1
-      }
-    ],
-    "volume": 1.0,
-    "pitch": 1.0
-  },
-  "bogre.carving_finish": {
-    "sounds": [
-      {
-        "name": "inhabitants:entity/bogre/skilling/carving_finish_sound"
-      }
-    ],
-    "volume": 1.0,
-    "pitch": 1.0
-  },
-  "immaterial.enter_wall": {
-    "subtitle": "subtitles.inhabitants.immaterial.enter_wall",
+  "effects.immaterial.enter_wall": {
+    "subtitle": "subtitles.inhabitants.effects.immaterial.enter_wall",
     "sounds": [
       {
         "name": "inhabitants:effects/immaterial_enter_wall"
@@ -407,8 +411,8 @@
     "volume": 0.8,
     "pitch": 1.0
   },
-  "immaterial.exit_wall": {
-    "subtitle": "subtitles.inhabitants.immaterial.exit_wall",
+  "effects.immaterial.exit_wall": {
+    "subtitle": "subtitles.inhabitants.effects.immaterial.exit_wall",
     "sounds": [
       {
         "name": "inhabitants:effects/immaterial_exit_wall"
@@ -417,7 +421,8 @@
     "volume": 0.8,
     "pitch": 1.0
   },
-  "immaterial.inside": {
+  "effects.immaterial.inside": {
+    "subtitle": "subtitles.inhabitants.effects.immaterial.inside",
     "sounds": [
       {
         "name": "inhabitants:effects/immaterial_inside",
@@ -427,7 +432,8 @@
     "volume": 1.0,
     "pitch": 1.0
   },
-  "concussion.buzz": {
+  "effects.concussion.buzz": {
+    "subtitle": "subtitles.inhabitants.effects.concussion.buzz",
     "sounds": [
       {
         "name": "inhabitants:effects/concussion_buzz",
@@ -437,21 +443,24 @@
     "volume": 1.0,
     "pitch": 1.0
   },
-  "item.javelin_aiming": {
+  "item.javelin.aiming": {
+    "subtitle": "subtitles.inhabitants.item.javelin.aiming",
     "sounds": [
       "inhabitants:item/javelin/aiming"
     ],
     "volume": 1.0,
     "pitch": 1.0
   },
-  "item.javelin_bounce": {
+  "item.javelin.bounce": {
+    "subtitle": "subtitles.inhabitants.item.javelin.bounce",
     "sounds": [
       "inhabitants:item/javelin/bounce"
     ],
     "volume": 1.0,
     "pitch": 1.0
   },
-  "item.javelin_launch": {
+  "item.javelin.launch": {
+    "subtitle": "subtitles.inhabitants.item.javelin.launch",
     "sounds": [
       "inhabitants:item/javelin/launching_01",
       "inhabitants:item/javelin/launching_02"
@@ -459,14 +468,16 @@
     "volume": 1.0,
     "pitch": 1.0
   },
-  "item.javelin_on_block_hit": {
+  "item.javelin.on_block_hit": {
+    "subtitle": "subtitles.inhabitants.item.javelin.on_block_hit",
     "sounds": [
       "inhabitants:item/javelin/on_block_hit"
     ],
     "volume": 1.0,
     "pitch": 1.0
   },
-  "item.javelin_on_entity_hit": {
+  "item.javelin.on_entity_hit": {
+    "subtitle": "subtitles.inhabitants.item.javelin.on_entity_hit",
     "sounds": [
       "inhabitants:item/javelin/on_entity_hit"
     ],
@@ -474,6 +485,7 @@
     "pitch": 1.0
   },
   "item.spike_drill.drilling_loop": {
+    "subtitle": "subtitles.inhabitants.item.spike_drill.drilling_loop",
     "sounds": [
       "inhabitants:item/spike_drill/drilling_loop"
     ],
@@ -481,6 +493,7 @@
     "pitch": 1.0
   },
   "item.spike_drill.drilling_stopped": {
+    "subtitle": "subtitles.inhabitants.item.spike_drill.drilling_stopped",
     "sounds": [
       "inhabitants:item/spike_drill/drilling_stopped"
     ],
@@ -488,6 +501,7 @@
     "pitch": 1.0
   },
   "item.spike_drill.drilling_start": {
+    "subtitle": "subtitles.inhabitants.item.spike_drill.drilling_start",
     "sounds": [
       "inhabitants:item/spike_drill/drilling_start"
     ],
@@ -495,6 +509,7 @@
     "pitch": 1.0
   },
   "item.spike_drill.drilling_dig": {
+    "subtitle": "subtitles.inhabitants.item.spike_drill.drilling_dig",
     "sounds": [
       "inhabitants:item/spike_drill/dig_0",
       "inhabitants:item/spike_drill/dig_1",

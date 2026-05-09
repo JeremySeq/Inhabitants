@@ -59,6 +59,13 @@ public class ModNetworking {
                 DrillDamagePacketC2S::decode,
                 DrillDamagePacketC2S::handle
         );
+        CHANNEL.registerMessage(
+                packetId++,
+                JavelinBounceTriggerPacketC2S.class,
+                JavelinBounceTriggerPacketC2S::encode,
+                JavelinBounceTriggerPacketC2S::decode,
+                JavelinBounceTriggerPacketC2S::handle
+        );
 
         // Server → Client
         CHANNEL.registerMessage(
