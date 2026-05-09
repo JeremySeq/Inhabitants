@@ -63,14 +63,12 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     private static final EntityDataAccessor<Integer> PANIC_PHASE = SynchedEntityData.defineId(ConcherEntity.class,
             EntityDataSerializers.INT);
 
-    public static boolean stopGrowth = true; // temporary for testing, TODO: remove stopGrowth after testing
-
     private ConcherAi ai;
 
     // growth (server side)
     public int growTimer = 0; // in seconds
     private static final int TICKS_PER_GROW_CHECK = 20; // check growth once per second
-    private static final int GROW_THRESHOLD_SECONDS = 30; // time to grow
+    private static final int[] GROW_THRESHOLDS = { 300, 600, 900 }; // 5m, 10m, 15m
 
     private Vec3 sheddingTargetPos = null;
     private float sheddingRotation = 0f;
@@ -159,13 +157,13 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         if (!this.level().isClientSide()) {
             // increment growTimer once per second and attempt growth
             if (this.tickCount % TICKS_PER_GROW_CHECK == 0) {
-                if (!stopGrowth && !isGrowthInhibited() && this.getStage() < 3) { // TODO: remove stopGrowth after
-                                                                                  // testing
+                if (!isGrowthInhibited() && this.getStage() < 3) {
                     growTimer++;
-                    if (growTimer >= GROW_THRESHOLD_SECONDS) {
+                    if (growTimer >= GROW_THRESHOLDS[this.getStage()]) {
                         int old = this.getStage();
                         this.setStage(old + 1);
                         growTimer = 0;
+                        this.getNavigation().stop();
                         this.getAI().onGrowStage(old, this.getStage());
                     }
                 }
@@ -339,17 +337,6 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     @Override
     public @NotNull InteractionResult mobInteract(Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-
-        if (stack.getItem() == Items.IRON_INGOT) { // TODO: remove after testing
-            if (!this.level().isClientSide() && this.getStage() < 3) {
-                int old = this.getStage();
-                this.setStage(old + 1);
-                this.growTimer = 0;
-                this.getAI().onGrowStage(old, this.getStage());
-            }
-
-            return InteractionResult.sidedSuccess(this.level().isClientSide());
-        }
 
         // right click with honeycomb to stop growth
         if (stack.getItem() == Items.HONEYCOMB) {
