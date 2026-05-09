@@ -117,6 +117,10 @@ public class ConcherPathfinding {
 
                 this.concher.zza = fCos * speedAttr;
                 this.concher.yya = -fSin * speedAttr;
+
+                if (this.concher.horizontalCollision && dy > 0) {
+                    this.concher.getJumpControl().jump();
+                }
             } else {
                 this.concher.setSpeed(0.0f);
                 this.concher.setXxa(0.0f);

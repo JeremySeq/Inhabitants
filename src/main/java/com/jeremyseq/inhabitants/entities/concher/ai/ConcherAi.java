@@ -191,7 +191,8 @@ public class ConcherAi {
                 Vec3 fleePos = DefaultRandomPos.getPosAway(concher, 10, 7, player.position());
 
                 if (fleePos != null) {
-                    moveTo(BlockPos.containing(fleePos), 1.5f);
+                    float fleeSpeed = getSpeed() * 1.5f;
+                    moveTo(BlockPos.containing(fleePos), fleeSpeed);
                 }
             }
         }
