@@ -52,6 +52,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
     public static final EntityDataAccessor<Boolean> WALK_PAUSING = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> SHEDDING_ACTIVE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> SHEDDING_DIRECTION_Y = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> PANIC_PHASE = SynchedEntityData.defineId(ConcherEntity.class, EntityDataSerializers.INT);
 
     public static boolean stopGrowth = true; // temporary for testing, TODO: remove stopGrowth after testing
 
@@ -94,6 +95,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         this.entityData.define(WALK_PAUSING, true);
         this.entityData.define(SHEDDING_ACTIVE, false);
         this.entityData.define(SHEDDING_DIRECTION_Y, 0f);
+        this.entityData.define(PANIC_PHASE, 0);
     }
 
     public int getStage() {
@@ -360,6 +362,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         tag.putInt("ConcherGrowTimer", this.growTimer);
         tag.putInt("ConcherAIState", this.entityData.get(AI_STATE));
         tag.putInt("ConcherSleepingState", this.entityData.get(SLEEPING_STATE));
+        tag.putInt("PanicPhase", this.entityData.get(PANIC_PHASE));
         
         tag.putBoolean("SheddingActive", isSheddingActive());
         tag.putFloat("SheddingRotation", this.sheddingRotation);
@@ -378,6 +381,7 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
         if (tag.contains("ConcherGrowTimer")) this.growTimer = tag.getInt("ConcherGrowTimer");
         if (tag.contains("ConcherAIState")) this.entityData.set(AI_STATE, tag.getInt("ConcherAIState"));
         if (tag.contains("ConcherSleepingState")) this.entityData.set(SLEEPING_STATE, tag.getInt("ConcherSleepingState"));
+        if (tag.contains("PanicPhase")) this.entityData.set(PANIC_PHASE, tag.getInt("PanicPhase"));
         
         if (tag.contains("SheddingActive")) setSheddingActive(tag.getBoolean("SheddingActive"));
         if (tag.contains("SheddingRotation")) this.sheddingRotation = tag.getFloat("SheddingRotation");
@@ -433,6 +437,14 @@ public class ConcherEntity extends WaterAnimal implements GeoEntity {
 
     public void setWalkPausing(boolean pausing) {
         this.entityData.set(WALK_PAUSING, pausing);
+    }
+
+    public void setPanicPhase(int phase) {
+        this.entityData.set(PANIC_PHASE, phase);
+    }
+
+    public int getPanicPhase() {
+        return this.entityData.get(PANIC_PHASE);
     }
 
     public ConcherAi getAI() {
