@@ -49,6 +49,10 @@ public class ModParticles {
             PARTICLES.register("impaler_head_attack",
                     () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> RIFTBLADE_SLASH =
+            PARTICLES.register("riftblade_slash",
+                    () -> new SimpleParticleType(false));
+
     @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent evt) {
         evt.registerSpriteSet(ModParticles.IMPALER_SCREAM.get(), ScreamParticle.Factory::new);
@@ -59,5 +63,6 @@ public class ModParticles {
         evt.registerSpriteSet(ModParticles.SONIC_WAVE.get(), SonicWaveParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.SHOCKWAVE.get(), ShockwaveParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.ABRACADABRA.get(), AbracadabraParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.RIFTBLADE_SLASH.get(), RiftbladeSlashParticle.Factory::new);
     }
 }

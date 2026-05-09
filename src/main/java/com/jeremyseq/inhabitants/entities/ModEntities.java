@@ -74,7 +74,7 @@ public class ModEntities {
             REGISTRY.register("slash_projectile",
                     () -> EntityType.Builder.<SlashProjectile>of(
                                     SlashProjectile::new, MobCategory.MISC)
-                            .sized(0.5f, 0.1f)
+                            .sized(1f, 1f)
                             .clientTrackingRange(4)
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "slash_projectile").toString()));
