@@ -374,6 +374,20 @@
 				},
 				"eyes": {
 					"position": [0, 0, 0.15]
+				},
+				"antennaes": {
+					"rotation": {
+						"0.0": {
+							"post": [17.5, 0, 0],
+							"lerp_mode": "catmullrom"
+						}
+					},
+					"position": {
+						"0.0": {
+							"post": [0, -2, 11],
+							"lerp_mode": "catmullrom"
+						}
+					}
 				}
 			}
 		},
@@ -389,6 +403,10 @@
 						"0.25": {
 							"post": [17.5, 0, 0],
 							"lerp_mode": "catmullrom"
+						},
+						"0.75": {
+							"post": [17.5, 0, 0],
+							"lerp_mode": "catmullrom"
 						}
 					},
 					"position": {
@@ -401,6 +419,10 @@
 							"lerp_mode": "catmullrom"
 						},
 						"0.3333": {
+							"post": [0, -2, 11],
+							"lerp_mode": "catmullrom"
+						},
+						"0.75": {
 							"post": [0, -2, 11],
 							"lerp_mode": "catmullrom"
 						}
