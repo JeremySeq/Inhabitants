@@ -165,6 +165,12 @@ public class ConcherPathfinding {
                     this.concher.setSpeed(speed);
                 }
 
+                if (this.concher.isInWater() && this.concher.horizontalCollision && this.concher.getStage() > 0) {
+                    if (dy > 0) {
+                        this.concher.getJumpControl().jump();
+                    }
+                }
+
                 if (this.concher.isWalkPausing() != isPausing) {
                     this.concher.setWalkPausing(isPausing);
                 }
