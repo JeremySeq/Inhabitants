@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.entities.nightmare;
+package com.jeremyseq.inhabitants.entities.nightmare.slash_projectile;
 
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import net.minecraft.core.particles.ParticleTypes;

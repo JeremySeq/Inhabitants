@@ -7,7 +7,7 @@ import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
 import com.jeremyseq.inhabitants.entities.nightmare.NightmareRenderer;
-import com.jeremyseq.inhabitants.entities.nightmare.SlashProjectileRenderer;
+import com.jeremyseq.inhabitants.entities.nightmare.slash_projectile.SlashProjectileRenderer;
 import com.jeremyseq.inhabitants.items.*;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;

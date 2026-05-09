@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.items;
 
-import com.jeremyseq.inhabitants.entities.nightmare.SlashProjectile;
+import com.jeremyseq.inhabitants.entities.nightmare.slash_projectile.SlashProjectile;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.*;
 

@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.entities.nightmare;
+package com.jeremyseq.inhabitants.entities.nightmare.slash_projectile;
 
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;

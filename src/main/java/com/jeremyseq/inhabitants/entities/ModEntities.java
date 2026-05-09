@@ -6,7 +6,7 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.nightmare.NightmareEntity;
-import com.jeremyseq.inhabitants.entities.nightmare.SlashProjectile;
+import com.jeremyseq.inhabitants.entities.nightmare.slash_projectile.SlashProjectile;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.javelin.JavelinEntity;
 import net.minecraft.resources.ResourceLocation;
