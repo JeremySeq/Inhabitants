@@ -67,14 +67,14 @@ public class ModEntities {
     public static final RegistryObject<EntityType<NightmareEntity>> NIGHTMARE =
             REGISTRY.register("nightmare",
                     () -> EntityType.Builder.<NightmareEntity>of(NightmareEntity::new, MobCategory.MONSTER)
-                            .sized(1, 2.4f)
+                            .sized(1, 2.0f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "nightmare").toString()));
 
     public static final RegistryObject<EntityType<SlashProjectile>> SLASH_PROJECTILE =
             REGISTRY.register("slash_projectile",
                     () -> EntityType.Builder.<SlashProjectile>of(
                                     SlashProjectile::new, MobCategory.MISC)
-                            .sized(0.5f, 0.5f)
+                            .sized(0.5f, 0.1f)
                             .clientTrackingRange(4)
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "slash_projectile").toString()));
