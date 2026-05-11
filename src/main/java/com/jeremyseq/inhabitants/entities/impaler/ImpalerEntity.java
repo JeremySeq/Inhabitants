@@ -1,37 +1,43 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
-import com.jeremyseq.inhabitants.entities.EntityUtil;
-import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
-import com.jeremyseq.inhabitants.entities.goals.*;
-import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.damagesource.ModDamageTypes;
-
+import com.jeremyseq.inhabitants.entities.EntityUtil;
+import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
+import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
+import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.*;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.damagesource.*;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.*;
-import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-
-import org.jetbrains.annotations.*;
-
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.*;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
@@ -41,19 +47,13 @@ import java.util.Random;
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
-    public static final int THORN_DAMAGE = 3;
     public static final int SCREAM_COOLDOWN = 300;
     public int screamCooldown = 0;
-    
-    public static final EntityDataAccessor<Boolean> SPIKED =
-        SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
+
     public static final EntityDataAccessor<Integer> SCREAM_START_TICK =
         SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
     public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
-
-    private static final int SPIKE_ANIM_DURATION = 30;
-    private int spiked_client_timer = -1; // used for spike particle timing, counts up
 
     private int attackAnimTimer = 0;
 
@@ -82,7 +82,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new RestrictSunGoal(this));
         this.goalSelector.addGoal(2, new FleeSunGoal(this, 1.0D));
-        this.goalSelector.addGoal(3, new ImpalerRageGoal(this));
+        this.goalSelector.addGoal(3, new ImpalerSpikeThrowGoal(this));
         this.goalSelector.addGoal(4, new ImpalerScreamGoal(this));
         this.goalSelector.addGoal(5, new SprintAtTargetGoal(this, 1.4D, 7, 3));
         this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.0D, true));
@@ -102,25 +102,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         // regenerate health over time
         if (this.getTarget() == null && this.tickCount % 60 == 0 && this.getHealth() < this.getMaxHealth()) {
             this.heal(1.0F);
-        }
-
-
-        // handle spike anim timer (client + server)
-        if (spiked_client_timer >= SPIKE_ANIM_DURATION) {
-            spiked_client_timer = -1;
-        } else if (spiked_client_timer > -1) {
-            spiked_client_timer++;
-        }
-
-        if (this.level().isClientSide) {
-            if (spiked_client_timer == 13) {
-                ImpalerSpikeRaiseParticle.spawnSpikeBurst((ClientLevel) this.level(), this, 20);
-            }
-        }
-        if (!this.level().isClientSide) {
-            if (spiked_client_timer == 9) {
-                this.playSound(ModSoundEvents.IMPALER_SPIKES.get(), 1, 1);
-            }
         }
 
         if (this.level().isClientSide) {
@@ -151,20 +132,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
     }
 
-    @Override
-    public void setSprinting(boolean pSprinting) {
-
-        if (this.isSprinting() && !pSprinting) {
-            // stop sprinting
-            this.triggerAnim("sprint", "stopSprint");
-        } else if (!this.isSprinting() && pSprinting) {
-            // start sprinting
-            this.triggerAnim("sprint", "startSprint");
-        }
-
-        super.setSprinting(pSprinting);
-    }
-
     public void aiStep() {
         // burn in sunlight
         if (this.isAlive()) {
@@ -193,20 +160,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> pKey) {
-        super.onSyncedDataUpdated(pKey);
-        if (pKey == SPIKED) {
-            if (this.entityData.get(SPIKED)) {
-                spiked_client_timer = 0;
-            }
-        }
-    }
-
-    @Override
     protected void customServerAiStep() {
-        if (this.getTarget() == null) {
-            this.getEntityData().set(SPIKED, false);
-        }
         if (this.attackAnimTimer > 0) {
             this.attackAnimTimer--;
             if (this.attackAnimTimer == 0) {
@@ -246,16 +200,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
             this.triggerAnim("hurt", "hurt");
         }
 
-        if (this.isSpiked() &&
-            !source.is(DamageTypes.THORNS) &&
-            !source.is(ModDamageTypes.IMPALED)) {
-            
-            if (source.getDirectEntity() instanceof LivingEntity livingEntity) {
-                livingEntity.hurt(ModDamageTypes.causeImpaledDamage(
-                    this.level(), this), THORN_DAMAGE);
-            }
-        }
-
         return result;
     }
 
@@ -266,24 +210,21 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+        controllers.add(new AnimationController<>(this, "controller", 10, this::predicate));
         controllers.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
                 .triggerableAnim("hurt", RawAnimation.begin().then("hurt", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
                 .triggerableAnim("bite", RawAnimation.begin().then("bite", Animation.LoopType.PLAY_ONCE)));
-        controllers.add(new AnimationController<>(this, "rage", 0, state -> PlayState.STOP)
-                .triggerableAnim("rage", RawAnimation.begin().then("rage", Animation.LoopType.PLAY_ONCE)));
+        controllers.add(new AnimationController<>(this, "spike throw", 0, state -> PlayState.STOP)
+                .triggerableAnim("spike throw", RawAnimation.begin().then("spike throw", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "scream", 0, state -> PlayState.STOP)
                 .triggerableAnim("scream", RawAnimation.begin().then("scream", Animation.LoopType.PLAY_ONCE)));
-        controllers.add(new AnimationController<>(this, "sprint", 0, state -> PlayState.STOP)
-                .triggerableAnim("startSprint", RawAnimation.begin().then("stepping on four", Animation.LoopType.PLAY_ONCE))
-                .triggerableAnim("stopSprint", RawAnimation.begin().then("stepping on two", Animation.LoopType.PLAY_ONCE)));
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
         if (animationState.isMoving()) {
             if (this.isSprinting()) {
-                animationState.getController().setAnimation(RawAnimation.begin().then("sprint", Animation.LoopType.LOOP));
+                animationState.getController().setAnimation(RawAnimation.begin().then("run", Animation.LoopType.LOOP));
             } else {
                 animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
             }
@@ -294,25 +235,21 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         return PlayState.CONTINUE;
     }
 
-    /**
-     * @return whether the impaler has its spikes out.
-     */
-    public boolean isSpiked() {
-        return this.entityData.get(SPIKED);
-    }
-
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define(SPIKED, false);
         entityData.define(SCREAM_START_TICK, -1);
-        entityData.define(TEXTURE, getBiomeTextureType());
+        entityData.define(TEXTURE, generateTextureType());
     }
 
-    private int getBiomeTextureType() {
+    private int generateTextureType() {
         if (this.level().getBiome(this.blockPosition()).is(Biomes.DRIPSTONE_CAVES)) {
             return 1;
         } else {
+            // 5% chance to spawn with albino texture, otherwise default texture
+            if (this.random.nextFloat() < 0.05f) {
+                return 2;
+            }
             return 0;
         }
     }
@@ -328,7 +265,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                                                   @Nullable SpawnGroupData pSpawnData,
                                                   @Nullable CompoundTag pDataTag) {
         if (pSpawnData == null) {
-            this.entityData.set(TEXTURE, getBiomeTextureType());
+            this.entityData.set(TEXTURE, generateTextureType());
         }
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
@@ -350,7 +287,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         if (tag.contains("textureType")) {
             entityData.set(TEXTURE, tag.getInt("textureType"));
         } else {
-            entityData.set(TEXTURE, getBiomeTextureType());
+            entityData.set(TEXTURE, generateTextureType());
         }
     }
 

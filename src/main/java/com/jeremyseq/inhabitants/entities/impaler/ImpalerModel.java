@@ -10,9 +10,6 @@ import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 
 public class ImpalerModel extends GeoModel<ImpalerEntity> {
-    private static final int FRAMES = 5; // number of frames in animation
-    private static final int FRAME_TIME = 3; // ticks per frame
-
     @Override
     public ResourceLocation getModelResource(ImpalerEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/impaler.geo.json");
@@ -20,12 +17,18 @@ public class ImpalerModel extends GeoModel<ImpalerEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ImpalerEntity animatable) {
-        int animationIndex = (animatable.tickCount / FRAME_TIME) % FRAMES;
-
-        if (animatable.getTextureType() == 0) {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("textures/entity/impaler/impaler_%d.png", animationIndex));
+        if (animatable.getTextureType() == 1) {
+            // 1 = dripstone texture
+            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_dripstone.png");
+        } else if (animatable.getTextureType() == 2) {
+            // 2 = albino texture
+            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_albino.png");
+        } else if (animatable.getTextureType() == 3) {
+            // 3 = Forlorn Hollows texture
+            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_forlorn_hollows.png");
         } else {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("textures/entity/impaler/impaler_dripstone_%d.png", animationIndex));
+            // 0 = default texture
+            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler.png");
         }
     }
 
@@ -43,13 +46,5 @@ public class ImpalerModel extends GeoModel<ImpalerEntity> {
             head.setRotX(entityData.headPitch() * Mth.DEG_TO_RAD);
             head.setRotY(entityData.netHeadYaw() * Mth.DEG_TO_RAD);
         }
-
-
-        boolean hideSpikes = !animatable.isSpiked();
-        getAnimationProcessor().getRegisteredBones().forEach(bone -> {
-            if (bone.getName().contains("spikes")) {
-                bone.setHidden(hideSpikes);
-            }
-        });
     }
 }
