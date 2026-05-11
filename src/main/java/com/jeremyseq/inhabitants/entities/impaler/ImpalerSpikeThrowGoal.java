@@ -60,11 +60,11 @@ public class ImpalerSpikeThrowGoal extends Goal {
     }
 
     private void throwSpikes() {
-//        if (mob.getTarget() == null) return;
-
         // throw line of spikes towards target
-        for (int i = 0; i<3; i++) {
-            ImpalerSpikeProjectile spike = new ImpalerSpikeProjectile(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), mob, mob.level());
+        for (int i = 0; i < 3; i++) {
+            ImpalerSpikeProjectile spike = new ImpalerSpikeProjectile(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), mob.level());
+            spike.setOwner(mob);
+            spike.setNoGravity(true);
 
             // get offsets for spike position based on mob's rotation
             double angle = Math.toRadians(mob.getYRot() + 90);
@@ -72,12 +72,20 @@ public class ImpalerSpikeThrowGoal extends Goal {
             double offsetX = Math.cos(angle) * radius + (double) i /2;
             double offsetZ = Math.sin(angle) * radius + (double) i /2;
 
-            spike.setPos(mob.getX() + offsetX, mob.getY(0.5), mob.getZ() + offsetZ);
+            spike.setPos(mob.getX() + offsetX, mob.getEyeY(), mob.getZ() + offsetZ);
 
             // shoot directly outwards
             double dx = Math.cos(angle) * 1.5;
             double dy = 0;
             double dz = Math.sin(angle) * 1.5;
+
+            if (mob.getTarget() != null) {
+                // get dy to account for target height difference
+                Vec3 targetPos = mob.getTarget().getEyePosition();
+                Vec3 startPos = spike.position();
+                Vec3 dir = targetPos.subtract(startPos).normalize();
+                dy = dir.y;
+            }
 
             double speed = 1.0;
             spike.setDeltaMovement(dx * speed, dy * speed, dz * speed);
