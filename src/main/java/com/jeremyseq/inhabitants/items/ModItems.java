@@ -75,6 +75,12 @@ public class ModItems {
     public static final RegistryObject<Item> BULLTOAD_SPAWN_EGG = ITEMS.register("bulltoad_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.BULLTOAD, 0x993728, 0xC4AA2B, new Item.Properties()));
 
+    public static final RegistryObject<Item> BULLTOAD_HORN = ITEMS.register("bulltoad_horn",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> CORNUCOPIA = ITEMS.register("cornucopia",
+            () -> new CornucopiaItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

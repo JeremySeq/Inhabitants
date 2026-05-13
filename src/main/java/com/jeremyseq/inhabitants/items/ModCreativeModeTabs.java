@@ -29,6 +29,7 @@ public class ModCreativeModeTabs {
 
                         // mob drops / materials
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
+                        pOutput.accept(ModItems.BULLTOAD_HORN.get());
 
                         // weapons / tools
                         pOutput.accept(ModItems.GIANT_BONE.get());
@@ -41,6 +42,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BAKED_BRAINS.get());
                         pOutput.accept(ModItems.MARINATED_SPIDER.get());
                         pOutput.accept(ModItems.DIMENSIONAL_SERVING.get());
+                        pOutput.accept(ModItems.CORNUCOPIA.get());
 
                         // decorative
                         pOutput.accept(ModItems.IMPALER_HEAD.get());
