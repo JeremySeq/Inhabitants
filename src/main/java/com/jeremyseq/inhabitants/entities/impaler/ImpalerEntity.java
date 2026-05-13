@@ -210,7 +210,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 10, this::predicate));
+        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
         controllers.add(new AnimationController<>(this, "hurt", 0, state -> PlayState.STOP)
                 .triggerableAnim("hurt", RawAnimation.begin().then("hurt", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
@@ -224,12 +224,12 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
         if (animationState.isMoving()) {
             if (this.isSprinting()) {
-                animationState.getController().setAnimation(RawAnimation.begin().then("run", Animation.LoopType.LOOP));
+                animationState.setAndContinue(RawAnimation.begin().then("run", Animation.LoopType.LOOP));
             } else {
-                animationState.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
+                animationState.setAndContinue(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
             }
         } else {
-            animationState.getController().setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.LOOP));
+            animationState.setAndContinue(RawAnimation.begin().then("idle", Animation.LoopType.LOOP));
         }
 
         return PlayState.CONTINUE;
