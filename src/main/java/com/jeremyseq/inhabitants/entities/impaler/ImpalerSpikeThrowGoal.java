@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -13,6 +14,7 @@ public class ImpalerSpikeThrowGoal extends Goal {
     private int timer = 0;
     private static final int DURATION = 40;
     private static final int THROW_TICK = 15;
+    private static final int SPIKE_TICK = 10;
     private static final int COOLDOWN_TICKS = 100;
     private long lastUsedTick = 0;
 
@@ -56,6 +58,10 @@ public class ImpalerSpikeThrowGoal extends Goal {
 
         if (timer == THROW_TICK) {
             throwSpikes();
+        }
+
+        if (timer == SPIKE_TICK) {
+            mob.playSound(ModSoundEvents.IMPALER_SPIKES.get(), 1, 1);
         }
     }
 
