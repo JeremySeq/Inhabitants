@@ -66,11 +66,12 @@ public class ImpalerSpikeThrowGoal extends Goal {
     }
 
     private void throwSpikes() {
+        if (mob.level().isClientSide()) return;
+
         // throw line of spikes towards target
         for (int i = 0; i < 3; i++) {
             ImpalerSpikeProjectile spike = new ImpalerSpikeProjectile(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), mob.level());
             spike.setOwner(mob);
-            spike.setNoGravity(true);
 
             // get offsets for spike position based on mob's rotation
             double angle = Math.toRadians(mob.getYRot() + 90);
