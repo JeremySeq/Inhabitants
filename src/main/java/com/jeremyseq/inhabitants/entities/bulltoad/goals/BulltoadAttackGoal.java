@@ -56,16 +56,6 @@ public class BulltoadAttackGoal extends Goal {
         target = null;
     }
 
-    private void snapToFaceTarget() {
-        Vec3 diff = target.position().subtract(bulltoad.position());
-        float yaw = (float) Math.toDegrees(Math.atan2(-diff.x, diff.z));
-        bulltoad.setYRot(yaw);
-        bulltoad.yRotO = yaw;
-        bulltoad.setYHeadRot(yaw);
-        bulltoad.yHeadRotO = yaw;
-        bulltoad.setYBodyRot(yaw);
-    }
-
     @Override
     public void tick() {
         double distSq = bulltoad.distanceToSqr(target);
@@ -84,7 +74,7 @@ public class BulltoadAttackGoal extends Goal {
 
             case FACE -> {
                 bulltoad.getNavigation().stop();
-                snapToFaceTarget();
+                bulltoad.snapToFaceTargetEntity(target);
                 this.bulltoad.setSnapYaw(true);
                 phaseTimer++;
 
@@ -101,7 +91,7 @@ public class BulltoadAttackGoal extends Goal {
             }
 
             case STRIKE -> {
-                snapToFaceTarget();
+                bulltoad.snapToFaceTargetEntity(target);
                 this.bulltoad.setSnapYaw(true);
 
                 if (phaseTimer == 0) {
@@ -121,7 +111,7 @@ public class BulltoadAttackGoal extends Goal {
             }
 
             case RETRACT -> {
-                snapToFaceTarget();
+                bulltoad.snapToFaceTargetEntity(target);
                 phaseTimer++;
                 if (phaseTimer >= 5) {
                     phase = Phase.CHASE;

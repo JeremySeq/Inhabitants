@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class BulltoadModel extends GeoModel<BulltoadEntity> {
     private final Map<Integer, Float> tongueScales = new HashMap<>();
+    private final Map<Integer, Float> hornScales = new HashMap<>();
 
     @Override
     public ResourceLocation getModelResource(BulltoadEntity animatable) {
@@ -78,5 +79,24 @@ public class BulltoadModel extends GeoModel<BulltoadEntity> {
                 tongueScales.put(animatable.getId(), 0f);
             }
         }
+
+
+        // show or hide horns
+        // lerp scale when growing horns
+        float targetHornScale = animatable.hasHorns() ? 1f : 0f;
+        float currentHornScale = hornScales.getOrDefault(animatable.getId(), 0f);
+        float speed = targetHornScale > currentHornScale ? 0.02f : 1f; // if growing horns, do it gradually, if losing horns, do it immediately
+        currentHornScale += (targetHornScale - currentHornScale) * speed;
+        hornScales.put(animatable.getId(), currentHornScale);
+
+        float finalCurrentHornScale = currentHornScale;
+        getAnimationProcessor().getRegisteredBones().forEach(bone -> {
+            if (bone.getName().contains("horns")) {
+                bone.setHidden(finalCurrentHornScale <= 0.01f);
+                bone.setScaleX(finalCurrentHornScale);
+                bone.setScaleY(finalCurrentHornScale);
+                bone.setScaleZ(finalCurrentHornScale);
+            }
+        });
     }
 }
