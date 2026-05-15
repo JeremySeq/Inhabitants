@@ -1,17 +1,18 @@
 package com.jeremyseq.inhabitants.mixin;
 
 import com.jeremyseq.inhabitants.effects.ModEffects;
-
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-
-import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
 @Mixin(LivingEntity.class)
@@ -67,5 +68,14 @@ public abstract class LivingEntityMixin {
             ) return true;
         }
         return false;
+    }
+
+    @Inject(method = "isImmobile", at = @At("HEAD"), cancellable = true)
+    private void inhabitants$concussionImmobilize(CallbackInfoReturnable<Boolean> cir) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+
+        if (entity.hasEffect(ModEffects.CONCUSSION.get()) && !(entity instanceof Player)) {
+            cir.setReturnValue(true);
+        }
     }
 }

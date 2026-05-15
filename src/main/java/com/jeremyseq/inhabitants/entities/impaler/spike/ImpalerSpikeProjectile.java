@@ -11,7 +11,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -109,9 +108,7 @@ public class ImpalerSpikeProjectile extends AbstractArrow implements GeoAnimatab
                     }
                 }
 
-                if (entity instanceof Player player) {
-                    player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 100, 0));
-                }
+                livingEntity.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 100, 0));
             } else {
                 this.setDeltaMovement(this.getDeltaMovement().scale(-0.1D));
                 this.setYRot(this.getYRot() + 180.0F);
