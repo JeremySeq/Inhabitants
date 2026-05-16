@@ -42,6 +42,9 @@ public class BulltoadBullfightGoal extends Goal {
             return true;
         }
 
+        // random chance to bullfight
+        if (bulltoad.getRandom().nextInt(80) != 0) return false;
+
         List<BulltoadEntity> nearby = bulltoad.level().getEntitiesOfClass(
                 BulltoadEntity.class,
                 bulltoad.getBoundingBox().inflate(FIGHT_RANGE),
@@ -49,6 +52,7 @@ public class BulltoadBullfightGoal extends Goal {
                         && !other.isBaby()
                         && other.getTarget() == null
                         && other.fightRival == null
+                        && other.hasHorns()
         );
 
         if (nearby.isEmpty()) return false;
