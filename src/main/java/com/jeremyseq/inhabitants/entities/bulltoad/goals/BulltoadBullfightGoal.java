@@ -12,7 +12,7 @@ public class BulltoadBullfightGoal extends Goal {
     private static final double FIGHT_RANGE = 20;
     private static final double LEAP_RANGE = 6;
     private static final double HIT_RANGE = 2.5;
-    private static final int COOLDOWN_TICKS = 100;
+    private static final int COOLDOWN_TICKS = 20*60;
     private static final int FACE_TICKS = 30; // both wait this long before jumping
 
     private final BulltoadEntity bulltoad;
@@ -22,6 +22,8 @@ public class BulltoadBullfightGoal extends Goal {
     private boolean readyToLeap = false;
     private boolean hasLeaped = false;
     private boolean hasDealtDamage = false;
+    private int leapWaitTimer = 0;
+    private static final int MAX_LEAP_WAIT = 60; // 3 seconds
 
     public BulltoadBullfightGoal(BulltoadEntity bulltoad) {
         this.bulltoad = bulltoad;
@@ -80,6 +82,7 @@ public class BulltoadBullfightGoal extends Goal {
         hasDealtDamage = false;
         readyToLeap = false;
         faceTimer = 0;
+        leapWaitTimer = 0;
     }
 
     @Override
@@ -126,6 +129,11 @@ public class BulltoadBullfightGoal extends Goal {
                     Vec3 leapDir = rival.position().subtract(bulltoad.position()).normalize();
                     bulltoad.setDeltaMovement(leapDir.x * 0.8, 0.6, leapDir.z * 0.8);
                     hasLeaped = true;
+                } else {
+                    leapWaitTimer++;
+                    if (leapWaitTimer >= MAX_LEAP_WAIT) {
+                        stop();
+                    }
                 }
             }
         } else {
