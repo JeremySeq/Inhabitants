@@ -31,7 +31,7 @@ public class BulltoadAttackGoal extends Goal {
     @Override
     public boolean canUse() {
         LivingEntity t = bulltoad.getTarget();
-        if (t == null || !t.isAlive()) return false;
+        if (t == null || !t.isAlive() || bulltoad.isBaby()) return false;
         target = t;
         return true;
     }
