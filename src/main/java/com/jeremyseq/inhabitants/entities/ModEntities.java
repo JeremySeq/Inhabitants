@@ -67,7 +67,7 @@ public class ModEntities {
 
     public static final RegistryObject<EntityType<BulltoadEntity>> BULLTOAD =
             REGISTRY.register("bulltoad",
-                    () -> EntityType.Builder.of(BulltoadEntity::new, MobCategory.CREATURE)
+                    () -> EntityType.Builder.of(BulltoadEntity::new, MobCategory.MONSTER)
                             .sized(2, 1.6f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bulltoad").toString()));
 

@@ -10,6 +10,7 @@ import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadJumpGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -358,5 +360,34 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         this.setYHeadRot(yaw);
         this.yHeadRotO = yaw;
         this.setYBodyRot(yaw);
+    }
+
+    @Override
+    public @NotNull SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor pLevel, @NotNull DifficultyInstance pDifficulty,
+                                                 @NotNull MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData,
+                                                 @Nullable CompoundTag pDataTag) {
+        SpawnGroupData data = super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
+
+        // 40% chance to spawn 2-3 babies alongside the adult
+        if (pReason == MobSpawnType.NATURAL) {
+            if (this.random.nextFloat() < 0.4f) {
+                int babyCount = 2 + this.random.nextInt(2);
+                for (int i = 0; i < babyCount; i++) {
+                    BulltoadEntity baby = ModEntities.BULLTOAD.get().create(pLevel.getLevel());
+                    if (baby != null) {
+                        baby.setBaby(true);
+                        baby.moveTo(
+                                this.getX() + (this.random.nextDouble() - 0.5) * 2,
+                                this.getY(),
+                                this.getZ() + (this.random.nextDouble() - 0.5) * 2,
+                                this.getYRot(), 0
+                        );
+                        pLevel.addFreshEntityWithPassengers(baby);
+                    }
+                }
+            }
+        }
+
+        return data;
     }
 }

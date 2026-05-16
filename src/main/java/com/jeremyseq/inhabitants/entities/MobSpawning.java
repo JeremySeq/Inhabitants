@@ -39,7 +39,13 @@ public class MobSpawning {
                     && !level.getBiome(pos).is(Biomes.MUSHROOM_FIELDS),
                 SpawnPlacementRegisterEvent.Operation.REPLACE
         );
-
+        event.register(
+                ModEntities.BULLTOAD.get(),
+                SpawnPlacements.Type.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                (type, level, reason, pos, random) -> true,
+                SpawnPlacementRegisterEvent.Operation.REPLACE
+        );
     }
 
     private static boolean isFlat(LevelAccessor level) {
