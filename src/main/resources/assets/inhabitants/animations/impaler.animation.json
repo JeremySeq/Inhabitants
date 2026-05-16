@@ -3003,6 +3003,11 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.4": {
+					"effect": "spikes"
+				}
 			}
 		},
 		"run": {

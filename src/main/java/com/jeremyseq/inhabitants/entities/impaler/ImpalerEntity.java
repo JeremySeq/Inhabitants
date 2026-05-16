@@ -6,6 +6,7 @@ import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -13,6 +14,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -41,6 +43,7 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.keyframe.event.CustomInstructionKeyframeEvent;
+import software.bernie.geckolib.core.keyframe.event.SoundKeyframeEvent;
 import software.bernie.geckolib.core.object.PlayState;
 
 import java.util.Random;
@@ -195,7 +198,9 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         controllers.add(new AnimationController<>(this, "attack", 0, state -> PlayState.STOP)
                 .triggerableAnim("bite", RawAnimation.begin().then("bite", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "spike throw", 0, state -> PlayState.STOP)
-                .triggerableAnim("spike throw", RawAnimation.begin().then("spike throw", Animation.LoopType.PLAY_ONCE)));
+                .triggerableAnim("spike throw", RawAnimation.begin().then("spike throw", Animation.LoopType.PLAY_ONCE))
+                .setSoundKeyframeHandler(ImpalerEntity::handleSpikeThrowKeyframe)
+        );
         controllers.add(new AnimationController<>(this, "scream", 0, state -> PlayState.STOP)
                 .triggerableAnim("scream", RawAnimation.begin().then("scream", Animation.LoopType.PLAY_ONCE))
                 .setCustomInstructionKeyframeHandler(ImpalerEntity::handleScreamKeyframe)
@@ -214,6 +219,13 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
 
         return PlayState.CONTINUE;
+    }
+
+    private static void handleSpikeThrowKeyframe(SoundKeyframeEvent<ImpalerEntity> event) {
+        if (event.getKeyframeData().getSound().trim().equals("spikes")) {
+            assert Minecraft.getInstance().level != null;
+            Minecraft.getInstance().level.playSound(Minecraft.getInstance().player, event.getAnimatable().blockPosition(), ModSoundEvents.IMPALER_SPIKES.get(), SoundSource.HOSTILE);
+        }
     }
 
     private static void handleScreamKeyframe(CustomInstructionKeyframeEvent<ImpalerEntity> event) {
