@@ -1783,6 +1783,10 @@
 						}
 					}
 				}
+			},
+			"timeline": {
+				"0.67": "screamTrigger",
+				"0.88": "screamTrigger"
 			}
 		},
 		"walk": {

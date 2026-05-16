@@ -40,18 +40,13 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.keyframe.event.CustomInstructionKeyframeEvent;
 import software.bernie.geckolib.core.object.PlayState;
 
 import java.util.Random;
 
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
-
-    public static final int SCREAM_COOLDOWN = 300;
-    public int screamCooldown = 0;
-
-    public static final EntityDataAccessor<Integer> SCREAM_START_TICK =
-        SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
     public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
@@ -97,25 +92,9 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public void tick() {
         super.tick();
 
-        screamCooldown = Math.max(0, screamCooldown - 1);
-
         // regenerate health over time
         if (this.getTarget() == null && this.tickCount % 60 == 0 && this.getHealth() < this.getMaxHealth()) {
             this.heal(1.0F);
-        }
-
-        if (this.level().isClientSide) {
-            int startTick = this.entityData.get(SCREAM_START_TICK);
-            if (startTick != -1) {
-                int elapsed = (int) (this.level().getGameTime() - startTick);
-                if (elapsed >= 0 && elapsed <= 10) {
-                    if (elapsed == 0 || elapsed == 5) {
-                        EntityUtil.screamParticles((ClientLevel) this.level(),
-                            new Vec3(getX(), getY() + 0.5, getZ()),
-                            this.getLookAngle());
-                    }
-                }
-            }
         }
     }
 
@@ -218,7 +197,9 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         controllers.add(new AnimationController<>(this, "spike throw", 0, state -> PlayState.STOP)
                 .triggerableAnim("spike throw", RawAnimation.begin().then("spike throw", Animation.LoopType.PLAY_ONCE)));
         controllers.add(new AnimationController<>(this, "scream", 0, state -> PlayState.STOP)
-                .triggerableAnim("scream", RawAnimation.begin().then("scream", Animation.LoopType.PLAY_ONCE)));
+                .triggerableAnim("scream", RawAnimation.begin().then("scream", Animation.LoopType.PLAY_ONCE))
+                .setCustomInstructionKeyframeHandler(ImpalerEntity::handleScreamKeyframe)
+        );
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> animationState) {
@@ -235,10 +216,17 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         return PlayState.CONTINUE;
     }
 
+    private static void handleScreamKeyframe(CustomInstructionKeyframeEvent<ImpalerEntity> event) {
+        ImpalerEntity impaler = event.getAnimatable();
+
+        EntityUtil.screamParticles((ClientLevel) impaler.level(),
+                new Vec3(impaler.getX(), impaler.getY() + 0.5, impaler.getZ()),
+                impaler.getLookAngle());
+    }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define(SCREAM_START_TICK, -1);
         entityData.define(TEXTURE, generateTextureType());
     }
 
@@ -274,16 +262,11 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("textureType", entityData.get(TEXTURE));
-        tag.putInt("screamCooldown", this.screamCooldown);
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.contains("screamCooldown")) {
-            this.screamCooldown = tag.getInt("screamCooldown");
-        }
-
         if (tag.contains("textureType")) {
             entityData.set(TEXTURE, tag.getInt("textureType"));
         } else {

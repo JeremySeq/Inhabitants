@@ -19,7 +19,12 @@ import static net.minecraft.world.level.block.PointedDripstoneBlock.TIP_DIRECTIO
 
 public class ImpalerScreamGoal extends Goal {
     private final ImpalerEntity mob;
-    private int screamTimer = 0;
+    private int timer = 0;
+
+    private static final int DURATION = 20;
+
+    private static final int COOLDOWN_TICKS = 300;
+    private long lastUsedTick = 0;
 
     private static final double dripRadius = 15.0d;
     private static final double dripHeight = 20.0d;
@@ -32,18 +37,18 @@ public class ImpalerScreamGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return mob.getTarget() != null && mob.screamCooldown == 0
+        return mob.getTarget() != null && mob.level().getGameTime() - lastUsedTick >= COOLDOWN_TICKS
                 && mob.getTarget().distanceToSqr(mob) <= 36 && mob.getTarget().distanceToSqr(mob) >= 16;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return screamTimer <= 20;
+        return timer <= DURATION;
     }
 
     @Override
     public void start() {
-        screamTimer = 0;
+        timer = 0;
         if (mob.getTarget() != null) {
             mob.lookAt(EntityAnchorArgument.Anchor.FEET, mob.getTarget().getPosition(0));
         }
@@ -53,25 +58,20 @@ public class ImpalerScreamGoal extends Goal {
 
     @Override
     public void stop() {
-        mob.screamCooldown = ImpalerEntity.SCREAM_COOLDOWN;
-        mob.getEntityData().set(ImpalerEntity.SCREAM_START_TICK, -1);
+        lastUsedTick = mob.level().getGameTime();
     }
 
     @Override
     public void tick() {
-        screamTimer++;
+        timer++;
 
         // make sure not moving during scream
         mob.getNavigation().stop();
         mob.setDeltaMovement(Vec3.ZERO);
 
-        if (screamTimer >= 6 && screamTimer <= 16) {
-            if (screamTimer == 6) {
-                // trigger client stuff
-                mob.getEntityData().set(ImpalerEntity.SCREAM_START_TICK, (int) mob.level().getGameTime());
-                
-                triggerDripstoneFall();
-            }
+        if (timer == 6) {
+            // trigger client stuff
+            triggerDripstoneFall();
         }
     }
 
