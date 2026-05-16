@@ -17,44 +17,39 @@ public class BulltoadBullfightGoal extends Goal {
 
     private final BulltoadEntity bulltoad;
     private BulltoadEntity rival;
-    private int cooldown = 0;
     private int faceTimer = 0;
     private boolean readyToLeap = false;
     private boolean hasLeaped = false;
     private boolean hasDealtDamage = false;
     private int leapWaitTimer = 0;
-    private static final int MAX_LEAP_WAIT = 60; // 3 seconds
+    private static final int MAX_LEAP_WAIT = 20*8; // 3 seconds
 
     public BulltoadBullfightGoal(BulltoadEntity bulltoad) {
         this.bulltoad = bulltoad;
         setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
+    private boolean canFight(BulltoadEntity bulltoad) {
+        return !bulltoad.isBaby()
+                && bulltoad.getTarget() == null
+                && bulltoad.hasHorns()
+                && bulltoad.bullfightCooldown == 0;
+    }
+
     @Override
     public boolean canUse() {
-        if (cooldown > 0) {
-            cooldown--;
-            return false;
-        }
-
-        if (bulltoad.isBaby() || bulltoad.getTarget() != null || !bulltoad.hasHorns()) return false;
+        if (!canFight(bulltoad)) return false;
 
         if (bulltoad.fightRival != null && bulltoad.fightRival.isAlive()) {
             rival = bulltoad.fightRival;
             return true;
         }
 
-        // random chance to bullfight
-        if (bulltoad.getRandom().nextInt(80) != 0) return false;
-
         List<BulltoadEntity> nearby = bulltoad.level().getEntitiesOfClass(
                 BulltoadEntity.class,
                 bulltoad.getBoundingBox().inflate(FIGHT_RANGE),
                 other -> other != bulltoad
-                        && !other.isBaby()
-                        && other.getTarget() == null
-                        && other.fightRival == null
-                        && other.hasHorns()
+                        && canFight(other)
         );
 
         if (nearby.isEmpty()) return false;
@@ -88,7 +83,7 @@ public class BulltoadBullfightGoal extends Goal {
     @Override
     public void stop() {
         bulltoad.getNavigation().stop();
-        cooldown = COOLDOWN_TICKS;
+        bulltoad.bullfightCooldown = COOLDOWN_TICKS;
         if (rival != null && rival.fightRival == bulltoad) {
             rival.fightRival = null;
         }

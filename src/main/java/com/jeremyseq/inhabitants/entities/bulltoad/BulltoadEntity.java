@@ -10,10 +10,7 @@ import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadJumpGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -78,6 +75,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     @Nullable
     public BulltoadEntity fightRival = null;
     public boolean fightReadyToLeap = false;
+    public int bullfightCooldown = 0;
 
     public BulltoadEntity(EntityType<? extends Animal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -227,6 +225,10 @@ public class BulltoadEntity extends Animal implements GeoEntity {
                     this.setHasHorns(true);
                     this.growHornsTicks = 0;
                 }
+            }
+
+            if (this.bullfightCooldown > 0) {
+                this.bullfightCooldown--;
             }
         }
     }
