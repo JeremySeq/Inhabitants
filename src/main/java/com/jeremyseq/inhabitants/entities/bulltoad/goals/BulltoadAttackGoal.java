@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class BulltoadAttackGoal extends Goal {
 
-    private static final double TONGUE_RANGE = 12;
+    private static final double TONGUE_RANGE = 7;
     private static final double TONGUE_RANGE_SQ = TONGUE_RANGE * TONGUE_RANGE;
     private static final int FACE_TICKS = 10;
     private static final int STRIKE_TICKS = 2;
