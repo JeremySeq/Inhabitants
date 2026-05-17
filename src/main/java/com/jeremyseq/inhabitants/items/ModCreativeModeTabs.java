@@ -26,6 +26,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
+                        pOutput.accept(ModItems.BULLTOAD_SPAWN_EGG.get());
 
                         // mob drops / materials
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
@@ -47,7 +48,6 @@ public class ModCreativeModeTabs {
                         // decorative
                         pOutput.accept(ModItems.IMPALER_HEAD.get());
                         pOutput.accept(ModItems.DRIPSTONE_IMPALER_HEAD.get());
-                        pOutput.accept(ModItems.BULLTOAD_SPAWN_EGG.get());
 
                         // misc special items
                         pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
