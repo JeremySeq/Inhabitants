@@ -99,7 +99,16 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new BulltoadAttackGoal(this));
         this.goalSelector.addGoal(2, new BulltoadBreedGoal(this, 1.0D));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class,
+        this.goalSelector.addGoal(4, new TemptGoal(this, 1f, TEMPTATION_ITEM, false));
+        this.goalSelector.addGoal(5, new BulltoadBullfightGoal(this));
+        this.goalSelector.addGoal(7, new BulltoadJumpGoal(this));
+        this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+
+        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 30f, 1));
+        this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
+
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class,
                 10, true, false,
                 (entity) -> {
                     if (this.isBaby()) return false;
@@ -111,17 +120,9 @@ public class BulltoadEntity extends Animal implements GeoEntity {
                                     && baby.tickCount - baby.getLastHurtByMobTimestamp() < 100
                     ).isEmpty();
                 }));
-        this.goalSelector.addGoal(4, new TemptGoal(this, 1f, TEMPTATION_ITEM, false));
-        this.goalSelector.addGoal(5, new BulltoadBullfightGoal(this));
-        this.goalSelector.addGoal(7, new BulltoadJumpGoal(this));
-        this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-
-        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 30f, 1));
-        this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
-
-        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class,
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class,
                 10, true, false, (entity) -> this.getBreedStage() > 0));
+
     }
 
     @Override
