@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "inhabitants:bulltoad_horn" }
+  ],
+  "result": {
+    "item": "minecraft:bone_meal",
+    "count": 4
+  }
+}
