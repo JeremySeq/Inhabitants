@@ -3,10 +3,7 @@ package com.jeremyseq.inhabitants.entities.bulltoad;
 import com.jeremyseq.inhabitants.debug.DefaultDebugRenderer;
 import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.entities.ModEntities;
-import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadAttackGoal;
-import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadBreedGoal;
-import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadBullfightGoal;
-import com.jeremyseq.inhabitants.entities.bulltoad.goals.BulltoadJumpGoal;
+import com.jeremyseq.inhabitants.entities.bulltoad.goals.*;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -65,6 +62,12 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     private static final String HAS_HORNS_KEY = "HasHorns";
     private static final String GROW_HORNS_TICKS_KEY = "GrowHornsTicks";
 
+    public static final double TONGUE_RANGE = 7;
+
+    // used for attack and eat goals
+    public static final int FACE_TICKS = 10;
+    public static final int STRIKE_TICKS = 2;
+
     private int breedTicks = 0;
     private static final int TICKS_PER_BREED_STAGE = 600; // 30 seconds per stage
 
@@ -99,6 +102,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new BulltoadAttackGoal(this));
         this.goalSelector.addGoal(2, new BulltoadBreedGoal(this, 1.0D));
+        this.goalSelector.addGoal(3, new BulltoadEatSlimeGoal(this));
         this.goalSelector.addGoal(4, new TemptGoal(this, 1f, TEMPTATION_ITEM, false));
         this.goalSelector.addGoal(5, new BulltoadBullfightGoal(this));
         this.goalSelector.addGoal(7, new BulltoadJumpGoal(this));

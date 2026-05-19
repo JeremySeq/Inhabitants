@@ -11,11 +11,6 @@ import java.util.Objects;
 
 public class BulltoadAttackGoal extends Goal {
 
-    private static final double TONGUE_RANGE = 7;
-    private static final double TONGUE_RANGE_SQ = TONGUE_RANGE * TONGUE_RANGE;
-    private static final int FACE_TICKS = 10;
-    private static final int STRIKE_TICKS = 2;
-
     private final BulltoadEntity bulltoad;
     private LivingEntity target;
 
@@ -65,7 +60,7 @@ public class BulltoadAttackGoal extends Goal {
                 bulltoad.getNavigation().moveTo(target, 1.2);
                 bulltoad.getLookControl().setLookAt(target);
 
-                if (distSq <= TONGUE_RANGE_SQ) {
+                if (distSq <= BulltoadEntity.TONGUE_RANGE * BulltoadEntity.TONGUE_RANGE) {
                     bulltoad.getNavigation().stop();
                     phase = Phase.FACE;
                     phaseTimer = 0;
@@ -78,12 +73,12 @@ public class BulltoadAttackGoal extends Goal {
                 this.bulltoad.setSnapYaw(true);
                 phaseTimer++;
 
-                if (distSq > TONGUE_RANGE_SQ) {
+                if (distSq > BulltoadEntity.TONGUE_RANGE * BulltoadEntity.TONGUE_RANGE) {
                     phase = Phase.CHASE;
                     return;
                 }
 
-                if (phaseTimer >= FACE_TICKS) {
+                if (phaseTimer >= BulltoadEntity.FACE_TICKS) {
                     bulltoad.setTongueTarget(target.getEyePosition());
                     phase = Phase.STRIKE;
                     phaseTimer = 0;
@@ -103,7 +98,7 @@ public class BulltoadAttackGoal extends Goal {
 
                 phaseTimer++;
 
-                if (phaseTimer >= STRIKE_TICKS) {
+                if (phaseTimer >= BulltoadEntity.STRIKE_TICKS) {
                     bulltoad.clearTongueTarget();
                     phase = Phase.RETRACT;
                     phaseTimer = 0;
