@@ -63,6 +63,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     private static final String GROW_HORNS_TICKS_KEY = "GrowHornsTicks";
 
     public static final double TONGUE_RANGE = 7;
+    private boolean wasTongueOut = false;
 
     // used for attack and eat goals
     public static final int FACE_TICKS = 10;
@@ -140,6 +141,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         controllers.add(new AnimationController<>(this, "jump", 0, this::jumpPredicate));
         controllers.add(new AnimationController<>(this, "croaking", 0, state -> PlayState.STOP)
                 .triggerableAnim("croaking", RawAnimation.begin().then("croaking", Animation.LoopType.PLAY_ONCE)));
+        controllers.add(new AnimationController<>(this, "mouth", 0, this::mouthPredicate));
     }
 
     private <T extends GeoAnimatable> PlayState jumpPredicate(AnimationState<T> state) {
@@ -148,6 +150,31 @@ public class BulltoadEntity extends Animal implements GeoEntity {
             controller.setAnimation(RawAnimation.begin().then("jumping", Animation.LoopType.HOLD_ON_LAST_FRAME));
             return PlayState.CONTINUE;
         }
+        return PlayState.STOP;
+    }
+
+    private <T extends GeoAnimatable> PlayState mouthPredicate(AnimationState<T> state) {
+        // just opened, play opening animation
+        if (isTongueOut() && !wasTongueOut) {
+            state.getController().setAnimation(RawAnimation.begin()
+                    .then("mouth_opening", Animation.LoopType.PLAY_ONCE)
+                    .then("mouth_open", Animation.LoopType.HOLD_ON_LAST_FRAME));
+            wasTongueOut = true;
+            return PlayState.CONTINUE;
+        }
+
+        // just closed, play closing animation
+        if (!isTongueOut() && wasTongueOut) {
+            state.getController().setAnimation(RawAnimation.begin()
+                    .then("mouth_closing", Animation.LoopType.PLAY_ONCE));
+            wasTongueOut = false;
+            return PlayState.CONTINUE;
+        }
+
+        if (isTongueOut()) {
+            return PlayState.CONTINUE;
+        }
+
         return PlayState.STOP;
     }
 
