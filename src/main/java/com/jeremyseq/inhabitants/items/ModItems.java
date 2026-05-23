@@ -79,6 +79,9 @@ public class ModItems {
             new Item.Properties().rarity(Rarity.UNCOMMON),
             Direction.DOWN));
 
+    public static final RegistryObject<Item> CONCUSSION_ARROW = ITEMS.register("concussion_arrow",
+            () -> new ConcussionArrowItem(new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
