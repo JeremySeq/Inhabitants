@@ -25,6 +25,7 @@
   "item.inhabitants.spike_drill": "Spike Drill",
   "item.inhabitants.impaler_head": "Impaler Head",
   "item.inhabitants.dripstone_impaler_head": "Dripstone Impaler Head",
+  "item.inhabitants.concussion_arrow": "Concussion Arrow",
 
   "block.inhabitants.impaler_head": "Impaler Head",
   "block.inhabitants.dripstone_impaler_head": "Dripstone Impaler Head",
@@ -41,6 +42,12 @@
   "effect.inhabitants.sticky_legs": "Sticky Legs",
   "effect.inhabitants.reverse_growth": "Reverse Growth",
   "effect.inhabitants.immaterial": "Immaterial",
+
+  "item.minecraft.tipped_arrow.effect.concussion": "Tipped Arrow of Concussion",
+  "item.minecraft.potion.effect.concussion": "Potion of Concussion",
+  "item.minecraft.splash_potion.effect.concussion": "Splash Potion of Concussion",
+  "item.minecraft.lingering_potion.effect.concussion": "Lingering Potion of Concussion",
+
 
   "advancement.inhabitants.david_and_goliath.title": "David and Goliath",
   "advancement.inhabitants.david_and_goliath.description": "Defeat the mighty Bogre.",

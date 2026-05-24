@@ -4,9 +4,11 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.enchantments.ModEnchantments;
 import com.jeremyseq.inhabitants.paintings.ModPaintings;
 
+import com.jeremyseq.inhabitants.potions.ModPotions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.*;
 
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -34,6 +36,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.GIANT_BONE.get());
                         pOutput.accept(ModItems.JAVELIN.get());
                         pOutput.accept(ModItems.SPIKE_DRILL.get());
+                        pOutput.accept(ModItems.CONCUSSION_ARROW.get());
 
                         // food
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
@@ -48,6 +51,11 @@ public class ModCreativeModeTabs {
 
                         // misc special items
                         pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
+
+                        // potions
+                        pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.CONCUSSION_POTION.get()));
+                        pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), ModPotions.CONCUSSION_POTION.get()));
+                        pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.LINGERING_POTION), ModPotions.CONCUSSION_POTION.get()));
 
                         // enchantments
                         addEnchantedBook(ModEnchantments.DIAMOND_TIP.get(), 1, pOutput);
