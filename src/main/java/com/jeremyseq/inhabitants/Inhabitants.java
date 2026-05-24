@@ -5,8 +5,8 @@ import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.debug.DebugCommands;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
+import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowDispenserBehavior;
 import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowRenderer;
-import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
 import com.jeremyseq.inhabitants.items.*;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
@@ -90,8 +90,8 @@ public class Inhabitants
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         event.enqueueWork(() -> {
-            DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(),
-            new ImpalerSpikeDispenserBehavior());
+            DispenserBlock.registerBehavior(ModItems.CONCUSSION_ARROW.get(),
+            new ConcussionArrowDispenserBehavior());
         });
     }
 

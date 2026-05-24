@@ -1,4 +1,4 @@
-package com.jeremyseq.inhabitants.entities.impaler.spike;
+package com.jeremyseq.inhabitants.entities.impaler.arrow;
 
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import net.minecraft.core.BlockSource;
@@ -11,14 +11,14 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class ImpalerSpikeDispenserBehavior extends DefaultDispenseItemBehavior {
+public class ConcussionArrowDispenserBehavior extends DefaultDispenseItemBehavior {
     @Override
     protected @NotNull ItemStack execute(@NotNull BlockSource source, @NotNull ItemStack stack) {
         Level level = source.getLevel();
         Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
 
         // Construct the entity properly using the registry object
-        ImpalerSpikeProjectile entity = ModEntities.IMPALER_SPIKE_PROJECTILE.get()
+        ConcussionArrowProjectile entity = ModEntities.CONCUSSION_ARROW_PROJECTILE.get()
                 .create(level);
 
         if (entity != null) {

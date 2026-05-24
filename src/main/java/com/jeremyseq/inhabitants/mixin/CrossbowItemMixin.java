@@ -1,7 +1,6 @@
 package com.jeremyseq.inhabitants.mixin;
 
-import com.jeremyseq.inhabitants.entities.ModEntities;
-import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
+import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowProjectile;
 import com.jeremyseq.inhabitants.items.ModItems;
 
 import net.minecraft.sounds.SoundEvents;
@@ -41,12 +40,11 @@ public abstract class CrossbowItemMixin {
         InteractionHand pHand, ItemStack pCrossbowStack, ItemStack pAmmoStack,
         float pSoundPitch, boolean pIsCreativeMode, float pVelocity, float pInaccuracy,
         float pProjectileAngle, CallbackInfo ci) {
-        if (pAmmoStack.is(ModItems.IMPALER_SPIKE.get())) {
+        if (pAmmoStack.is(ModItems.CONCUSSION_ARROW.get())) {
 
             // shoot impaler spike
             if (!pLevel.isClientSide) {
-                ImpalerSpikeProjectile spike = new ImpalerSpikeProjectile(
-                    ModEntities.IMPALER_SPIKE_PROJECTILE.get(), pShooter, pLevel);
+                ConcussionArrowProjectile spike = new ConcussionArrowProjectile(pLevel, pShooter);
 
                 Vec3 vec31 = pShooter.getUpVector(1.0F);
                 
@@ -90,7 +88,7 @@ public abstract class CrossbowItemMixin {
         cancellable = true
     )
     private void inhabitants$getAllSupportedProjectiles(CallbackInfoReturnable<Predicate<ItemStack>> cir) {
-        cir.setReturnValue(ProjectileWeaponItem.ARROW_ONLY.or((item) -> item.is(ModItems.IMPALER_SPIKE.get())));
+        cir.setReturnValue(ProjectileWeaponItem.ARROW_ONLY.or((item) -> item.is(ModItems.CONCUSSION_ARROW.get())));
         cir.cancel();
     }
 
@@ -101,7 +99,7 @@ public abstract class CrossbowItemMixin {
     )
     private static void inhabitants$loadProjectile(LivingEntity pShooter, ItemStack pCrossbowStack, CallbackInfoReturnable<Boolean> cir) {
         ItemStack projectileStack = pShooter.getProjectile(pCrossbowStack);
-        if (!projectileStack.is(ModItems.IMPALER_SPIKE.get())) return;
+        if (!projectileStack.is(ModItems.CONCUSSION_ARROW.get())) return;
 
         int multishotLevel = pCrossbowStack.getEnchantmentLevel(Enchantments.MULTISHOT);
         int projectileCount = multishotLevel == 0 ? 1 : 3;
@@ -115,7 +113,7 @@ public abstract class CrossbowItemMixin {
             }
 
             if (projectileStack.isEmpty() && isCreative) {
-                projectileStack = new ItemStack(ModItems.IMPALER_SPIKE.get());
+                projectileStack = new ItemStack(ModItems.CONCUSSION_ARROW.get());
                 original = projectileStack.copy();
             }
 
