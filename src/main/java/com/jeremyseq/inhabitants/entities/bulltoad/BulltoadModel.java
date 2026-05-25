@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class BulltoadModel extends GeoModel<BulltoadEntity> {
     private final Map<Integer, Float> tongueScales = new HashMap<>();
+    private final Map<Integer, Float> tiltAngles = new HashMap<>();
 
     @Override
     public ResourceLocation getModelResource(BulltoadEntity animatable) {
@@ -52,6 +53,15 @@ public class BulltoadModel extends GeoModel<BulltoadEntity> {
                 head.setRotX(entityData.headPitch() * Mth.DEG_TO_RAD);
                 head.setRotY(entityData.netHeadYaw() * Mth.DEG_TO_RAD);
             }
+        }
+
+        CoreGeoBone root = getAnimationProcessor().getBone("Bulltoad");
+        if (root != null) {
+            float targetTilt = animatable.isBullfightJumping() ? (float) Math.toRadians(-30f) : 0f;
+            float currentTilt = tiltAngles.getOrDefault(animatable.getId(), 0f);
+            currentTilt += (targetTilt - currentTilt) * 0.2f;
+            tiltAngles.put(animatable.getId(), currentTilt);
+            root.setRotX(currentTilt);
         }
 
         CoreGeoBone tongue = getAnimationProcessor().getBone("tongue");

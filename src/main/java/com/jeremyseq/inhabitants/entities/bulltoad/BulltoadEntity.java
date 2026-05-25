@@ -51,6 +51,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
     public static final EntityDataAccessor<Boolean> TONGUE_OUT = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Vector3f> TONGUE_LENGTH = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.VECTOR3);
     public static final EntityDataAccessor<Boolean> SNAP_YAW = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> BULLFIGHT_JUMPING = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static final EntityDataAccessor<Boolean> HAS_HORNS = SynchedEntityData.defineId(BulltoadEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -213,6 +214,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         entityData.define(TONGUE_LENGTH, new Vector3f(0, 0, 0));
         entityData.define(SNAP_YAW, false);
         entityData.define(HAS_HORNS, true);
+        entityData.define(BULLFIGHT_JUMPING, false);
     }
 
     @Override
@@ -369,6 +371,14 @@ public class BulltoadEntity extends Animal implements GeoEntity {
 
     private void setHasHorns(boolean horns) {
         this.entityData.set(HAS_HORNS, horns);
+    }
+
+    public void setBullfightJumping(boolean jumping) {
+        this.entityData.set(BULLFIGHT_JUMPING, jumping);
+    }
+
+    public boolean isBullfightJumping() {
+        return this.entityData.get(BULLFIGHT_JUMPING);
     }
 
     /**

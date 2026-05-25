@@ -10,19 +10,18 @@ import java.util.List;
 public class BulltoadBullfightGoal extends Goal {
 
     private static final double FIGHT_RANGE = 20;
-    private static final double LEAP_RANGE = 6;
+    private static final double LEAP_RANGE = 6; // bulltoad will target within 2 blocks of this range
     private static final double HIT_RANGE = 2.5;
-    private static final int COOLDOWN_TICKS = 20*60;
-    private static final int FACE_TICKS = 30; // both wait this long before jumping
+    private static final int COOLDOWN_TICKS = 20 * 60;
+    private static final int FACE_TICKS = 30;
 
     private final BulltoadEntity bulltoad;
-    private BulltoadEntity rival;
     private int faceTimer = 0;
     private boolean readyToLeap = false;
     private boolean hasLeaped = false;
     private boolean hasDealtDamage = false;
     private int leapWaitTimer = 0;
-    private static final int MAX_LEAP_WAIT = 20*8; // 3 seconds
+    private static final int MAX_LEAP_WAIT = 20 * 8;
 
     public BulltoadBullfightGoal(BulltoadEntity bulltoad) {
         this.bulltoad = bulltoad;
@@ -33,42 +32,49 @@ public class BulltoadBullfightGoal extends Goal {
         return !bulltoad.isBaby()
                 && bulltoad.getTarget() == null
                 && bulltoad.hasHorns()
-                && bulltoad.bullfightCooldown == 0;
+                && bulltoad.bullfightCooldown == 0
+                && bulltoad.fightRival == null;
     }
 
     @Override
     public boolean canUse() {
-        if (!canFight(bulltoad)) return false;
-
         if (bulltoad.fightRival != null && bulltoad.fightRival.isAlive()) {
-            rival = bulltoad.fightRival;
             return true;
         }
+
+        if (!canFight(bulltoad)) return false;
 
         List<BulltoadEntity> nearby = bulltoad.level().getEntitiesOfClass(
                 BulltoadEntity.class,
                 bulltoad.getBoundingBox().inflate(FIGHT_RANGE),
-                other -> other != bulltoad
-                        && canFight(other)
+                other -> other != bulltoad && canFight(other)
         );
 
         if (nearby.isEmpty()) return false;
 
-        rival = nearby.stream()
+        // find the nearest bulltoad that doesn't already have a rival
+        BulltoadEntity nearest = nearby.stream()
+                .filter(other -> other.fightRival == null)
                 .min(java.util.Comparator.comparingDouble(bulltoad::distanceToSqr))
                 .orElse(null);
 
-        bulltoad.fightRival = rival;
-        rival.fightRival = bulltoad;
-        return true;
+        if (nearest != null) {
+            bulltoad.fightRival = nearest;
+            nearest.fightRival = bulltoad;
+            return true;
+        }
+
+        return false;
     }
+
 
     @Override
     public boolean canContinueToUse() {
-        return rival != null
-                && rival.isAlive()
-                && bulltoad.distanceToSqr(rival) < FIGHT_RANGE * FIGHT_RANGE
-                && bulltoad.getTarget() == null;
+        return bulltoad.fightRival != null
+                && bulltoad.fightRival.isAlive()
+                && bulltoad.distanceToSqr(bulltoad.fightRival) < FIGHT_RANGE * FIGHT_RANGE
+                && bulltoad.getTarget() == null
+                && bulltoad.fightRival.fightRival == bulltoad;
     }
 
     @Override
@@ -83,42 +89,49 @@ public class BulltoadBullfightGoal extends Goal {
     @Override
     public void stop() {
         bulltoad.getNavigation().stop();
-        bulltoad.bullfightCooldown = COOLDOWN_TICKS;
-        if (rival != null && rival.fightRival == bulltoad) {
-            rival.fightRival = null;
+        if (bulltoad.fightRival != null && bulltoad.fightRival.fightRival == bulltoad) {
+            bulltoad.fightRival.fightRival = null;
         }
         bulltoad.fightRival = null;
-        rival = null;
         bulltoad.fightReadyToLeap = false;
+        bulltoad.setBullfightJumping(false);
+        bulltoad.bullfightCooldown = COOLDOWN_TICKS;
     }
 
     @Override
     public void tick() {
+        BulltoadEntity rival = bulltoad.fightRival;
+        if (rival == null) { stop(); return; }
+
         double distSq = bulltoad.distanceToSqr(rival);
 
         if (!hasLeaped) {
             if (!readyToLeap) {
-                // phase 1: walk toward rival until in leap range
-                bulltoad.getNavigation().moveTo(rival, 1.4);
-                bulltoad.getLookControl().setLookAt(rival);
+                double dist = Math.sqrt(distSq);
 
-                if (distSq < LEAP_RANGE * LEAP_RANGE) {
-                    // in range, stop moving and start face countdown
+                if (dist > LEAP_RANGE+1) {
+                    bulltoad.getNavigation().moveTo(rival, 1.4);
+                    bulltoad.getLookControl().setLookAt(rival);
+                    faceTimer = 0;
+                } else if (dist < LEAP_RANGE-1) {
+                    Vec3 awayDir = bulltoad.position().subtract(rival.position()).normalize();
+                    Vec3 backTarget = bulltoad.position().add(awayDir.scale(2.0));
+                    bulltoad.getNavigation().moveTo(backTarget.x, backTarget.y, backTarget.z, 1.4);
+                    bulltoad.getLookControl().setLookAt(rival);
+                    faceTimer = 0;
+                } else {
                     bulltoad.getNavigation().stop();
                     bulltoad.snapToFaceTargetEntity(rival);
                     faceTimer++;
 
-                    // mark self ready, wait for rival to be ready
                     if (faceTimer >= FACE_TICKS) {
                         readyToLeap = true;
                         bulltoad.fightReadyToLeap = true;
                     }
                 }
             } else {
-                // phase 2: ready, leap only when rival is also ready
                 bulltoad.snapToFaceTargetEntity(rival);
-                boolean rivalReady = rival.fightRival == bulltoad
-                        && rival.isFightReadyToLeap();
+                boolean rivalReady = rival.fightRival == bulltoad && rival.isFightReadyToLeap();
 
                 if (rivalReady && bulltoad.onGround()) {
                     Vec3 leapDir = rival.position().subtract(bulltoad.position()).normalize();
@@ -132,8 +145,8 @@ public class BulltoadBullfightGoal extends Goal {
                 }
             }
         } else {
-            // phase 3: airborne, deal damage on contact
             if (!hasDealtDamage && distSq < HIT_RANGE * HIT_RANGE) {
+                bulltoad.setBullfightJumping(true);
                 rival.hurt(bulltoad.damageSources().mobAttack(bulltoad), 4.0f);
                 Vec3 knockDir = rival.position().subtract(bulltoad.position()).normalize();
                 rival.setDeltaMovement(knockDir.x * 1.2, 0.4, knockDir.z * 1.2);
@@ -143,13 +156,13 @@ public class BulltoadBullfightGoal extends Goal {
                 rival.setLastHurtByMob(null);
                 rival.setTarget(null);
 
-                // if bulltoad has horns, remove rival's
                 if (bulltoad.hasHorns()) {
                     rival.dropHorns();
                 }
             }
 
             if (bulltoad.onGround()) {
+                bulltoad.setBullfightJumping(false);
                 stop();
             }
         }
