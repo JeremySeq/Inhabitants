@@ -31,7 +31,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.particles.ParticleTypes;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;

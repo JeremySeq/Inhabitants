@@ -7,6 +7,8 @@ import net.minecraft.client.Minecraft;
  * soo.. maybe i'll try to make this more like CSS
  * may be i'll be wrong, but i'm trying okay ?
  * sanks
+ *
+ * a truly noble goal
  */
 public class GuiLayout {
     public int x, y, width, height, zIndex;
