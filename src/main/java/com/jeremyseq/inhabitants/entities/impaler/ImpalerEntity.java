@@ -9,10 +9,13 @@ import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.DifficultyInstance;
@@ -31,9 +34,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -243,15 +248,27 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     }
 
     private int generateTextureType() {
+        // 5% chance to spawn with albino texture, otherwise default texture
+        if (this.random.nextFloat() < 0.05f) {
+            return 2;
+        }
+
         if (this.level().getBiome(this.blockPosition()).is(Biomes.DRIPSTONE_CAVES)) {
             return 1;
-        } else {
-            // 5% chance to spawn with albino texture, otherwise default texture
-            if (this.random.nextFloat() < 0.05f) {
-                return 2;
-            }
-            return 0;
         }
+
+        // alex's caves forlorn hollows compat
+        if (ModList.get().isLoaded("alexscaves")) {
+            ResourceKey<Biome> FORLORN_HOLLOW_BIOME =
+                    ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("alexscaves", "forlorn_hollows"));
+
+            if (this.level().getBiome(this.blockPosition()).is(FORLORN_HOLLOW_BIOME)) {
+                return 3;
+            }
+        }
+
+        // basic ahh impaler
+        return 0;
     }
 
     public int getTextureType() {
