@@ -24,8 +24,6 @@ import java.util.UUID;
  * 
  * This goal is responsible for managing the attack sequence of the Bogre, 
  * including the roar, chase, and attack phases.
- * 
- * @jeremy should we change the name to BogreAggressiveGoal?
  */
 public class BogreAttackGoal extends Goal {
 

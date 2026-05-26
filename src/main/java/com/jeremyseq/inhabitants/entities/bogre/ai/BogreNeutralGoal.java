@@ -1,7 +1,6 @@
 package com.jeremyseq.inhabitants.entities.bogre.ai;
 
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
 
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
