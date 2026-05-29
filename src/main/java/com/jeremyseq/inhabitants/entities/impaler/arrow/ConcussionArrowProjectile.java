@@ -11,10 +11,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
 
-public class ConcussionArrowProjectile extends AbstractArrow {
-    public ConcussionArrowProjectile(EntityType<? extends ConcussionArrowProjectile> entityType, Level level) {
+public class ConcussionArrowProjectile extends AbstractArrow implements GeoEntity {
+    private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+
+    public ConcussionArrowProjectile(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+    }
+
+    public ConcussionArrowProjectile(Level pLevel, LivingEntity pShooter) {
+        super(ModEntities.CONCUSSION_ARROW_PROJECTILE.get(), pShooter, pLevel);
     }
 
     @Override
@@ -25,12 +35,18 @@ public class ConcussionArrowProjectile extends AbstractArrow {
         }
     }
 
-    public ConcussionArrowProjectile(Level pLevel, LivingEntity pShooter) {
-        super(ModEntities.CONCUSSION_ARROW_PROJECTILE.get(), pShooter, pLevel);
-    }
-
     @Override
     public @NotNull ItemStack getPickupItem() {
         return ModItems.CONCUSSION_ARROW.get().getDefaultInstance();
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }
