@@ -26,7 +26,7 @@ public class ConcussionArrowProjectile extends AbstractArrow {
     protected void onHitEntity(@NotNull EntityHitResult pResult) {
         super.onHitEntity(pResult);
         if (pResult.getEntity() instanceof LivingEntity livingEntity) {
-            livingEntity.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 200));
+            livingEntity.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 6*20));
         }
     }
 
