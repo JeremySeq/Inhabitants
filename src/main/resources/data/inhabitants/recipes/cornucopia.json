@@ -3,13 +3,13 @@
   "ingredients": [
     { "item": "inhabitants:bulltoad_horn" },
     { "item": "minecraft:golden_apple" },
-    { "item": "minecraft:pumpkin_pie" },
-    { "item": "minecraft:cooked_beef" },
-    { "item": "minecraft:bread" },
+    { "item": "minecraft:chorus_fruit" },
     { "item": "minecraft:carrot" },
+    { "item": "minecraft:sweet_berries" },
+    { "item": "minecraft:golden_carrot" },
     { "item": "minecraft:apple" },
-    { "item": "minecraft:cooked_chicken" },
-    { "item": "minecraft:potato" }
+    { "item": "minecraft:melon_slice" },
+    { "item": "minecraft:glow_berries" }
   ],
   "result": {
     "item": "inhabitants:cornucopia",
