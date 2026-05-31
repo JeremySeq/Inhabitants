@@ -276,7 +276,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
 
     @Override
     protected int calculateFallDamage(float pFallDistance, float pDamageMultiplier) {
-        return super.calculateFallDamage(pFallDistance, pDamageMultiplier) - 5;
+        return super.calculateFallDamage(pFallDistance, pDamageMultiplier) - 10;
     }
 
     @Override
