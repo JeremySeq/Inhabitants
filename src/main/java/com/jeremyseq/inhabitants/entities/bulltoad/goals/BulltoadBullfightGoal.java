@@ -44,6 +44,9 @@ public class BulltoadBullfightGoal extends Goal {
 
         if (!canFight(bulltoad)) return false;
 
+        // rarity
+        if (bulltoad.getRandom().nextInt(1200) != 0) return false;
+
         List<BulltoadEntity> nearby = bulltoad.level().getEntitiesOfClass(
                 BulltoadEntity.class,
                 bulltoad.getBoundingBox().inflate(FIGHT_RANGE),
