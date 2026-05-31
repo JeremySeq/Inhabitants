@@ -1,7 +1,5 @@
 package com.jeremyseq.inhabitants.gui.components;
 
-import com.jeremyseq.inhabitants.Inhabitants;
-
 import net.minecraft.client.gui.GuiGraphics;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.resources.ResourceLocation;

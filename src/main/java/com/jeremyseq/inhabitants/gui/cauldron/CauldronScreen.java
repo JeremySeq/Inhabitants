@@ -23,8 +23,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.jetbrains.annotations.NotNull;
 
-import org.lwjgl.glfw.GLFW;
-
 public class CauldronScreen extends AbstractContainerScreen<CauldronMenu> {
     private final CauldronRecipeBook recipeBookComponent = new CauldronRecipeBook();
     private boolean widthTooNarrow;

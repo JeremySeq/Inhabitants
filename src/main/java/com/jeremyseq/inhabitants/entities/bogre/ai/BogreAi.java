@@ -4,8 +4,6 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
 import com.jeremyseq.inhabitants.entities.bogre.skill.*;
 import com.jeremyseq.inhabitants.recipe.*;
-import com.jeremyseq.inhabitants.items.ModItems;
-import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.core.BlockPos;
@@ -13,16 +11,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.sounds.SoundEvents;
 
 import java.util.*;
 
 /**
  * The brain of the bogre.
- * 
- * @jeremy should we name it bogreBrain.java ?
  */
 
 public class BogreAi {
