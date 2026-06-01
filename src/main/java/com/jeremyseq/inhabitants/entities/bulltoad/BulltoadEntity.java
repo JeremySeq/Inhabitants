@@ -5,8 +5,11 @@ import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.bulltoad.goals.*;
 import com.jeremyseq.inhabitants.items.ModItems;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -14,6 +17,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,6 +30,9 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.Node;
+import net.minecraft.world.level.pathfinder.PathFinder;
+import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -88,6 +96,7 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         super(pEntityType, pLevel);
         this.setPathfindingMalus(BlockPathTypes.WATER, -2f);
         this.setPathfindingMalus(BlockPathTypes.LAVA, -2f);
+        this.moveControl = new BulltoadMoveControl(this);
     }
 
     public static AttributeSupplier setAttributes() {
@@ -107,7 +116,6 @@ public class BulltoadEntity extends Animal implements GeoEntity {
         this.goalSelector.addGoal(3, new BulltoadEatSlimeGoal(this));
         this.goalSelector.addGoal(4, new TemptGoal(this, 1f, TEMPTATION_ITEM, false));
         this.goalSelector.addGoal(5, new BulltoadBullfightGoal(this));
-        this.goalSelector.addGoal(7, new BulltoadJumpGoal(this));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
 
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 30f, 1));
