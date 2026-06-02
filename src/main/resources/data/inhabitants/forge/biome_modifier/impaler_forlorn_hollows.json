@@ -1,0 +1,11 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": "alexscaves:forlorn_hollows",
+  "spawners":
+  {
+    "type": "inhabitants:impaler",
+    "weight": 40,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}
