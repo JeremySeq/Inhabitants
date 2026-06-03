@@ -21,6 +21,7 @@ public class WarpedClamItem extends Item {
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
+
         if (!level.isClientSide) {
             Player player = context.getPlayer();
             BlockPos clickedPos = context.getClickedPos();
@@ -40,10 +41,18 @@ public class WarpedClamItem extends Item {
             clam.setDir(direction);
             clam.updateRot();
 
-            if (itemStack.getTag() != null && itemStack.getTag().contains("has_pearl")) {
-                clam.setHasPearl(itemStack.getTag().getBoolean("has_pearl"));
-            } else {
-                clam.setHasPearl(false);
+            if (itemStack.getTag() != null) {
+                if (itemStack.getTag().contains("has_pearl")) {
+                    clam.setHasPearl(itemStack.getTag().getBoolean("has_pearl"));
+                } else {
+                    clam.setHasPearl(false);
+                }
+
+                if (itemStack.getTag().contains("variant")) {
+                    clam.setVariant(itemStack.getTag().getInt("variant"));
+                } else {
+                    clam.setVariant(WarpedClamEntity.Variant.ENDER);
+                }
             }
 
             level.addFreshEntity(clam);

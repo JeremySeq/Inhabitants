@@ -31,7 +31,6 @@ import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadRenderer;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.server.level.ServerPlayer;
@@ -125,6 +124,14 @@ public class Inhabitants
                 CauldronScreen::new);
                 ModPotions.registerBrewingRecipes();
             });
+
+            ItemProperties.register(ModItems.WARPED_CLAM_ITEM.get(),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "variant"), (stack, level, entity, seed) -> {
+                        if (stack.hasTag() && stack.getTag().contains("variant")) {
+                            return (float) stack.getTag().getInt("variant");
+                        }
+                        return 0.0f;
+                    });
 
             ItemProperties.register(ModItems.JAVELIN.get(),
                 ResourceLocation.fromNamespaceAndPath(MODID, "aiming"), (stack, level, entity, seed) -> {
