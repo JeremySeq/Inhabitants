@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants;
 
 import com.jeremyseq.inhabitants.blocks.entity.ModBlockEntities;
+import com.jeremyseq.inhabitants.compat.ModBiomeModifiers;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.debug.DebugCommands;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
@@ -80,6 +81,7 @@ public class Inhabitants
         ModSoundEvents.register(modEventBus);
         ModNetworking.register();
         ModPaintings.register(modEventBus);
+        ModBiomeModifiers.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(DebugCommands.class);
