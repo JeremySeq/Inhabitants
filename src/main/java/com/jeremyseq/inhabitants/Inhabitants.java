@@ -126,15 +126,6 @@ public class Inhabitants
                 ModPotions.registerBrewingRecipes();
             });
 
-            ItemProperties.register(Items.CROSSBOW, ResourceLocation.fromNamespaceAndPath(MODID,"spike_loaded"), (stack, level, entity, seed) -> {
-                if (stack.getItem() instanceof CrossbowItem && CrossbowItem.isCharged(stack)) {
-                    if (CrossbowItem.containsChargedProjectile(stack, ModItems.IMPALER_SPIKE.get())) {
-                        return 1.0F;
-                    }
-                }
-                return 0.0F;
-            });
-
             ItemProperties.register(ModItems.JAVELIN.get(),
                 ResourceLocation.fromNamespaceAndPath(MODID, "aiming"), (stack, level, entity, seed) -> {
                     return entity != null &&
