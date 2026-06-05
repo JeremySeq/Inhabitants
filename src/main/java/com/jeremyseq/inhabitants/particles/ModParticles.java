@@ -21,8 +21,18 @@ public class ModParticles {
     public static final RegistryObject<SimpleParticleType> WARPED_CLAM_PEARL_AMBIENCE =
             PARTICLES.register("warped_clam_pearl_ambience",
                     () -> new SimpleParticleType(false));
-    public static final RegistryObject<SimpleParticleType> WARPED_CLAM_PEARL_INDICATOR =
-            PARTICLES.register("warped_clam_pearl_indicator",
+
+    public static final RegistryObject<SimpleParticleType> WARPED_CLAM_INDICATOR_ENDER =
+            PARTICLES.register("warped_clam_indicator_ender",
+                    () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> WARPED_CLAM_INDICATOR_CAMOUFLAGE =
+            PARTICLES.register("warped_clam_indicator_camouflage",
+                    () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> WARPED_CLAM_INDICATOR_VOIDBLUE =
+            PARTICLES.register("warped_clam_indicator_voidblue",
+                    () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> WARPED_CLAM_INDICATOR_AMARANTH =
+            PARTICLES.register("warped_clam_indicator_amaranth",
                     () -> new SimpleParticleType(false));
 
     public static final RegistryObject<SimpleParticleType> ROAR_EFFECT =
@@ -45,7 +55,10 @@ public class ModParticles {
     public static void registerParticles(RegisterParticleProvidersEvent evt) {
         evt.registerSpriteSet(ModParticles.IMPALER_SCREAM.get(), ScreamParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.WARPED_CLAM_PEARL_AMBIENCE.get(), WarpedClamPearlAmbienceParticle.Factory::new);
-        evt.registerSpriteSet(ModParticles.WARPED_CLAM_PEARL_INDICATOR.get(), WarpedClamPearlIndicatorParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.WARPED_CLAM_INDICATOR_ENDER.get(), WarpedClamPearlIndicatorParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.WARPED_CLAM_INDICATOR_CAMOUFLAGE.get(), WarpedClamPearlIndicatorParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.WARPED_CLAM_INDICATOR_VOIDBLUE.get(), WarpedClamPearlIndicatorParticle.Factory::new);
+        evt.registerSpriteSet(ModParticles.WARPED_CLAM_INDICATOR_AMARANTH.get(), WarpedClamPearlIndicatorParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.ROAR_EFFECT.get(), RoarEffectParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.SONIC_WAVE.get(), SonicWaveParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.SHOCKWAVE.get(), ShockwaveParticle.Factory::new);

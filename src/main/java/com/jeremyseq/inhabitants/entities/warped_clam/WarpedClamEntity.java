@@ -4,6 +4,7 @@ import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -248,7 +249,15 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         double cx = getX() + (random.nextDouble() - 0.5) * 1.2;
         double cy = getY() + getBbHeight() + (random.nextDouble() * 0.3);
         double cz = getZ() + (random.nextDouble() - 0.5) * 1.2;
-        level().addParticle(ModParticles.WARPED_CLAM_PEARL_INDICATOR.get(), cx, cy, cz,
+
+        ParticleOptions particle = switch (getVariant()) {
+            case ENDER -> ModParticles.WARPED_CLAM_INDICATOR_ENDER.get();
+            case CAMOUFLAGE -> ModParticles.WARPED_CLAM_INDICATOR_CAMOUFLAGE.get();
+            case VOID_BLUE -> ModParticles.WARPED_CLAM_INDICATOR_VOIDBLUE.get();
+            case AMARANTH -> ModParticles.WARPED_CLAM_INDICATOR_AMARANTH.get();
+        };
+
+        level().addParticle(particle, cx, cy, cz,
                 (random.nextDouble() - 0.5) * 0.01, (random.nextDouble() - 0.1) * 0.02, (random.nextDouble() - 0.5) * 0.01);
     }
 
