@@ -390,8 +390,8 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
-        controllers.add(new AnimationController<>(this, "open", 0, state -> PlayState.STOP)
+        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
+        controllers.add(new AnimationController<>(this, "open", 5, state -> PlayState.STOP)
                 .triggerableAnim("open", RawAnimation.begin().then("Opening", Animation.LoopType.PLAY_ONCE)));
     }
 
