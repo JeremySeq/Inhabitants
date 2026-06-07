@@ -56,13 +56,30 @@ import java.util.Random;
 public class ImpalerEntity extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
-    public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
     private int attackAnimTimer = 0;
 
     public ImpalerEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.setMaxUpStep(1.5f);
+    }
+
+    public enum Variant {
+        DEFAULT(0),
+        DRIPSTONE(1),
+        ALBINO(2),
+        FORLORN(3);
+
+        private final int id;
+
+        Variant(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
     }
 
     public static AttributeSupplier setAttributes() {
@@ -113,8 +130,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
         if (source.getEntity() instanceof Creeper creeper &&
             creeper.isPowered()) {
-            
-            this.spawnAtLocation(this.getTextureType() == 1 ?
+
+            this.spawnAtLocation(this.getVariant() == Variant.DRIPSTONE ?
                 ModItems.DRIPSTONE_IMPALER_HEAD.get() : ModItems.IMPALER_HEAD.get());
         }
     }
@@ -244,17 +261,17 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define(TEXTURE, generateTextureType());
+        entityData.define(VARIANT, Variant.DEFAULT.getId());
     }
 
-    private int generateTextureType() {
+    private Variant generateVariant() {
         // 5% chance to spawn with albino texture, otherwise default texture
         if (this.random.nextFloat() < 0.05f) {
-            return 2;
+            return Variant.ALBINO;
         }
 
         if (this.level().getBiome(this.blockPosition()).is(Biomes.DRIPSTONE_CAVES)) {
-            return 1;
+            return Variant.DRIPSTONE;
         }
 
         // alex's caves forlorn hollows compat
@@ -263,16 +280,23 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                     ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("alexscaves", "forlorn_hollows"));
 
             if (this.level().getBiome(this.blockPosition()).is(FORLORN_HOLLOW_BIOME)) {
-                return 3;
+                return Variant.FORLORN;
             }
         }
 
         // basic ahh impaler
-        return 0;
+        return Variant.DEFAULT;
     }
 
-    public int getTextureType() {
-        return entityData.get(TEXTURE);
+    public Variant getVariant() {
+        return Variant.values()[this.entityData.get(VARIANT)];
+    }
+
+    public void setVariant(Variant v) {
+        this.entityData.set(VARIANT, v.getId());
+    }
+    public void setVariant(int id) {
+        this.entityData.set(VARIANT, id);
     }
 
     @Override
@@ -282,7 +306,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                                                   @Nullable SpawnGroupData pSpawnData,
                                                   @Nullable CompoundTag pDataTag) {
         if (pSpawnData == null) {
-            this.entityData.set(TEXTURE, generateTextureType());
+            this.setVariant(generateVariant());
         }
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
@@ -290,16 +314,16 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.putInt("textureType", entityData.get(TEXTURE));
+        tag.putInt("variant", entityData.get(VARIANT));
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.contains("textureType")) {
-            entityData.set(TEXTURE, tag.getInt("textureType"));
+        if (tag.contains("variant")) {
+            this.setVariant(tag.getInt("variant"));
         } else {
-            entityData.set(TEXTURE, generateTextureType());
+            this.setVariant(Variant.DEFAULT);
         }
     }
 

@@ -17,19 +17,12 @@ public class ImpalerModel extends GeoModel<ImpalerEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ImpalerEntity animatable) {
-        if (animatable.getTextureType() == 1) {
-            // 1 = dripstone texture
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_dripstone.png");
-        } else if (animatable.getTextureType() == 2) {
-            // 2 = albino texture
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_albino.png");
-        } else if (animatable.getTextureType() == 3) {
-            // 3 = Forlorn Hollows texture
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_forlorn_hollows.png");
-        } else {
-            // 0 = default texture
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler.png");
-        }
+        return switch (animatable.getVariant()) {
+            case DEFAULT -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler.png");
+            case DRIPSTONE -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_dripstone.png");
+            case ALBINO -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_albino.png");
+            case FORLORN -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_forlorn_hollows.png");
+        };
     }
 
     @Override
