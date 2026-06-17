@@ -33,7 +33,7 @@ public class ReverseGrowthMixin {
 
         private boolean hasReverseGrowth() {
             Map<MobEffect, MobEffectInstance> effects =
-                ((LivingEntityAccessor) this).inhabitants$getActiveEffects();
+                ((Player) (Object) this).getActiveEffectsMap();
             
             return effects != null && effects.containsKey(ModEffects.REVERSE_GROWTH.get());
         }
