@@ -107,7 +107,9 @@
   "gui.inhabitants.jei.carving": "Bogre Carving",
 
   "enchantment.inhabitants.diamond_tip": "Diamond Tip",
+  "enchantment.inhabitants.diamond_tip.desc": "Raises drill tier to diamond level",
   "enchantment.inhabitants.thermal_capacity": "Thermal Capacity",
+  "enchantment.inhabitants.thermal_capacity.desc": "Increases drill's thermal capacity",
 
   "death.attack.inhabitants.impaled": "%1$s was impaled"
 }
