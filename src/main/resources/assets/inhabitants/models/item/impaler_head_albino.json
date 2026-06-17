@@ -1,6 +1,6 @@
 {
   "parent": "inhabitants:block/impaler_head_gui",
   "textures": {
-    "0": "inhabitants:block/impaler_head"
+    "0": "inhabitants:block/impaler_head_albino"
   }
 }

@@ -21,7 +21,7 @@ public class ImpalerModel extends GeoModel<ImpalerEntity> {
             case DEFAULT -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler.png");
             case DRIPSTONE -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_dripstone.png");
             case ALBINO -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_albino.png");
-            case FORLORN -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_forlorn_hollows.png");
+            case FORLORN_HOLLOWS -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_forlorn_hollows.png");
         };
     }
 

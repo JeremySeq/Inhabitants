@@ -62,15 +62,24 @@ public class ModItems {
 
     public static final RegistryObject<Item> IMPALER_HEAD = ITEMS.register("impaler_head",
             () -> new StandingAndWallBlockItem(ModBlocks.IMPALER_HEAD.get(),
-            ModBlocks.IMPALER_WALL_HEAD.get(),
+            ModBlocks.IMPALER_HEAD_WALL.get(),
             new Item.Properties().rarity(Rarity.UNCOMMON),
             Direction.DOWN));
-
-    public static final RegistryObject<Item> DRIPSTONE_IMPALER_HEAD = ITEMS.register("dripstone_impaler_head",
-            () -> new StandingAndWallBlockItem(ModBlocks.DRIPSTONE_IMPALER_HEAD.get(),
-            ModBlocks.DRIPSTONE_IMPALER_WALL_HEAD.get(),
+    public static final RegistryObject<Item> IMPALER_HEAD_DRIPSTONE = ITEMS.register("impaler_head_dripstone",
+            () -> new StandingAndWallBlockItem(ModBlocks.IMPALER_HEAD_DRIPSTONE.get(),
+            ModBlocks.IMPALER_HEAD_WALL_DRIPSTONE.get(),
             new Item.Properties().rarity(Rarity.UNCOMMON),
             Direction.DOWN));
+    public static final RegistryObject<Item> IMPALER_HEAD_ALBINO = ITEMS.register("impaler_head_albino",
+            () -> new StandingAndWallBlockItem(ModBlocks.IMPALER_HEAD_ALBINO.get(),
+                    ModBlocks.IMPALER_HEAD_WALL_ALBINO.get(),
+                    new Item.Properties().rarity(Rarity.UNCOMMON),
+                    Direction.DOWN));
+    public static final RegistryObject<Item> IMPALER_HEAD_FORLORN_HOLLOWS = ITEMS.register("impaler_head_forlorn_hollows",
+            () -> new StandingAndWallBlockItem(ModBlocks.IMPALER_HEAD_FORLORN_HOLLOWS.get(),
+                    ModBlocks.IMPALER_HEAD_WALL_FORLORN_HOLLOWS.get(),
+                    new Item.Properties().rarity(Rarity.UNCOMMON),
+                    Direction.DOWN));
 
     public static final RegistryObject<Item> CONCUSSION_ARROW = ITEMS.register("concussion_arrow",
             () -> new ConcussionArrowItem(new Item.Properties()));

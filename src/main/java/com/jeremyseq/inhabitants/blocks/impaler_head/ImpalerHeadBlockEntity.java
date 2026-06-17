@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.blocks.impaler_head;
 
 import com.jeremyseq.inhabitants.blocks.entity.ModBlockEntities;
 
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import net.minecraft.core.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.*;
 import java.util.List;
 
 public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntity {
+    private ImpalerEntity.Variant variant;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private int attackTimer = -1;
     private ResourceLocation noteBlockSound = ResourceLocation
@@ -32,6 +34,11 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
 
     public ImpalerHeadBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(), pPos, pBlockState);
+    }
+
+    public ImpalerHeadBlockEntity(BlockPos pPos, BlockState pBlockState, ImpalerEntity.Variant variant) {
+        super(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(), pPos, pBlockState);
+        this.setVariant(variant);
     }
 
     @Override
@@ -55,6 +62,9 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
         if (this.noteBlockSound != null) {
             pTag.putString("note_block_sound", this.noteBlockSound.toString());
         }
+        if (variant != null) {
+            pTag.putInt("variant", this.getVariant().getId());
+        }
     }
 
     @Override
@@ -64,6 +74,18 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
             this.noteBlockSound = ResourceLocation
                 .tryParse(pTag.getString("note_block_sound"));
         }
+
+        if (pTag.contains("variant")) {
+            this.setVariant(ImpalerEntity.Variant.values()[pTag.getInt("variant")]);
+        }
+    }
+
+    public ImpalerEntity.Variant getVariant() {
+        return variant;
+    }
+
+    public void setVariant(ImpalerEntity.Variant v) {
+        variant = v;
     }
 
     @Nullable

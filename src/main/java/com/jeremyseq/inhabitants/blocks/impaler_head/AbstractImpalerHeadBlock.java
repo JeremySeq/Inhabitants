@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.blocks.impaler_head;
 
 import com.jeremyseq.inhabitants.blocks.entity.ModBlockEntities;
 
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -12,10 +13,13 @@ import net.minecraft.world.level.block.state.properties.*;
 import org.jetbrains.annotations.*;
 
 public abstract class AbstractImpalerHeadBlock extends BaseEntityBlock {
+    private ImpalerEntity.Variant variant;
+
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    protected AbstractImpalerHeadBlock(Properties pProperties) {
+    protected AbstractImpalerHeadBlock(Properties pProperties, ImpalerEntity.Variant variant) {
         super(pProperties);
+        this.variant = variant;
     }
 
     @Override
@@ -26,7 +30,7 @@ public abstract class AbstractImpalerHeadBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
-        return new ImpalerHeadBlockEntity(pPos, pState);
+        return new ImpalerHeadBlockEntity(pPos, pState, variant);
     }
 
     @Override

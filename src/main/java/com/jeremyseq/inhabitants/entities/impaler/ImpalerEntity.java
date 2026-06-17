@@ -31,6 +31,7 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -69,7 +70,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         DEFAULT(0),
         DRIPSTONE(1),
         ALBINO(2),
-        FORLORN(3);
+        FORLORN_HOLLOWS(3);
 
         private final int id;
 
@@ -131,8 +132,14 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         if (source.getEntity() instanceof Creeper creeper &&
             creeper.isPowered()) {
 
-            this.spawnAtLocation(this.getVariant() == Variant.DRIPSTONE ?
-                ModItems.DRIPSTONE_IMPALER_HEAD.get() : ModItems.IMPALER_HEAD.get());
+            Item head = switch (this.getVariant()) {
+                case DEFAULT -> ModItems.IMPALER_HEAD.get();
+                case DRIPSTONE -> ModItems.IMPALER_HEAD_DRIPSTONE.get();
+                case ALBINO -> ModItems.IMPALER_HEAD_ALBINO.get();
+                case FORLORN_HOLLOWS -> ModItems.IMPALER_HEAD_FORLORN_HOLLOWS.get();
+            };
+
+            this.spawnAtLocation(head);
         }
     }
 
@@ -280,7 +287,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
                     ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("alexscaves", "forlorn_hollows"));
 
             if (this.level().getBiome(this.blockPosition()).is(FORLORN_HOLLOW_BIOME)) {
-                return Variant.FORLORN;
+                return Variant.FORLORN_HOLLOWS;
             }
         }
 

@@ -1,8 +1,5 @@
 package com.jeremyseq.inhabitants.blocks.impaler_head;
 
-import com.jeremyseq.inhabitants.Inhabitants;
-import com.jeremyseq.inhabitants.blocks.ModBlocks;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.client.renderer.*;
 import net.minecraft.core.Direction;
@@ -22,12 +19,12 @@ import com.mojang.math.Axis;
 import org.joml.Matrix4f;
 
 public class ImpalerHeadRenderer extends GeoBlockRenderer<ImpalerHeadBlockEntity> {
-    private static final ResourceLocation NORMAL_TEXTURE =
-        ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
-            "textures/entity/impaler_head/impaler_head_texture.png");
-    private static final ResourceLocation DRIPSTONE_TEXTURE =
-        ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
-            "textures/entity/impaler_head/dripstone_impaler_head_texture.png");
+//    private static final ResourceLocation NORMAL_TEXTURE =
+//        ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
+//            "textures/entity/impaler_head/impaler_head.png");
+//    private static final ResourceLocation DRIPSTONE_TEXTURE =
+//        ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
+//            "textures/entity/impaler_head/impaler_head_dripstone.png");
 
     public ImpalerHeadRenderer() {
         super(new ImpalerHeadModel());
@@ -35,13 +32,7 @@ public class ImpalerHeadRenderer extends GeoBlockRenderer<ImpalerHeadBlockEntity
 
     @Override
     public ResourceLocation getTextureLocation(ImpalerHeadBlockEntity animatable) {
-        BlockState state = animatable.getBlockState();
-        if (state.is(ModBlocks.DRIPSTONE_IMPALER_HEAD.get()) ||
-            state.is(ModBlocks.DRIPSTONE_IMPALER_WALL_HEAD.get())) {
-            return DRIPSTONE_TEXTURE;
-        }
-
-        return NORMAL_TEXTURE;
+        return model.getTextureResource(animatable);
     }
 
     @Override
@@ -68,7 +59,7 @@ public class ImpalerHeadRenderer extends GeoBlockRenderer<ImpalerHeadBlockEntity
             long instanceId = getInstanceId(animatable);
             GeoModel<ImpalerHeadBlockEntity> currentModel = getGeoModel();
 
-            animationState.setData(DataTickets.TICK, (double)animatable.getTick(animatable));
+            animationState.setData(DataTickets.TICK, animatable.getTick(animatable));
             animationState.setData(DataTickets.BLOCK_ENTITY, animatable);
             currentModel.addAdditionalStateData(animatable, instanceId, animationState::setData);
 

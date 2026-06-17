@@ -11,7 +11,7 @@ public class ImpalerHeadModel extends GeoModel<ImpalerHeadBlockEntity> {
     public ResourceLocation getModelResource(ImpalerHeadBlockEntity animatable) {
         if (animatable.getBlockState().hasProperty(ImpalerWallHeadBlock.FACING)) {
             return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
-                "geo/impaler_wall_head.geo.json");
+                "geo/impaler_head_wall.geo.json");
         }
 
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
@@ -20,8 +20,12 @@ public class ImpalerHeadModel extends GeoModel<ImpalerHeadBlockEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ImpalerHeadBlockEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
-            "textures/entity/impaler_head/impaler_head_texture.png");
+        return switch (animatable.getVariant()) {
+            case DEFAULT -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler.png");
+            case DRIPSTONE -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_dripstone.png");
+            case ALBINO -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_albino.png");
+            case FORLORN_HOLLOWS -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/impaler_forlorn_hollows.png");
+        };
     }
 
     @Override

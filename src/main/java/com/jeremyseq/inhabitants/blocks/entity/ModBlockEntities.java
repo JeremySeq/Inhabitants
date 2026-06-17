@@ -16,8 +16,8 @@ public class ModBlockEntities {
     public static final RegistryObject<BlockEntityType<ImpalerHeadBlockEntity>> IMPALER_HEAD_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("impaler_head_block_entity",
                 () -> BlockEntityType.Builder.of(ImpalerHeadBlockEntity::new,
-                ModBlocks.IMPALER_HEAD.get(), ModBlocks.DRIPSTONE_IMPALER_HEAD.get(),
-                ModBlocks.IMPALER_WALL_HEAD.get(), ModBlocks.DRIPSTONE_IMPALER_WALL_HEAD.get()).build(null));
+                ModBlocks.IMPALER_HEAD.get(), ModBlocks.IMPALER_HEAD_DRIPSTONE.get(), ModBlocks.IMPALER_HEAD_ALBINO.get(), ModBlocks.IMPALER_HEAD_FORLORN_HOLLOWS.get(),
+                ModBlocks.IMPALER_HEAD_WALL.get(), ModBlocks.IMPALER_HEAD_WALL_DRIPSTONE.get(), ModBlocks.IMPALER_HEAD_WALL_ALBINO.get(), ModBlocks.IMPALER_HEAD_WALL_FORLORN_HOLLOWS.get()).build(null));
 
 
     public static void register(IEventBus eventBus) {

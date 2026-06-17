@@ -1,6 +1,12 @@
 {
   "values": [
     "inhabitants:impaler_head",
-    "inhabitants:dripstone_impaler_head"
+    "inhabitants:impaler_head_wall",
+    "inhabitants:impaler_head_dripstone",
+    "inhabitants:impaler_head_wall_dripstone",
+    "inhabitants:impaler_head_albino",
+    "inhabitants:impaler_head_wall_albino",
+    "inhabitants:impaler_head_forlorn_hollows",
+    "inhabitants:impaler_head_wall_forlorn_hollows"
   ]
 }

@@ -24,10 +24,10 @@
   "item.inhabitants.bogre_cauldron": "Котел Бологра",
   "item.inhabitants.spike_drill": "Шипобур",
   "item.inhabitants.impaler_head": "Голова Пронзателя",
-  "item.inhabitants.dripstone_impaler_head": "Голова сталагмитового Пронзателя",
+  "item.inhabitants.impaler_head_dripstone": "Голова сталагмитового Пронзателя",
 
   "block.inhabitants.impaler_head": "Голова Пронзателя",
-  "block.inhabitants.dripstone_impaler_head": "Голова сталагмитового Пронзателя",
+  "block.inhabitants.impaler_head_dripstone": "Голова сталагмитового Пронзателя",
 
 
   "tooltip.inhabitants.special_effect": "Особая способность",

@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.blocks.impaler_head;
 
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -23,8 +24,8 @@ public class ImpalerWallHeadBlock extends AbstractImpalerHeadBlock {
         Direction.EAST, Block.box(0.0D, 4.0D, 4.0D, 8.0D, 12.0D, 12.0D)
     );
 
-    public ImpalerWallHeadBlock(Properties pProperties) {
-        super(pProperties);
+    public ImpalerWallHeadBlock(Properties pProperties, ImpalerEntity.Variant variant) {
+        super(pProperties, variant);
         this.registerDefaultState(this.stateDefinition.any()
             .setValue(FACING, Direction.NORTH)
             .setValue(POWERED, false));
