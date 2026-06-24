@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"0": "inhabitants:block/impaler_head",
-		"particle": "inhabitants:block/impaler_head"
+		"0": "inhabitants:block/impaler_head/default",
+		"particle": "inhabitants:block/impaler_head/default"
 	},
 	"elements": [
 		{

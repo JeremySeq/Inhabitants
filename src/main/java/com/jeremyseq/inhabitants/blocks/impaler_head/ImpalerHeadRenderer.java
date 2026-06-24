@@ -19,13 +19,6 @@ import com.mojang.math.Axis;
 import org.joml.Matrix4f;
 
 public class ImpalerHeadRenderer extends GeoBlockRenderer<ImpalerHeadBlockEntity> {
-//    private static final ResourceLocation NORMAL_TEXTURE =
-//        ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
-//            "textures/entity/impaler_head/impaler_head.png");
-//    private static final ResourceLocation DRIPSTONE_TEXTURE =
-//        ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
-//            "textures/entity/impaler_head/impaler_head_dripstone.png");
-
     public ImpalerHeadRenderer() {
         super(new ImpalerHeadModel());
     }

@@ -1,5 +1,5 @@
 {
   "textures": {
-    "particle": "inhabitants:block/impaler_head"
+    "particle": "inhabitants:block/impaler_head/default"
   }
 }

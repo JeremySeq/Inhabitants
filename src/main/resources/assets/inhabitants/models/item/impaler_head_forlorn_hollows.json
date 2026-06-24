@@ -1,6 +1,6 @@
 {
   "parent": "inhabitants:block/impaler_head_gui",
   "textures": {
-    "0": "inhabitants:block/impaler_head_forlorn_hollows"
+    "0": "inhabitants:block/impaler_head/forlorn_hollows"
   }
 }
