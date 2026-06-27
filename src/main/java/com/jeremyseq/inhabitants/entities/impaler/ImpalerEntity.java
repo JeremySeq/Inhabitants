@@ -64,6 +64,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public ImpalerEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.setMaxUpStep(1.5f);
+        this.noCulling = true;
     }
 
     public enum Variant {
@@ -85,8 +86,8 @@ public class ImpalerEntity extends Monster implements GeoEntity {
 
     public static AttributeSupplier setAttributes() {
         return Monster.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 50f)
-                .add(Attributes.ATTACK_DAMAGE, 8f)
+                .add(Attributes.MAX_HEALTH, 60f)
+                .add(Attributes.ATTACK_DAMAGE, 10f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5F)
                 .add(Attributes.FOLLOW_RANGE, 30f)
@@ -253,7 +254,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     private static void handleSpikeThrowKeyframe(SoundKeyframeEvent<ImpalerEntity> event) {
         if (event.getKeyframeData().getSound().trim().equals("spikes")) {
             assert Minecraft.getInstance().level != null;
-            Minecraft.getInstance().level.playSound(Minecraft.getInstance().player, event.getAnimatable().blockPosition(), ModSoundEvents.IMPALER_SPIKES.get(), SoundSource.HOSTILE);
+            event.getAnimatable().playSound(ModSoundEvents.IMPALER_SPIKES.get());
         }
     }
 
