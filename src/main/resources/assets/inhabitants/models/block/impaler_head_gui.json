@@ -107,13 +107,16 @@
 			"translation": [0, 4.5, 0]
 		},
 		"gui": {
-			"rotation": [-160, -45, -180],
-			"translation": [1.25, 1, 0],
+			"rotation": [10, -170, 0],
+			"translation": [1, 0.75, 0],
 			"scale": [0.8, 0.8, 0.8]
 		},
 		"head": {
 			"translation": [0, 7.75, 0.75],
 			"scale": [1.6, 1.6, 1.6]
+		},
+		"fixed": {
+			"translation": [0, 3.75, 0]
 		}
 	},
 	"groups": [
