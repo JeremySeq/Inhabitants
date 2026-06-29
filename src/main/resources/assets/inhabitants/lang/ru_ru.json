@@ -1,9 +1,11 @@
 {
   "entity.inhabitants.bogre": "Бологр",
-
+  "entity.inhabitants.bogre.description": "Богр — такой же житель болот, который не любит слишком шумные компании. Однако, если игрок не проявляет враждебности, Богр с радостью впустит его в своё логово. Богр может готовить в своём котле различные блюда, дарующие игроку уникальные эффекты. Он также умеет вырезать для игроков костяное оружие и очень любит музыку!",
   "entity.inhabitants.bogre_cauldron": "Котел Бологра",
   "entity.inhabitants.warped_clam": "Искаженная ракушка",
+  "entity.inhabitants.warped_clam.description": "Мирное существо, которое спокойно покоится среди ландшафтов Края. Его можно использовать как батут, чтобы подбрасывать игроков в воздух, а также расчёсывать щёткой, чтобы получать жемчуг Края.",
   "entity.inhabitants.impaler": "Пронзатель",
+  "entity.inhabitants.impaler.description": "Пронзатели — подземные обитатели, представляющие серьёзную опасность для неподготовленных исследователей. Они способны неестественно быстро бросаться на свою цель, метать шипы, вызывающие сотрясение, и атаковать в ближнем бою своими острыми зубами.",
 
   "creativetab.inhabitants_tab": "Обитатели",
 
@@ -24,10 +26,15 @@
   "item.inhabitants.bogre_cauldron": "Котел Бологра",
   "item.inhabitants.spike_drill": "Шипобур",
   "item.inhabitants.impaler_head": "Голова Пронзателя",
-  "item.inhabitants.impaler_head_dripstone": "Голова сталагмитового Пронзателя",
+  "item.inhabitants.impaler_head_dripstone": "Голова капельникового пронзателя",
+  "item.inhabitants.impaler_head_albino": "Голова пронзателя-альбиноса",
+  "item.inhabitants.impaler_head_forlorn_hollows": "Голова пронзателя Забытых Пустот",
+  "item.inhabitants.concussion_arrow": "Стрела сотрясения",
 
   "block.inhabitants.impaler_head": "Голова Пронзателя",
-  "block.inhabitants.impaler_head_dripstone": "Голова сталагмитового Пронзателя",
+  "block.inhabitants.impaler_head_dripstone": "Голова капельникового пронзателя",
+  "block.inhabitants.impaler_head_albino": "Голова пронзателя-альбиноса",
+  "block.inhabitants.impaler_head_forlorn_hollows": "Голова пронзателя Забытых Пустот",
 
 
   "tooltip.inhabitants.special_effect": "Особая способность",
@@ -41,6 +48,12 @@
   "effect.inhabitants.sticky_legs": "Липкие ноги",
   "effect.inhabitants.reverse_growth": "Обратный рост",
   "effect.inhabitants.immaterial": "Нематериальный",
+
+  "item.minecraft.tipped_arrow.effect.concussion": "Стрела с эффектом сотрясения",
+  "item.minecraft.potion.effect.concussion": "Зелье сотрясения",
+  "item.minecraft.splash_potion.effect.concussion": "Взрывное зелье сотрясения",
+  "item.minecraft.lingering_potion.effect.concussion": "Туманное зелье сотрясения",
+
 
   "advancement.inhabitants.david_and_goliath.title": "Давид и Голиаф",
   "advancement.inhabitants.david_and_goliath.description": "Сразите Бологра",
@@ -100,7 +113,9 @@
   "gui.inhabitants.jei.carving": "Ремесло Бологра",
 
   "enchantment.inhabitants.diamond_tip": "Алмазный наконечник",
+  "enchantment.inhabitants.diamond_tip.desc": "Повышает уровень бура до алмазного",
   "enchantment.inhabitants.thermal_capacity": "Тепловая вместительность",
+  "enchantment.inhabitants.thermal_capacity.desc": "Увеличивает тепловую ёмкость бура",
 
   "death.attack.inhabitants.impaled": "%1$s был пронзен"
 }
