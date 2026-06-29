@@ -32,5 +32,8 @@ public class ModPotions {
         BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
                 Items.SPLASH_POTION, Potions.AWKWARD, ModItems.IMPALER_SPIKE.get(), ModPotions.CONCUSSION_POTION.get()
         ));
+        BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
+                Items.LINGERING_POTION, Potions.AWKWARD, ModItems.IMPALER_SPIKE.get(), ModPotions.CONCUSSION_POTION.get()
+        ));
     }
 }
