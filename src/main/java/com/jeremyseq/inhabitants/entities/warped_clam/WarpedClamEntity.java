@@ -4,6 +4,7 @@ import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.items.ModItems;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -45,6 +46,8 @@ import java.util.List;
 public class WarpedClamEntity extends Mob implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
+    public static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.INT);
+
     public static final EntityDataAccessor<Integer> DIRECTION = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.INT);
 
     public static final EntityDataAccessor<Boolean> OPEN = SynchedEntityData.defineId(WarpedClamEntity.class, EntityDataSerializers.BOOLEAN);
@@ -64,6 +67,23 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
     public static AttributeSupplier setAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 20f).build();
+    }
+
+    public enum Variant {
+        ENDER(0),
+        CAMOUFLAGE(1),
+        VOID_BLUE(2),
+        AMARANTH(3);
+
+        private final int id;
+
+        Variant(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
     }
 
     @Override
@@ -91,6 +111,8 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         float yaw = this.getYRot();
         int direction = Math.round(yaw / 45f) & 7;
         setDir(direction);
+
+        this.setVariant(generateVariant());
 
         return pSpawnData;
     }
@@ -227,7 +249,15 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         double cx = getX() + (random.nextDouble() - 0.5) * 1.2;
         double cy = getY() + getBbHeight() + (random.nextDouble() * 0.3);
         double cz = getZ() + (random.nextDouble() - 0.5) * 1.2;
-        level().addParticle(ModParticles.WARPED_CLAM_PEARL_INDICATOR.get(), cx, cy, cz,
+
+        ParticleOptions particle = switch (getVariant()) {
+            case ENDER -> ModParticles.WARPED_CLAM_INDICATOR_ENDER.get();
+            case CAMOUFLAGE -> ModParticles.WARPED_CLAM_INDICATOR_CAMOUFLAGE.get();
+            case VOID_BLUE -> ModParticles.WARPED_CLAM_INDICATOR_VOIDBLUE.get();
+            case AMARANTH -> ModParticles.WARPED_CLAM_INDICATOR_AMARANTH.get();
+        };
+
+        level().addParticle(particle, cx, cy, cz,
                 (random.nextDouble() - 0.5) * 0.01, (random.nextDouble() - 0.1) * 0.02, (random.nextDouble() - 0.5) * 0.01);
     }
 
@@ -254,6 +284,7 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
                 this.discard();
                 ItemStack clamItem = new ItemStack(ModItems.WARPED_CLAM_ITEM.get());
                 clamItem.getOrCreateTag().putBoolean("has_pearl", hasPearl());
+                clamItem.getOrCreateTag().putInt("variant", getVariant().getId());
                 this.spawnAtLocation(clamItem);
             }
             return InteractionResult.sidedSuccess(level().isClientSide);
@@ -359,8 +390,8 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
-        controllers.add(new AnimationController<>(this, "open", 0, state -> PlayState.STOP)
+        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
+        controllers.add(new AnimationController<>(this, "open", 5, state -> PlayState.STOP)
                 .triggerableAnim("open", RawAnimation.begin().then("Opening", Animation.LoopType.PLAY_ONCE)));
     }
 
@@ -414,9 +445,36 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
         return cache;
     }
 
+    private Variant generateVariant() {
+        float randomChance = this.random.nextFloat();
+
+        // 25% chance to spawn with each variant
+        if (randomChance < 0.25f) {
+            return Variant.ENDER;
+        } else if (randomChance < 0.5f) {
+            return Variant.CAMOUFLAGE;
+        } else if (randomChance < 0.75f) {
+            return Variant.VOID_BLUE;
+        } else {
+            return Variant.AMARANTH;
+        }
+    }
+
+    public Variant getVariant() {
+        return Variant.values()[this.entityData.get(VARIANT)];
+    }
+
+    public void setVariant(Variant v) {
+        this.entityData.set(VARIANT, v.getId());
+    }
+    public void setVariant(int id) {
+        this.entityData.set(VARIANT, id);
+    }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        entityData.define(VARIANT, Variant.ENDER.getId());
         entityData.define(FLING_ANIM, false);
         entityData.define(HAS_PEARL, true);
         entityData.define(OPEN, false);
@@ -427,6 +485,8 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
 
+        tag.putInt("variant", getVariant().getId());
+
         tag.putBoolean("hasPearl", hasPearl());
         tag.putInt("pearlRegenTimer", this.pearlRegenTimer);
         tag.putInt("direction", getDir());
@@ -435,6 +495,12 @@ public class WarpedClamEntity extends Mob implements GeoEntity {
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+
+        if (tag.contains("variant")) {
+            this.setVariant(tag.getInt("variant"));
+        } else {
+            this.setVariant(Variant.ENDER);
+        }
 
         if (tag.contains("hasPearl")) {
             this.setHasPearl(tag.getBoolean("hasPearl"));

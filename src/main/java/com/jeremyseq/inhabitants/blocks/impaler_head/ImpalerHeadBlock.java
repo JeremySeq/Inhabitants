@@ -1,5 +1,6 @@
 package com.jeremyseq.inhabitants.blocks.impaler_head;
 
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import net.minecraft.core.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -14,8 +15,8 @@ public class ImpalerHeadBlock extends AbstractImpalerHeadBlock {
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
     protected static final VoxelShape SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 8.0D, 12.0D);
 
-    public ImpalerHeadBlock(Properties pProperties) {
-        super(pProperties);
+    public ImpalerHeadBlock(Properties pProperties, ImpalerEntity.Variant variant) {
+        super(pProperties, variant);
         this.registerDefaultState(this.stateDefinition.any()
             .setValue(ROTATION, 0)
             .setValue(POWERED, false));

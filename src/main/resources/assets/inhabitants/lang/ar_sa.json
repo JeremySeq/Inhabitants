@@ -1,9 +1,11 @@
 {
   "entity.inhabitants.bogre": "بوجر",
-
+  "entity.inhabitants.bogre.description": "البوغر هو أحد سكان المستنقعات الذي لا يحب كثرة الزوار. ومع ذلك، إذا لم يُبدِ اللاعب أي نوايا عدائية، فسيرحب به البوغر في وكره. يستطيع البوغر طهي أطعمة مختلفة في قدره تمنح اللاعب تأثيرات فريدة. كما يمكنه نحت أسلحة عظمية للاعبين، وهو يعشق الموسيقى!",
   "entity.inhabitants.bogre_cauldron": "مرجل بوجر",
   "entity.inhabitants.warped_clam": "محارة ملتوية",
+  "entity.inhabitants.warped_clam.description": "مخلوق مسالم يرقد بهدوء في أراضي الإند. يمكن استخدامه كمنصة قفز لإطلاق اللاعبين إلى الهواء، كما يمكن تنظيفه بالفرشاة للحصول على لآلئ الإندر.",
   "entity.inhabitants.impaler": "المخوزق",
+  "entity.inhabitants.impaler.description": "المخترقون هم كائنات تعيش تحت الأرض وتشكل خطرًا كبيرًا على المستكشفين غير المستعدين. يمكنهم الاندفاع نحو هدفهم بسرعة غير طبيعية، ورمي الأشواك التي تسبب الارتجاج، وتنفيذ هجمات قريبة بأسنانهم الحادة.",
 
   "creativetab.inhabitants_tab": "السكان",
 
@@ -24,10 +26,15 @@
   "item.inhabitants.bogre_cauldron": "مرجل بوجر",
   "item.inhabitants.spike_drill": "مثقاب المخوزق",
   "item.inhabitants.impaler_head": "رأس المخوزق",
-  "item.inhabitants.dripstone_impaler_head": "رأس المخوزق المنقط",
+  "item.inhabitants.impaler_head_dripstone": "رأس المخوزق المنقط",
+  "item.inhabitants.impaler_head_albino": "رأس المخترق الأمهق",
+  "item.inhabitants.impaler_head_forlorn_hollows": "رأس مخترق التجاويف المهجورة",
+  "item.inhabitants.concussion_arrow": "سهم الارتجاج",
 
   "block.inhabitants.impaler_head": "رأس المخوزق",
-  "block.inhabitants.dripstone_impaler_head": "رأس المخوزق المنقط",
+  "block.inhabitants.impaler_head_dripstone": "رأس المخوزق المنقط",
+  "block.inhabitants.impaler_head_albino": "رأس المخترق الأمهق",
+  "block.inhabitants.impaler_head_forlorn_hollows": "رأس مخترق التجاويف المهجورة",
 
 
   "tooltip.inhabitants.special_effect": "قدرة خاصة",
@@ -41,6 +48,12 @@
   "effect.inhabitants.sticky_legs": "أرجل لزجة",
   "effect.inhabitants.reverse_growth": "نمو عكسي",
   "effect.inhabitants.immaterial": "غير مادي",
+
+  "item.minecraft.tipped_arrow.effect.concussion": "سهم برأس ذي تأثير الارتجاج",
+  "item.minecraft.potion.effect.concussion": "جرعة الارتجاج",
+  "item.minecraft.splash_potion.effect.concussion": "جرعة ارتجاج متفجرة",
+  "item.minecraft.lingering_potion.effect.concussion": "جرعة ارتجاج باقية",
+
 
   "advancement.inhabitants.david_and_goliath.title": "داوود وجالوت",
   "advancement.inhabitants.david_and_goliath.description": "اهزم بوجر الجبار.",
@@ -100,7 +113,9 @@
   "gui.inhabitants.jei.carving": "نحت بوجر",
 
   "enchantment.inhabitants.diamond_tip": "رأس ألماسي",
+  "enchantment.inhabitants.diamond_tip.desc": "يرفع مستوى الحفار إلى مستوى الألماس",
   "enchantment.inhabitants.thermal_capacity": "السعة الحرارية",
+  "enchantment.inhabitants.thermal_capacity.desc": "يزيد السعة الحرارية للحفار",
 
   "death.attack.inhabitants.impaled": "تم خوزقة %1$s"
 }

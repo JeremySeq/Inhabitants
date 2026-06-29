@@ -1,6 +1,5 @@
 package com.jeremyseq.inhabitants.entities.warped_clam;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,6 +21,7 @@ public class WarpedClamRenderer extends GeoEntityRenderer<WarpedClamEntity> {
                 if (!animatable.hasPearl()) {
                     return;
                 }
+
                 super.render(poseStack, animatable, bakedModel, renderType, bufferSource, buffer, partialTick, packedLight, packedOverlay);
             }
         });
@@ -29,6 +29,6 @@ public class WarpedClamRenderer extends GeoEntityRenderer<WarpedClamEntity> {
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull WarpedClamEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/warped_clam.png");
+        return this.getGeoModel().getTextureResource(animatable);
     }
 }

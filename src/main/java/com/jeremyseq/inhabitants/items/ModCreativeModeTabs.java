@@ -2,11 +2,14 @@ package com.jeremyseq.inhabitants.items;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.enchantments.ModEnchantments;
+import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.paintings.ModPaintings;
 
+import com.jeremyseq.inhabitants.potions.ModPotions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.*;
 
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -25,7 +28,26 @@ public class ModCreativeModeTabs {
                         // spawn eggs
                         pOutput.accept(ModItems.BOGRE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
-                        pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
+
+                        ItemStack warped_clam_ender = new ItemStack(ModItems.WARPED_CLAM_ITEM.get());
+                        warped_clam_ender.getOrCreateTag().putInt("variant", WarpedClamEntity.Variant.ENDER.ordinal());
+                        warped_clam_ender.getOrCreateTag().putBoolean("has_pearl", true);
+                        pOutput.accept(warped_clam_ender);
+
+                        ItemStack warped_clam_camouflage = new ItemStack(ModItems.WARPED_CLAM_ITEM.get());
+                        warped_clam_camouflage.getOrCreateTag().putInt("variant", WarpedClamEntity.Variant.CAMOUFLAGE.ordinal());
+                        warped_clam_camouflage.getOrCreateTag().putBoolean("has_pearl", true);
+                        pOutput.accept(warped_clam_camouflage);
+
+                        ItemStack warped_clam_amaranth = new ItemStack(ModItems.WARPED_CLAM_ITEM.get());
+                        warped_clam_amaranth.getOrCreateTag().putInt("variant", WarpedClamEntity.Variant.AMARANTH.ordinal());
+                        warped_clam_amaranth.getOrCreateTag().putBoolean("has_pearl", true);
+                        pOutput.accept(warped_clam_amaranth);
+
+                        ItemStack warped_clam_voidblue = new ItemStack(ModItems.WARPED_CLAM_ITEM.get());
+                        warped_clam_voidblue.getOrCreateTag().putInt("variant", WarpedClamEntity.Variant.VOID_BLUE.ordinal());
+                        warped_clam_voidblue.getOrCreateTag().putBoolean("has_pearl", true);
+                        pOutput.accept(warped_clam_voidblue);
 
                         // mob drops / materials
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
@@ -34,6 +56,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.GIANT_BONE.get());
                         pOutput.accept(ModItems.JAVELIN.get());
                         pOutput.accept(ModItems.SPIKE_DRILL.get());
+                        pOutput.accept(ModItems.CONCUSSION_ARROW.get());
 
                         // food
                         pOutput.accept(ModItems.FISH_SNOT_CHOWDER.get());
@@ -44,10 +67,17 @@ public class ModCreativeModeTabs {
 
                         // decorative
                         pOutput.accept(ModItems.IMPALER_HEAD.get());
-                        pOutput.accept(ModItems.DRIPSTONE_IMPALER_HEAD.get());
+                        pOutput.accept(ModItems.IMPALER_HEAD_DRIPSTONE.get());
+                        pOutput.accept(ModItems.IMPALER_HEAD_ALBINO.get());
+                        pOutput.accept(ModItems.IMPALER_HEAD_FORLORN_HOLLOWS.get());
 
                         // misc special items
                         pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
+
+                        // potions
+                        pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.CONCUSSION_POTION.get()));
+                        pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), ModPotions.CONCUSSION_POTION.get()));
+                        pOutput.accept(PotionUtils.setPotion(new ItemStack(Items.LINGERING_POTION), ModPotions.CONCUSSION_POTION.get()));
 
                         // enchantments
                         addEnchantedBook(ModEnchantments.DIAMOND_TIP.get(), 1, pOutput);

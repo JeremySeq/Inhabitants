@@ -5,6 +5,7 @@
   "refmap": "inhabitants.refmap.json",
   "mixins": [
     "CrossbowItemMixin",
+    "BowItemMixin",
     "NearestAttackableTargetGoalMixin",
     "StickyLegsMixin",
     "ReverseGrowthMixin$Physics",

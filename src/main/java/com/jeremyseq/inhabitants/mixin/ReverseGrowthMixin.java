@@ -7,6 +7,7 @@ import com.jeremyseq.inhabitants.effects.ModEffects;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.effect.MobEffect;
@@ -33,7 +34,7 @@ public class ReverseGrowthMixin {
 
         private boolean hasReverseGrowth() {
             Map<MobEffect, MobEffectInstance> effects =
-                ((LivingEntityAccessor) this).inhabitants$getActiveEffects();
+                    ((LivingEntity) (Object) this).getActiveEffectsMap();
             
             return effects != null && effects.containsKey(ModEffects.REVERSE_GROWTH.get());
         }

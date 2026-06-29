@@ -1,11 +1,13 @@
 package com.jeremyseq.inhabitants;
 
 import com.jeremyseq.inhabitants.blocks.entity.ModBlockEntities;
+import com.jeremyseq.inhabitants.compat.ModBiomeModifiers;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.debug.DebugCommands;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
-import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
+import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowDispenserBehavior;
+import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowRenderer;
 import com.jeremyseq.inhabitants.items.*;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
@@ -29,7 +31,6 @@ import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadRenderer;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.server.level.ServerPlayer;
@@ -79,6 +80,7 @@ public class Inhabitants
         ModSoundEvents.register(modEventBus);
         ModNetworking.register();
         ModPaintings.register(modEventBus);
+        ModBiomeModifiers.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(DebugCommands.class);
@@ -89,8 +91,8 @@ public class Inhabitants
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         event.enqueueWork(() -> {
-            DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(),
-            new ImpalerSpikeDispenserBehavior());
+            DispenserBlock.registerBehavior(ModItems.CONCUSSION_ARROW.get(),
+            new ConcussionArrowDispenserBehavior());
         });
     }
 
@@ -120,16 +122,16 @@ public class Inhabitants
             event.enqueueWork(() -> {
                 MenuScreens.register(ModMenuTypes.CAULDRON_MENU.get(),
                 CauldronScreen::new);
+                ModPotions.registerBrewingRecipes();
             });
 
-            ItemProperties.register(Items.CROSSBOW, ResourceLocation.fromNamespaceAndPath(MODID,"spike_loaded"), (stack, level, entity, seed) -> {
-                if (stack.getItem() instanceof CrossbowItem && CrossbowItem.isCharged(stack)) {
-                    if (CrossbowItem.containsChargedProjectile(stack, ModItems.IMPALER_SPIKE.get())) {
-                        return 1.0F;
-                    }
-                }
-                return 0.0F;
-            });
+            ItemProperties.register(ModItems.WARPED_CLAM_ITEM.get(),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "variant"), (stack, level, entity, seed) -> {
+                        if (stack.hasTag() && stack.getTag().contains("variant")) {
+                            return (float) stack.getTag().getInt("variant");
+                        }
+                        return 0.0f;
+                    });
 
             ItemProperties.register(ModItems.JAVELIN.get(),
                 ResourceLocation.fromNamespaceAndPath(MODID, "aiming"), (stack, level, entity, seed) -> {
@@ -181,6 +183,7 @@ public class Inhabitants
             event.registerEntityRenderer(ModEntities.IMPALER.get(), ImpalerRenderer::new);
             event.registerEntityRenderer(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
             event.registerEntityRenderer(ModEntities.JAVELIN.get(), JavelinRenderer::new);
+            event.registerEntityRenderer(ModEntities.CONCUSSION_ARROW_PROJECTILE.get(), ConcussionArrowRenderer::new);
 
             event.registerBlockEntityRenderer(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(),
                     context -> new ImpalerHeadRenderer());

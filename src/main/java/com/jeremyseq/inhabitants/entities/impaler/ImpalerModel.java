@@ -10,9 +10,6 @@ import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 
 public class ImpalerModel extends GeoModel<ImpalerEntity> {
-    private static final int FRAMES = 5; // number of frames in animation
-    private static final int FRAME_TIME = 3; // ticks per frame
-
     @Override
     public ResourceLocation getModelResource(ImpalerEntity animatable) {
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "geo/impaler.geo.json");
@@ -20,13 +17,12 @@ public class ImpalerModel extends GeoModel<ImpalerEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ImpalerEntity animatable) {
-        int animationIndex = (animatable.tickCount / FRAME_TIME) % FRAMES;
-
-        if (animatable.getTextureType() == 0) {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("textures/entity/impaler/impaler_%d.png", animationIndex));
-        } else {
-            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, String.format("textures/entity/impaler/impaler_dripstone_%d.png", animationIndex));
-        }
+        return switch (animatable.getVariant()) {
+            case DEFAULT -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/default.png");
+            case DRIPSTONE -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/dripstone.png");
+            case ALBINO -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/albino.png");
+            case FORLORN_HOLLOWS -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/impaler/forlorn_hollows.png");
+        };
     }
 
     @Override
@@ -43,13 +39,5 @@ public class ImpalerModel extends GeoModel<ImpalerEntity> {
             head.setRotX(entityData.headPitch() * Mth.DEG_TO_RAD);
             head.setRotY(entityData.netHeadYaw() * Mth.DEG_TO_RAD);
         }
-
-
-        boolean hideSpikes = !animatable.isSpiked();
-        getAnimationProcessor().getRegisteredBones().forEach(bone -> {
-            if (bone.getName().contains("spikes")) {
-                bone.setHidden(hideSpikes);
-            }
-        });
     }
 }

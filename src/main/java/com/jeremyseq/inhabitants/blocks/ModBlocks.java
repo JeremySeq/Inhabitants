@@ -1,6 +1,7 @@
 package com.jeremyseq.inhabitants.blocks;
 
 import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.blocks.impaler_head.*;
 
@@ -23,28 +24,49 @@ public class ModBlocks
             () -> new InvisibleCauldronBlock(Block.Properties.of().noLootTable().strength(-1.0F, 3600000.0F).noOcclusion())
     );
 
+
     public static final RegistryObject<Block> IMPALER_HEAD = registerBlock(
             "impaler_head",
             () -> new ImpalerHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
-            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
+            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD), ImpalerEntity.Variant.DEFAULT)
+    );
+    public static final RegistryObject<Block> IMPALER_HEAD_WALL = registerBlock(
+            "impaler_head_wall",
+            () -> new ImpalerWallHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
+            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD), ImpalerEntity.Variant.DEFAULT)
     );
 
-    public static final RegistryObject<Block> DRIPSTONE_IMPALER_HEAD = registerBlock(
-            "dripstone_impaler_head",
+    public static final RegistryObject<Block> IMPALER_HEAD_DRIPSTONE = registerBlock(
+            "impaler_head_dripstone",
             () -> new ImpalerHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
-            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
+                    .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD), ImpalerEntity.Variant.DRIPSTONE)
+    );
+    public static final RegistryObject<Block> IMPALER_HEAD_WALL_DRIPSTONE = registerBlock(
+            "impaler_head_wall_dripstone",
+            () -> new ImpalerWallHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
+            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD), ImpalerEntity.Variant.DRIPSTONE)
     );
 
-    public static final RegistryObject<Block> IMPALER_WALL_HEAD = registerBlock(
-            "impaler_wall_head",
+    public static final RegistryObject<Block> IMPALER_HEAD_ALBINO = registerBlock(
+            "impaler_head_albino",
+            () -> new ImpalerHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
+                    .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD), ImpalerEntity.Variant.ALBINO)
+    );
+    public static final RegistryObject<Block> IMPALER_HEAD_WALL_ALBINO = registerBlock(
+            "impaler_head_wall_albino",
             () -> new ImpalerWallHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
-            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
+                    .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD), ImpalerEntity.Variant.ALBINO)
     );
 
-    public static final RegistryObject<Block> DRIPSTONE_IMPALER_WALL_HEAD = registerBlock(
-            "dripstone_impaler_wall_head",
+    public static final RegistryObject<Block> IMPALER_HEAD_FORLORN_HOLLOWS = registerBlock(
+            "impaler_head_forlorn_hollows",
+            () -> new ImpalerHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
+                    .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD), ImpalerEntity.Variant.FORLORN_HOLLOWS)
+    );
+    public static final RegistryObject<Block> IMPALER_HEAD_WALL_FORLORN_HOLLOWS = registerBlock(
+            "impaler_head_wall_forlorn_hollows",
             () -> new ImpalerWallHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
-            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
+                    .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD), ImpalerEntity.Variant.FORLORN_HOLLOWS)
     );
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {

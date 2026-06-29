@@ -1,9 +1,11 @@
 {
   "entity.inhabitants.bogre": "Bogre",
-
+  "entity.inhabitants.bogre.description": "The Bogre is fellow swamp citizen that doesn't like too much company. However, if a player has no hostile intentions, the Bogre will welcome them into its lair. The Bogre can cook different foods in its cauldron that grant the player unique effects. It can also carve bone weapons for players, and it loves music!",
   "entity.inhabitants.bogre_cauldron": "Bogre Cauldron",
   "entity.inhabitants.warped_clam": "Warped Clam",
+  "entity.inhabitants.warped_clam.description": "A peaceful creature that quietly lies in the End landscapes. It can be used as a trampoline to launch players into the air, and can be brushed for Ender pearls.",
   "entity.inhabitants.impaler": "Impaler",
+  "entity.inhabitants.impaler.description": "Impalers are underground dwellers that can be very dangerous for the unprepared explorer. They can sprint unnaturally fast at their target, throw spikes that cause concussions, and perform melee attacks with their sharp teeth.",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -24,10 +26,15 @@
   "item.inhabitants.bogre_cauldron": "Bogre's Cauldron",
   "item.inhabitants.spike_drill": "Spike Drill",
   "item.inhabitants.impaler_head": "Impaler Head",
-  "item.inhabitants.dripstone_impaler_head": "Dripstone Impaler Head",
+  "item.inhabitants.impaler_head_dripstone": "Dripstone Impaler Head",
+  "item.inhabitants.impaler_head_albino": "Albino Impaler Head",
+  "item.inhabitants.impaler_head_forlorn_hollows": "Forlorn Hollows Impaler Head",
+  "item.inhabitants.concussion_arrow": "Concussive Arrow",
 
   "block.inhabitants.impaler_head": "Impaler Head",
-  "block.inhabitants.dripstone_impaler_head": "Dripstone Impaler Head",
+  "block.inhabitants.impaler_head_dripstone": "Dripstone Impaler Head",
+  "block.inhabitants.impaler_head_albino": "Albino Impaler Head",
+  "block.inhabitants.impaler_head_forlorn_hollows": "Forlorn Hollows Impaler Head",
 
 
   "tooltip.inhabitants.special_effect": "Special Ability",
@@ -41,6 +48,12 @@
   "effect.inhabitants.sticky_legs": "Sticky Legs",
   "effect.inhabitants.reverse_growth": "Reverse Growth",
   "effect.inhabitants.immaterial": "Immaterial",
+
+  "item.minecraft.tipped_arrow.effect.concussion": "Tipped Arrow of Concussion",
+  "item.minecraft.potion.effect.concussion": "Potion of Concussion",
+  "item.minecraft.splash_potion.effect.concussion": "Splash Potion of Concussion",
+  "item.minecraft.lingering_potion.effect.concussion": "Lingering Potion of Concussion",
+
 
   "advancement.inhabitants.david_and_goliath.title": "David and Goliath",
   "advancement.inhabitants.david_and_goliath.description": "Defeat the mighty Bogre.",
@@ -100,7 +113,9 @@
   "gui.inhabitants.jei.carving": "Bogre Carving",
 
   "enchantment.inhabitants.diamond_tip": "Diamond Tip",
+  "enchantment.inhabitants.diamond_tip.desc": "Raises drill tier to diamond level",
   "enchantment.inhabitants.thermal_capacity": "Thermal Capacity",
+  "enchantment.inhabitants.thermal_capacity.desc": "Increases drill's thermal capacity",
 
   "death.attack.inhabitants.impaled": "%1$s was impaled"
 }

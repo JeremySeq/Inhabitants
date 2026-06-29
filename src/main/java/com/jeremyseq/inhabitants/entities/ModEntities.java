@@ -5,6 +5,7 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
+import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowProjectile;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.javelin.JavelinEntity;
 
@@ -63,6 +64,15 @@ public class ModEntities {
                             .clientTrackingRange(4)
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "javelin").toString()));
+
+    public static final RegistryObject<EntityType<ConcussionArrowProjectile>> CONCUSSION_ARROW_PROJECTILE =
+            REGISTRY.register("concussion_arrow",
+                    () -> EntityType.Builder.<ConcussionArrowProjectile>of(
+                                    ConcussionArrowProjectile::new, MobCategory.MISC)
+                            .sized(0.5f, 0.5f)
+                            .clientTrackingRange(4)
+                            .updateInterval(20)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "concussion_arrow").toString()));
 
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {

@@ -13,7 +13,12 @@ public class WarpedClamModel extends GeoModel<WarpedClamEntity> {
 
     @Override
     public ResourceLocation getTextureResource(WarpedClamEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/warped_clam.png");
+        return switch (animatable.getVariant()) {
+            case ENDER -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/warped_clam/ender.png");
+            case CAMOUFLAGE -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/warped_clam/camouflage.png");
+            case VOID_BLUE -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/warped_clam/voidblue.png");
+            case AMARANTH -> ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/entity/warped_clam/amaranth.png");
+        };
     }
 
     @Override

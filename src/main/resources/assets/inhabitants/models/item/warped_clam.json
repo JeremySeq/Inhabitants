@@ -1,6 +1,32 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "inhabitants:item/warped_clam"
-  }
+    "layer0": "inhabitants:item/warped_clam/ender"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "inhabitants:variant": 0.0
+      },
+      "model": "inhabitants:item/warped_clam/ender"
+    },
+    {
+      "predicate": {
+        "inhabitants:variant": 1.0
+      },
+      "model": "inhabitants:item/warped_clam/camouflage"
+    },
+    {
+      "predicate": {
+        "inhabitants:variant": 2.0
+      },
+      "model": "inhabitants:item/warped_clam/voidblue"
+    },
+    {
+      "predicate": {
+        "inhabitants:variant": 3.0
+      },
+      "model": "inhabitants:item/warped_clam/amaranth"
+    }
+  ]
 }
